@@ -60,83 +60,83 @@ export interface GoogleAdsLayout {
 
 export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
   if (format.id === 'landscape_1200x628') {
-    return {
-      formatId: format.id,
+  return {
+    formatId: format.id,
 
-      background: {
-        x: 0,
-        y: 0,
-        width: 1200,
-        height: 628,
+    background: {
+      x: 0,
+      y: 0,
+      width: 1200,
+      height: 628,
+    },
+
+    photo: {
+      x: 610,
+      y: 72,
+      width: 500,
+      height: 330,
+      radius: 28,
+    },
+
+    contentPanel: {
+      x: 0,
+      y: 0,
+      width: 1200,
+      height: 628,
+    },
+
+    titleCard: {
+      x: 74,
+      y: 132,
+      width: 430,
+      height: 208,
+      radius: 20,
+      paddingX: 30,
+      paddingY: 32,
+    },
+
+    title: {
+      x: 104,
+      y: 194,
+      maxChars: 18,
+      maxLines: 3,
+      fontSize: 42,
+      lineHeight: 45,
+    },
+
+    subtitle: {
+      x: 104,
+      y: 316,
+      maxChars: 30,
+      maxLines: 2,
+      fontSize: 23,
+      lineHeight: 27,
+    },
+
+    actionRow: {
+      x: 74,
+      y: 488,
+      height: 58,
+      gap: 12,
+
+      cta: {
+        width: 180,
+        fontSize: 21,
       },
 
-      photo: {
-        x: 610,
-        y: 72,
-        width: 500,
-        height: 310,
-        radius: 28,
+      city: {
+        minWidth: 250,
+        maxWidth: 390,
+        fontSize: 19,
       },
 
-      contentPanel: {
-        x: 0,
-        y: 0,
-        width: 1200,
-        height: 628,
+      logo: {
+        width: 190,
+        height: 58,
       },
-
-      titleCard: {
-        x: 74,
-        y: 120,
-        width: 430,
-        height: 180,
-        radius: 18,
-        paddingX: 28,
-        paddingY: 32,
-      },
-
-      title: {
-        x: 102,
-        y: 178,
-        maxChars: 18,
-        maxLines: 3,
-        fontSize: 38,
-        lineHeight: 42,
-      },
-
-      subtitle: {
-        x: 102,
-        y: 292,
-        maxChars: 28,
-        maxLines: 2,
-        fontSize: 22,
-        lineHeight: 26,
-      },
-
-      actionRow: {
-        x: 74,
-        y: 492,
-        height: 54,
-        gap: 12,
-
-        cta: {
-          width: 158,
-          fontSize: 22,
-        },
-
-        city: {
-          minWidth: 230,
-          maxWidth: 380,
-          fontSize: 20,
-        },
-
-        logo: {
-          width: 176,
-          height: 54,
-        },
-      },
-    };
-  }
+    },
+  };
+}
 
   if (format.id === 'portrait_960x1200') {
     return {
