@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import { getCities, getCourses, getImageMap, resolveTestCreatives } from '../utils/creativeResolver';
+import { computed } from "vue";
+import {
+  getCities,
+  getCourses,
+  getImageMap,
+  resolveTestCreatives,
+} from "../utils/creativeResolver";
+import AdsFormatPreview from "./AdsFormatPreview.vue";
 
 const testCreatives = computed(() => resolveTestCreatives());
 
@@ -44,7 +50,10 @@ const stats = computed(() => {
         v-for="creative in testCreatives"
         :key="`${creative.courseId}-${creative.cityId}`"
         class="card"
-        :style="{ borderColor: creative.colors.primary, background: creative.colors.soft }"
+        :style="{
+          borderColor: creative.colors.primary,
+          background: creative.colors.soft,
+        }"
       >
         <div class="imageWrap">
           <img :src="creative.imagePath" :alt="creative.title" />
@@ -80,7 +89,10 @@ const stats = computed(() => {
             </div>
             <div>
               <dt>length</dt>
-              <dd>{{ creative.meta.courseLengthClass }} / {{ creative.meta.cityLengthClass }}</dd>
+              <dd>
+                {{ creative.meta.courseLengthClass }} /
+                {{ creative.meta.cityLengthClass }}
+              </dd>
             </div>
           </dl>
 
@@ -92,6 +104,9 @@ const stats = computed(() => {
               </li>
             </ul>
           </div>
+        </div>
+        <div class="previewBlock">
+          <AdsFormatPreview :creative="creative" />
         </div>
       </article>
     </section>
@@ -109,7 +124,7 @@ const stats = computed(() => {
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    "Segoe UI",
     sans-serif;
 }
 
@@ -201,6 +216,12 @@ h1 {
   padding: 28px;
   background: rgba(255, 255, 255, 0.74);
   backdrop-filter: blur(12px);
+}
+
+.previewBlock {
+  grid-column: 1 / -1;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.55);
 }
 
 .brand {
