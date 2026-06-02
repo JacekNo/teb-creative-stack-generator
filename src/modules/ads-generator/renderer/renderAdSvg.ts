@@ -1,19 +1,23 @@
-import type { ResolvedCreativeInput } from '../types/ads.types';
-import type { GoogleAdsFormat } from './googleAdsFormats';
+import type { ResolvedCreativeInput } from "../types/ads.types";
+import type { GoogleAdsFormat } from "./googleAdsFormats";
 
 function escapeXml(value: string): string {
   return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;');
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
 }
 
-function splitTextToLines(text: string, maxChars: number, maxLines: number): string[] {
+function splitTextToLines(
+  text: string,
+  maxChars: number,
+  maxLines: number,
+): string[] {
   const words = text.trim().split(/\s+/);
   const lines: string[] = [];
-  let currentLine = '';
+  let currentLine = "";
 
   for (const word of words) {
     const nextLine = currentLine ? `${currentLine} ${word}` : word;
@@ -68,27 +72,55 @@ function renderTextLines(options: {
         >${escapeXml(line)}</text>
       `;
     })
-    .join('');
+    .join("");
 }
 
 function getLayout(format: GoogleAdsFormat) {
-  if (format.id === 'landscape_1200x628') {
+  if (format.id === "landscape_1200x628") {
     return {
       image: { x: 656, y: 0, width: 544, height: 628 },
       panel: { x: 0, y: 0, width: 700, height: 628 },
-      title: { x: 74, y: 188, maxChars: 24, maxLines: 3, fontSize: 58, lineHeight: 62 },
-      subtitle: { x: 74, y: 394, maxChars: 36, maxLines: 2, fontSize: 30, lineHeight: 36 },
+      title: {
+        x: 74,
+        y: 188,
+        maxChars: 24,
+        maxLines: 3,
+        fontSize: 58,
+        lineHeight: 62,
+      },
+      subtitle: {
+        x: 74,
+        y: 394,
+        maxChars: 36,
+        maxLines: 2,
+        fontSize: 30,
+        lineHeight: 36,
+      },
       city: { x: 74, y: 502, fontSize: 28 },
       logo: { x: 74, y: 72 },
     };
   }
 
-  if (format.id === 'portrait_960x1200') {
+  if (format.id === "portrait_960x1200") {
     return {
       image: { x: 0, y: 0, width: 960, height: 610 },
       panel: { x: 0, y: 520, width: 960, height: 680 },
-      title: { x: 76, y: 720, maxChars: 22, maxLines: 4, fontSize: 62, lineHeight: 66 },
-      subtitle: { x: 76, y: 990, maxChars: 34, maxLines: 2, fontSize: 31, lineHeight: 38 },
+      title: {
+        x: 76,
+        y: 720,
+        maxChars: 22,
+        maxLines: 4,
+        fontSize: 62,
+        lineHeight: 66,
+      },
+      subtitle: {
+        x: 76,
+        y: 990,
+        maxChars: 34,
+        maxLines: 2,
+        fontSize: 31,
+        lineHeight: 38,
+      },
       city: { x: 76, y: 1102, fontSize: 30 },
       logo: { x: 76, y: 640 },
     };
@@ -97,14 +129,31 @@ function getLayout(format: GoogleAdsFormat) {
   return {
     image: { x: 0, y: 0, width: 1200, height: 660 },
     panel: { x: 0, y: 560, width: 1200, height: 640 },
-    title: { x: 86, y: 770, maxChars: 24, maxLines: 4, fontSize: 68, lineHeight: 72 },
-    subtitle: { x: 86, y: 1036, maxChars: 38, maxLines: 2, fontSize: 34, lineHeight: 40 },
+    title: {
+      x: 86,
+      y: 770,
+      maxChars: 24,
+      maxLines: 4,
+      fontSize: 68,
+      lineHeight: 72,
+    },
+    subtitle: {
+      x: 86,
+      y: 1036,
+      maxChars: 38,
+      maxLines: 2,
+      fontSize: 34,
+      lineHeight: 40,
+    },
     city: { x: 86, y: 1138, fontSize: 32 },
     logo: { x: 86, y: 676 },
   };
 }
 
-export function renderAdSvg(creative: ResolvedCreativeInput, format: GoogleAdsFormat): string {
+export function renderAdSvg(
+  creative: ResolvedCreativeInput,
+  format: GoogleAdsFormat,
+): string {
   const layout = getLayout(format);
 
   const titleLines = splitTextToLines(
@@ -114,10 +163,18 @@ export function renderAdSvg(creative: ResolvedCreativeInput, format: GoogleAdsFo
   );
 
   const subtitleLines = creative.subtitle
-    ? splitTextToLines(creative.subtitle, layout.subtitle.maxChars, layout.subtitle.maxLines)
+    ? splitTextToLines(
+        creative.subtitle,
+        layout.subtitle.maxChars,
+        layout.subtitle.maxLines,
+      )
     : [];
 
   const cityText = creative.cta || creative.cityDisplay;
+  const logoPath =
+    creative.logoPath || "/creative-stack/logos/teb-edukacja.svg";
+  const logoWidth = 260;
+  const logoHeight = 74;
 
   return `
     <svg
@@ -182,33 +239,26 @@ export function renderAdSvg(creative: ResolvedCreativeInput, format: GoogleAdsFo
         opacity="0.12"
       />
 
-      <rect
-        x="${layout.logo.x}"
-        y="${layout.logo.y - 44}"
-        width="230"
-        height="58"
-        rx="29"
-        fill="#ffffff"
-        opacity="0.92"
-      />
+<rect
+  x="${layout.logo.x}"
+  y="${layout.logo.y - 56}"
+  width="${logoWidth}"
+  height="${logoHeight}"
+  rx="37"
+  fill="#ffffff"
+  opacity="0.94"
+/>
 
-      <text
-        x="${layout.logo.x + 28}"
-        y="${layout.logo.y - 6}"
-        font-family="Roc Grotesk, Arial, sans-serif"
-        font-size="28"
-        font-weight="900"
-        fill="#E30613"
-      >TEB</text>
+<image
+  href="${logoPath}"
+  x="${layout.logo.x + 24}"
+  y="${layout.logo.y - 42}"
+  width="${logoWidth - 48}"
+  height="${logoHeight - 28}"
+  preserveAspectRatio="xMidYMid meet"
+/>
 
-      <text
-        x="${layout.logo.x + 88}"
-        y="${layout.logo.y - 7}"
-        font-family="Roc Grotesk, Arial, sans-serif"
-        font-size="21"
-        font-weight="800"
-        fill="#102D69"
-      >Edukacja</text>
+ 
 
       ${renderTextLines({
         lines: titleLines,
@@ -231,7 +281,7 @@ export function renderAdSvg(creative: ResolvedCreativeInput, format: GoogleAdsFo
               fill: creative.colors.primary,
               weight: 800,
             })
-          : ''
+          : ""
       }
 
       <rect

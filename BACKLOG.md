@@ -2,15 +2,11 @@
 
 ## Now
 
-- [ ] Zweryfikować znormalizowaną listę kierunków.
-- [ ] Sprawdzić podział długich nazw na `course_title` i `course_subtitle`.
-- [ ] Zweryfikować odmiany miast z arkusza TEB.
-- [ ] Ustalić zasady nazewnictwa plików zdjęć.
-- [ ] Przygotować mapowanie zdjęć 1080×720 do kierunków.
-- [ ] Wybrać 3 przypadki testowe:
-  - Barber / Piła
-  - Technik dentystyczny z technologią CAD/CAM / Poznań
-  - Technik usług kosmetycznych z certyfikatem Bielenda Professional / Piotrków Trybunalski
+- Podpiąć prawdziwe logo SVG TEB Edukacja.
+- Dodać lokalny font Roc Grotesk do podglądu.
+- Poprawić layout tekstu dla krótkich i długich nazw.
+- Dodać reguły text fittingu.
+- Dodać wybór kierunku i miasta w UI.
 
 ## Next
 
@@ -32,3 +28,4 @@
 - [ ] Dane kampanijne dla social media.
 - [ ] Obsługa przewag, partnerów, startów i certyfikatów.
 - [ ] Integracja z biblioteką assetów PAW Generator.
+

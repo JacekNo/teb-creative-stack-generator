@@ -1,8 +1,8 @@
-export type BrandKey = 'kursy' | 'medyczne' | 'policealne' | 'unknown';
+export type BrandKey = "kursy" | "medyczne" | "policealne" | "unknown";
 
-export type OfferType = 'SP' | 'PKU' | 'KKZ' | string;
+export type OfferType = "SP" | "PKU" | "KKZ" | string;
 
-export type ImageStatus = 'mapped' | 'missing' | 'needs-review' | string;
+export type ImageStatus = "mapped" | "missing" | "needs-review" | string;
 
 export interface CourseRecord {
   record_id: string;
@@ -52,7 +52,7 @@ export interface BrandToken {
   primary: string;
   soft: string;
   text: string;
-  logo: string;
+  logo?: string;
   notes?: string;
 }
 
@@ -91,7 +91,7 @@ export interface ResolvedCreativeInput {
 
   courseId: string;
   cityId: string;
-  brandKey: BrandToken['brand_key'];
+  brandKey: BrandToken["brand_key"];
 
   title: string;
   subtitle: string;
@@ -99,7 +99,7 @@ export interface ResolvedCreativeInput {
   cta: string;
 
   imagePath: string;
-
+  logoPath: string;
   colors: {
     primary: string;
     soft: string;

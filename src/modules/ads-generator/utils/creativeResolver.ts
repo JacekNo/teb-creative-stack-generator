@@ -144,37 +144,38 @@ export function resolveCreativeInput(
   const cta = resolveCta(campaign.cta, city);
 
   return {
-    course,
-    city,
-    brand,
-    image,
-    campaign,
+  course,
+  city,
+  brand,
+  image,
+  campaign,
 
-    courseId,
-    cityId,
-    brandKey: brand.brand_key,
+  courseId,
+  cityId,
+  brandKey: brand.brand_key,
 
-    title,
-    subtitle,
-    cityDisplay,
-    cta,
+  title,
+  subtitle,
+  cityDisplay,
+  cta,
 
-    imagePath: buildImagePublicPath(image),
+  imagePath: buildImagePublicPath(image),
+  logoPath: buildLogoPublicPath(brand),
 
-    colors: {
-      primary: brand.primary,
-      soft: brand.soft,
-      text: brand.text,
-    },
+  colors: {
+    primary: brand.primary,
+    soft: brand.soft,
+    text: brand.text,
+  },
 
-    meta: {
-      offerType: course.offer_type,
-      layoutVariant: course.layout_variant || 'standard',
-      courseLengthClass: course.length_class || 'unknown',
-      cityLengthClass: city.city_length_class || 'unknown',
-      warnings,
-    },
-  };
+  meta: {
+    offerType: course.offer_type,
+    layoutVariant: course.layout_variant || 'standard',
+    courseLengthClass: course.length_class || 'unknown',
+    cityLengthClass: city.city_length_class || 'unknown',
+    warnings,
+  },
+};
 }
 
 export function resolveTestCreatives(): ResolvedCreativeInput[] {
@@ -186,4 +187,10 @@ export function resolveTestCreatives(): ResolvedCreativeInput[] {
       'piotrkow-trybunalski',
     ),
   ];
+}
+
+export function buildLogoPublicPath(brand?: BrandToken): string {
+  const logoFile = brand?.logo || 'teb-edukacja.svg';
+
+  return `/creative-stack/logos/${logoFile}`;
 }
