@@ -1,0 +1,24 @@
+[
+  {
+    "campaign_id": "google_ads_2026_default",
+    "format_group": "google-ads",
+    "headline": "",
+    "subheadline": "",
+    "cta": "ucz się w {{city_display}}",
+    "start_label": "",
+    "price_info": "",
+    "legal_note": "",
+    "notes": "Pierwszy use case używa głównie: zdjęcie, kierunek, miasto, CTA, brand, logo."
+  },
+  {
+    "campaign_id": "social_media_2026_placeholder",
+    "format_group": "social-media",
+    "headline": "",
+    "subheadline": "",
+    "cta": "",
+    "start_label": "",
+    "price_info": "",
+    "legal_note": "",
+    "notes": "Rezerwa pod social media: start, przewagi, partnerzy, certyfikaty, forma nauki."
+  }
+]

@@ -1,0 +1,32 @@
+[
+  {
+    "brand_key": "kursy",
+    "brand_label": "TEB Kursy",
+    "source_offer_types": "PKU; KKZ",
+    "primary": "#994365",
+    "soft": "#F5EDF0",
+    "text": "#0941A1",
+    "logo": "TEB Edukacja",
+    "notes": "PKU i KKZ korzystają z tego samego zestawu kolorystycznego."
+  },
+  {
+    "brand_key": "medyczne",
+    "brand_label": "TEB Szkoły Medyczne",
+    "source_offer_types": "SP",
+    "primary": "#009489",
+    "soft": "#E6F5F4",
+    "text": "#0941A1",
+    "logo": "TEB Edukacja",
+    "notes": ""
+  },
+  {
+    "brand_key": "policealne",
+    "brand_label": "TEB Szkoły Policealne",
+    "source_offer_types": "SP",
+    "primary": "#E27D00",
+    "soft": "#FDF2E6",
+    "text": "#0941A1",
+    "logo": "TEB Edukacja",
+    "notes": ""
+  }
+]
