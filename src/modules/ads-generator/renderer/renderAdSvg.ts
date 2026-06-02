@@ -1,23 +1,20 @@
-import type { ResolvedCreativeInput } from "../types/ads.types";
-import type { GoogleAdsFormat } from "./googleAdsFormats";
+import type { ResolvedCreativeInput } from '../types/ads.types';
+import type { GoogleAdsFormat } from './googleAdsFormats';
+import { getGoogleAdsLayout } from './googleAdsLayouts';
 
 function escapeXml(value: string): string {
   return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
 }
 
-function splitTextToLines(
-  text: string,
-  maxChars: number,
-  maxLines: number,
-): string[] {
+function splitTextToLines(text: string, maxChars: number, maxLines: number): string[] {
   const words = text.trim().split(/\s+/);
   const lines: string[] = [];
-  let currentLine = "";
+  let currentLine = '';
 
   for (const word of words) {
     const nextLine = currentLine ? `${currentLine} ${word}` : word;
@@ -45,6 +42,10 @@ function splitTextToLines(
   return lines;
 }
 
+function estimateTextWidth(text: string, fontSize: number): number {
+  return Math.ceil(text.length * fontSize * 0.55);
+}
+
 function renderTextLines(options: {
   lines: string[];
   x: number;
@@ -53,8 +54,18 @@ function renderTextLines(options: {
   lineHeight: number;
   fill: string;
   weight?: number;
+  letterSpacing?: number;
 }): string {
-  const { lines, x, y, fontSize, lineHeight, fill, weight = 800 } = options;
+  const {
+    lines,
+    x,
+    y,
+    fontSize,
+    lineHeight,
+    fill,
+    weight = 800,
+    letterSpacing = -1.2,
+  } = options;
 
   return lines
     .map((line, index) => {
@@ -67,94 +78,38 @@ function renderTextLines(options: {
           font-family="Roc Grotesk, Arial, sans-serif"
           font-size="${fontSize}"
           font-weight="${weight}"
-          letter-spacing="-1.5"
+          letter-spacing="${letterSpacing}"
           fill="${fill}"
         >${escapeXml(line)}</text>
       `;
     })
-    .join("");
+    .join('');
 }
 
-function getLayout(format: GoogleAdsFormat) {
-  if (format.id === "landscape_1200x628") {
-    return {
-      image: { x: 656, y: 0, width: 544, height: 628 },
-      panel: { x: 0, y: 0, width: 700, height: 628 },
-      title: {
-        x: 74,
-        y: 188,
-        maxChars: 24,
-        maxLines: 3,
-        fontSize: 58,
-        lineHeight: 62,
-      },
-      subtitle: {
-        x: 74,
-        y: 394,
-        maxChars: 36,
-        maxLines: 2,
-        fontSize: 30,
-        lineHeight: 36,
-      },
-      city: { x: 74, y: 502, fontSize: 28 },
-      logo: { x: 74, y: 72 },
-    };
-  }
-
-  if (format.id === "portrait_960x1200") {
-    return {
-      image: { x: 0, y: 0, width: 960, height: 610 },
-      panel: { x: 0, y: 520, width: 960, height: 680 },
-      title: {
-        x: 76,
-        y: 720,
-        maxChars: 22,
-        maxLines: 4,
-        fontSize: 62,
-        lineHeight: 66,
-      },
-      subtitle: {
-        x: 76,
-        y: 990,
-        maxChars: 34,
-        maxLines: 2,
-        fontSize: 31,
-        lineHeight: 38,
-      },
-      city: { x: 76, y: 1102, fontSize: 30 },
-      logo: { x: 76, y: 640 },
-    };
-  }
-
-  return {
-    image: { x: 0, y: 0, width: 1200, height: 660 },
-    panel: { x: 0, y: 560, width: 1200, height: 640 },
-    title: {
-      x: 86,
-      y: 770,
-      maxChars: 24,
-      maxLines: 4,
-      fontSize: 68,
-      lineHeight: 72,
-    },
-    subtitle: {
-      x: 86,
-      y: 1036,
-      maxChars: 38,
-      maxLines: 2,
-      fontSize: 34,
-      lineHeight: 40,
-    },
-    city: { x: 86, y: 1138, fontSize: 32 },
-    logo: { x: 86, y: 676 },
-  };
+function renderPattern(format: GoogleAdsFormat, color: string): string {
+  return `
+    <pattern
+      id="brandPattern-${format.id}"
+      width="74"
+      height="74"
+      patternUnits="userSpaceOnUse"
+      patternTransform="rotate(0)"
+    >
+      <path
+        d="M18 26 L36 12 L54 26 M36 12 V58"
+        fill="none"
+        stroke="${color}"
+        stroke-width="4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        opacity="0.15"
+      />
+    </pattern>
+  `;
 }
 
-export function renderAdSvg(
-  creative: ResolvedCreativeInput,
-  format: GoogleAdsFormat,
-): string {
-  const layout = getLayout(format);
+function renderTitleCard(creative: ResolvedCreativeInput, format: GoogleAdsFormat): string {
+  const layout = getGoogleAdsLayout(format);
 
   const titleLines = splitTextToLines(
     creative.title,
@@ -163,18 +118,134 @@ export function renderAdSvg(
   );
 
   const subtitleLines = creative.subtitle
-    ? splitTextToLines(
-        creative.subtitle,
-        layout.subtitle.maxChars,
-        layout.subtitle.maxLines,
-      )
+    ? splitTextToLines(creative.subtitle, layout.subtitle.maxChars, layout.subtitle.maxLines)
     : [];
 
-  const cityText = creative.cta || creative.cityDisplay;
-  const logoPath =
-    creative.logoPath || "/creative-stack/logos/teb-edukacja.svg";
-  const logoWidth = 260;
-  const logoHeight = 74;
+  return `
+    <rect
+      x="${layout.titleCard.x}"
+      y="${layout.titleCard.y}"
+      width="${layout.titleCard.width}"
+      height="${layout.titleCard.height}"
+      rx="${layout.titleCard.radius ?? 20}"
+      fill="#ffffff"
+      opacity="0.96"
+    />
+
+    ${renderTextLines({
+      lines: titleLines,
+      x: layout.title.x,
+      y: layout.title.y,
+      fontSize: layout.title.fontSize,
+      lineHeight: layout.title.lineHeight,
+      fill: creative.colors.text,
+      weight: 900,
+      letterSpacing: -1.3,
+    })}
+
+    ${
+      subtitleLines.length
+        ? renderTextLines({
+            lines: subtitleLines,
+            x: layout.subtitle.x,
+            y: layout.subtitle.y,
+            fontSize: layout.subtitle.fontSize,
+            lineHeight: layout.subtitle.lineHeight,
+            fill: creative.colors.text,
+            weight: 700,
+            letterSpacing: -0.5,
+          })
+        : ''
+    }
+  `;
+}
+
+function renderActionRow(creative: ResolvedCreativeInput, format: GoogleAdsFormat): string {
+  const layout = getGoogleAdsLayout(format);
+  const row = layout.actionRow;
+
+  const logoPath = creative.logoPath || '/creative-stack/logos/teb-edukacja.svg';
+
+  const ctaText = 'rozpocznij naukę';
+  const cityText = creative.cityDisplay;
+
+  const cityWidth = Math.min(
+    row.city.maxWidth,
+    Math.max(row.city.minWidth, estimateTextWidth(cityText, row.city.fontSize) + 42),
+  );
+
+  const ctaX = row.x;
+  const cityX = ctaX + row.cta.width + row.gap;
+  const logoX = cityX + cityWidth + row.gap;
+
+  const radius = row.height / 2;
+
+  return `
+    <g id="action-row-${format.id}">
+      <rect
+        x="${ctaX}"
+        y="${row.y}"
+        width="${row.cta.width}"
+        height="${row.height}"
+        rx="${radius}"
+        fill="#0941A1"
+      />
+
+      <text
+        x="${ctaX + row.cta.width / 2}"
+        y="${row.y + row.height / 2 + row.cta.fontSize * 0.34}"
+        text-anchor="middle"
+        font-family="Roc Grotesk, Arial, sans-serif"
+        font-size="${row.cta.fontSize}"
+        font-weight="900"
+        fill="#ffffff"
+        letter-spacing="-0.4"
+      >${escapeXml(ctaText)}</text>
+
+      <rect
+        x="${cityX}"
+        y="${row.y}"
+        width="${cityWidth}"
+        height="${row.height}"
+        rx="${radius}"
+        fill="#ffffff"
+        opacity="0.96"
+      />
+
+      <text
+        x="${cityX + cityWidth / 2}"
+        y="${row.y + row.height / 2 + row.city.fontSize * 0.34}"
+        text-anchor="middle"
+        font-family="Roc Grotesk, Arial, sans-serif"
+        font-size="${row.city.fontSize}"
+        font-weight="800"
+        fill="#0941A1"
+        letter-spacing="-0.2"
+      >${escapeXml(cityText)}</text>
+
+      <rect
+        x="${logoX}"
+        y="${row.y}"
+        width="${row.logo.width}"
+        height="${row.logo.height}"
+        rx="${Math.min(16, radius)}"
+        fill="#0941A1"
+      />
+
+      <image
+        href="${logoPath}"
+        x="${logoX + 18}"
+        y="${row.y + 10}"
+        width="${row.logo.width - 36}"
+        height="${row.logo.height - 20}"
+        preserveAspectRatio="xMidYMid meet"
+      />
+    </g>
+  `;
+}
+
+export function renderAdSvg(creative: ResolvedCreativeInput, format: GoogleAdsFormat): string {
+  const layout = getGoogleAdsLayout(format);
 
   return `
     <svg
@@ -186,121 +257,63 @@ export function renderAdSvg(
       aria-label="${escapeXml(`${creative.title} ${creative.cityDisplay}`)}"
     >
       <defs>
-        <clipPath id="imageClip-${format.id}">
+        <clipPath id="photoClip-${format.id}">
           <rect
-            x="${layout.image.x}"
-            y="${layout.image.y}"
-            width="${layout.image.width}"
-            height="${layout.image.height}"
-            rx="0"
+            x="${layout.photo.x}"
+            y="${layout.photo.y}"
+            width="${layout.photo.width}"
+            height="${layout.photo.height}"
+            rx="${layout.photo.radius ?? 0}"
           />
         </clipPath>
 
         <linearGradient id="photoShade-${format.id}" x1="0" x2="0" y1="0" y2="1">
           <stop offset="0%" stop-color="#000000" stop-opacity="0" />
-          <stop offset="100%" stop-color="#000000" stop-opacity="0.18" />
+          <stop offset="100%" stop-color="#000000" stop-opacity="0.16" />
         </linearGradient>
+
+        ${renderPattern(format, '#ffffff')}
       </defs>
 
-      <rect width="${format.width}" height="${format.height}" fill="${creative.colors.soft}" />
+      <rect
+        x="${layout.background.x}"
+        y="${layout.background.y}"
+        width="${layout.background.width}"
+        height="${layout.background.height}"
+        fill="${creative.colors.primary}"
+      />
+
+      <rect
+        x="${layout.background.x}"
+        y="${layout.background.y}"
+        width="${layout.background.width}"
+        height="${layout.background.height}"
+        fill="url(#brandPattern-${format.id})"
+        opacity="0.58"
+      />
 
       <image
         href="${creative.imagePath}"
-        x="${layout.image.x}"
-        y="${layout.image.y}"
-        width="${layout.image.width}"
-        height="${layout.image.height}"
+        x="${layout.photo.x}"
+        y="${layout.photo.y}"
+        width="${layout.photo.width}"
+        height="${layout.photo.height}"
         preserveAspectRatio="xMidYMid slice"
-        clip-path="url(#imageClip-${format.id})"
+        clip-path="url(#photoClip-${format.id})"
       />
 
       <rect
-        x="${layout.image.x}"
-        y="${layout.image.y}"
-        width="${layout.image.width}"
-        height="${layout.image.height}"
+        x="${layout.photo.x}"
+        y="${layout.photo.y}"
+        width="${layout.photo.width}"
+        height="${layout.photo.height}"
         fill="url(#photoShade-${format.id})"
-        clip-path="url(#imageClip-${format.id})"
+        clip-path="url(#photoClip-${format.id})"
       />
 
-      <rect
-        x="${layout.panel.x}"
-        y="${layout.panel.y}"
-        width="${layout.panel.width}"
-        height="${layout.panel.height}"
-        fill="${creative.colors.soft}"
-      />
+      ${renderTitleCard(creative, format)}
 
-      <circle
-        cx="${layout.panel.x + layout.panel.width - 80}"
-        cy="${layout.panel.y + 80}"
-        r="190"
-        fill="${creative.colors.primary}"
-        opacity="0.12"
-      />
-
-<rect
-  x="${layout.logo.x}"
-  y="${layout.logo.y - 56}"
-  width="${logoWidth}"
-  height="${logoHeight}"
-  rx="37"
-  fill="#ffffff"
-  opacity="0.94"
-/>
-
-<image
-  href="${logoPath}"
-  x="${layout.logo.x + 24}"
-  y="${layout.logo.y - 42}"
-  width="${logoWidth - 48}"
-  height="${logoHeight - 28}"
-  preserveAspectRatio="xMidYMid meet"
-/>
-
- 
-
-      ${renderTextLines({
-        lines: titleLines,
-        x: layout.title.x,
-        y: layout.title.y,
-        fontSize: layout.title.fontSize,
-        lineHeight: layout.title.lineHeight,
-        fill: creative.colors.text,
-        weight: 900,
-      })}
-
-      ${
-        subtitleLines.length
-          ? renderTextLines({
-              lines: subtitleLines,
-              x: layout.subtitle.x,
-              y: layout.subtitle.y,
-              fontSize: layout.subtitle.fontSize,
-              lineHeight: layout.subtitle.lineHeight,
-              fill: creative.colors.primary,
-              weight: 800,
-            })
-          : ""
-      }
-
-      <rect
-        x="${layout.city.x}"
-        y="${layout.city.y - 44}"
-        width="${Math.min(520, cityText.length * 17 + 56)}"
-        height="62"
-        rx="31"
-        fill="${creative.colors.primary}"
-      />
-
-      <text
-        x="${layout.city.x + 28}"
-        y="${layout.city.y - 4}"
-        font-family="Roc Grotesk, Arial, sans-serif"
-        font-size="${layout.city.fontSize}"
-        font-weight="900"
-        fill="#ffffff"
-      >${escapeXml(cityText)}</text>
+      ${renderActionRow(creative, format)}
     </svg>
   `;
 }
