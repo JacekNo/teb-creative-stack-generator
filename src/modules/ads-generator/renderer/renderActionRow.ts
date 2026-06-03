@@ -16,22 +16,28 @@ export function renderActionRow(
   const ctaText = 'rozpocznij naukę';
   const cityText = creative.cityDisplay;
 
+  const ctaX = row.x;
+  const cityX = ctaX + row.cta.width + row.gap;
+
+  const maxCityWidthBeforeLogo = Math.max(
+    row.city.minWidth,
+    row.logo.x - cityX - row.gap,
+  );
+
+  const safeCityMaxWidth = Math.min(row.city.maxWidth, maxCityWidthBeforeLogo);
+
   const cityFit = fitSingleLineText({
     text: cityText,
-    maxWidth: row.city.maxWidth - 42,
+    maxWidth: safeCityMaxWidth - 42,
     maxFontSize: row.city.fontSize,
     minFontSize: 13,
     averageCharWidthRatio: 0.53,
   });
 
   const cityWidth = Math.min(
-    row.city.maxWidth,
+    safeCityMaxWidth,
     Math.max(row.city.minWidth, cityFit.width + 42),
   );
-
-  const ctaX = row.x;
-  const cityX = ctaX + row.cta.width + row.gap;
-  const logoX = cityX + cityWidth + row.gap;
 
   const radius = row.height / 2;
 
@@ -69,7 +75,7 @@ export function renderActionRow(
 
       <text
         x="${cityX + cityWidth / 2}"
-        y="${row.y + row.height / 2 + row.city.fontSize * 0.34}"
+        y="${row.y + row.height / 2 + cityFit.fontSize * 0.34}"
         text-anchor="middle"
         font-family="Roc Grotesk, Arial, sans-serif"
         font-size="${cityFit.fontSize}"
@@ -79,18 +85,18 @@ export function renderActionRow(
       >${escapeXml(cityFit.text)}</text>
 
       <rect
-        x="${logoX}"
-        y="${row.y}"
+        x="${row.logo.x}"
+        y="${row.logo.y}"
         width="${row.logo.width}"
         height="${row.logo.height}"
-        rx="${Math.min(16, radius)}"
+        rx="${Math.min(16, row.logo.height / 2)}"
         fill="#0941A1"
       />
 
       <image
         href="${logoPath}"
-        x="${logoX + 18}"
-        y="${row.y + 10}"
+        x="${row.logo.x + 18}"
+        y="${row.logo.y + 10}"
         width="${row.logo.width - 36}"
         height="${row.logo.height - 20}"
         preserveAspectRatio="xMidYMid meet"

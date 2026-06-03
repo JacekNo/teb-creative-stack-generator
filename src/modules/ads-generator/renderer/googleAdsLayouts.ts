@@ -1,4 +1,4 @@
-import type { GoogleAdsFormat, GoogleAdsFormatId } from './googleAdsFormats';
+import type { GoogleAdsFormat, GoogleAdsFormatId } from "./googleAdsFormats";
 
 export interface RectLayout {
   x: number;
@@ -35,6 +35,8 @@ export interface ActionRowLayout {
   };
 
   logo: {
+    x: number;
+    y: number;
     width: number;
     height: number;
   };
@@ -60,7 +62,7 @@ export interface GoogleAdsLayout {
 
 const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
   landscape_1200x628: {
-    formatId: 'landscape_1200x628',
+    formatId: "landscape_1200x628",
 
     background: {
       x: 0,
@@ -113,31 +115,33 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 74,
-      y: 488,
-      height: 58,
-      gap: 12,
+      x: 49,
+      y: 505,
+      height: 89,
+      gap: 11,
 
       cta: {
-        width: 180,
-        fontSize: 21,
+        width: 291,
+        fontSize: 30,
       },
 
       city: {
-        minWidth: 250,
-        maxWidth: 390,
-        fontSize: 19,
+        minWidth: 121,
+        maxWidth: 450,
+        fontSize: 30,
       },
 
       logo: {
-        width: 190,
-        height: 58,
+        x: 953,
+        y: 495,
+        width: 210,
+        height: 109,
       },
     },
   },
 
   portrait_960x1200: {
-    formatId: 'portrait_960x1200',
+    formatId: "portrait_960x1200",
 
     background: {
       x: 0,
@@ -190,31 +194,33 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 86,
-      y: 1072,
-      height: 58,
-      gap: 12,
+      x: 38,
+      y: 1063,
+      height: 89,
+      gap: 11,
 
       cta: {
-        width: 230,
-        fontSize: 23,
+        width: 291,
+        fontSize: 30,
       },
 
       city: {
-        minWidth: 280,
-        maxWidth: 390,
-        fontSize: 20,
+        minWidth: 120,
+        maxWidth: 347,
+        fontSize: 26,
       },
 
       logo: {
-        width: 190,
-        height: 58,
+        x: 699,
+        y: 1049,
+        width: 227,
+        height: 117,
       },
     },
   },
 
   square_1200x1200: {
-    formatId: 'square_1200x1200',
+    formatId: "square_1200x1200",
 
     background: {
       x: 0,
@@ -267,25 +273,27 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 86,
-      y: 1066,
-      height: 62,
-      gap: 14,
+      x: 50,
+      y: 1038,
+      height: 89,
+      gap: 10,
 
       cta: {
-        width: 240,
-        fontSize: 24,
+        width: 376,
+        fontSize: 34,
       },
 
       city: {
-        minWidth: 300,
-        maxWidth: 430,
-        fontSize: 21,
+        minWidth: 120,
+        maxWidth: 437,
+        fontSize: 30,
       },
 
       logo: {
-        width: 204,
-        height: 62,
+        x: 923,
+        y: 1024,
+        width: 227,
+        height: 117,
       },
     },
   },
