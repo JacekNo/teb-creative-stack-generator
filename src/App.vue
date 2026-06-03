@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import AdsGeneratorPlayground from './modules/ads-generator/components/AdsGeneratorPlayground.vue';
+import AdsQualityOverview from './modules/ads-generator/components/AdsQualityOverview.vue';
 </script>
 
 <template>
-  <AdsGeneratorPlayground />
+  <AdsQualityOverview />
 </template>
