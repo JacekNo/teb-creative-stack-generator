@@ -58,10 +58,9 @@ export interface GoogleAdsLayout {
   actionRow: ActionRowLayout;
 }
 
-export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
-  if (format.id === 'landscape_1200x628') {
-  return {
-    formatId: format.id,
+const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
+  landscape_1200x628: {
+    formatId: 'landscape_1200x628',
 
     background: {
       x: 0,
@@ -135,90 +134,87 @@ export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
         height: 58,
       },
     },
-  };
-}
+  },
 
-  if (format.id === 'portrait_960x1200') {
-    return {
-      formatId: format.id,
+  portrait_960x1200: {
+    formatId: 'portrait_960x1200',
 
-      background: {
-        x: 0,
-        y: 0,
-        width: 960,
-        height: 1200,
+    background: {
+      x: 0,
+      y: 0,
+      width: 960,
+      height: 1200,
+    },
+
+    photo: {
+      x: 86,
+      y: 72,
+      width: 788,
+      height: 520,
+      radius: 34,
+    },
+
+    contentPanel: {
+      x: 0,
+      y: 520,
+      width: 960,
+      height: 680,
+    },
+
+    titleCard: {
+      x: 86,
+      y: 660,
+      width: 720,
+      height: 220,
+      radius: 22,
+      paddingX: 34,
+      paddingY: 38,
+    },
+
+    title: {
+      x: 120,
+      y: 728,
+      maxChars: 22,
+      maxLines: 3,
+      fontSize: 48,
+      lineHeight: 52,
+    },
+
+    subtitle: {
+      x: 120,
+      y: 868,
+      maxChars: 32,
+      maxLines: 2,
+      fontSize: 28,
+      lineHeight: 32,
+    },
+
+    actionRow: {
+      x: 86,
+      y: 1072,
+      height: 58,
+      gap: 12,
+
+      cta: {
+        width: 230,
+        fontSize: 23,
       },
 
-      photo: {
-        x: 86,
-        y: 72,
-        width: 788,
-        height: 520,
-        radius: 34,
+      city: {
+        minWidth: 280,
+        maxWidth: 390,
+        fontSize: 20,
       },
 
-      contentPanel: {
-        x: 0,
-        y: 520,
-        width: 960,
-        height: 680,
-      },
-
-      titleCard: {
-        x: 86,
-        y: 660,
-        width: 720,
-        height: 220,
-        radius: 22,
-        paddingX: 34,
-        paddingY: 38,
-      },
-
-      title: {
-        x: 120,
-        y: 728,
-        maxChars: 22,
-        maxLines: 3,
-        fontSize: 48,
-        lineHeight: 52,
-      },
-
-      subtitle: {
-        x: 120,
-        y: 868,
-        maxChars: 32,
-        maxLines: 2,
-        fontSize: 28,
-        lineHeight: 32,
-      },
-
-      actionRow: {
-        x: 86,
-        y: 1072,
+      logo: {
+        width: 190,
         height: 58,
-        gap: 12,
-
-        cta: {
-          width: 230,
-          fontSize: 23,
-        },
-
-        city: {
-          minWidth: 280,
-          maxWidth: 390,
-          fontSize: 20,
-        },
-
-        logo: {
-          width: 190,
-          height: 58,
-        },
       },
-    };
-  }
+    },
+  },
 
-  return {
-    formatId: format.id,
+  square_1200x1200: {
+    formatId: 'square_1200x1200',
 
     background: {
       x: 0,
@@ -292,5 +288,9 @@ export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
         height: 62,
       },
     },
-  };
+  },
+};
+
+export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
+  return GOOGLE_ADS_LAYOUTS[format.id];
 }
