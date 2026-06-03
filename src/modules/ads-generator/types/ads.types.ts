@@ -91,7 +91,7 @@ export interface ResolvedCreativeInput {
 
   courseId: string;
   cityId: string;
-  brandKey: BrandToken["brand_key"];
+  brandKey: BrandKey;
 
   title: string;
   subtitle: string;

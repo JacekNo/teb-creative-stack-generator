@@ -1,39 +1,50 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import AdsFormatPreview from './AdsFormatPreview.vue';
-import { getBrands, getCities, getCourses, resolveCreativeInput } from '../utils/creativeResolver';
-import type { BrandKey } from '../types/ads.types';
+import { computed, ref, watch } from "vue";
+import AdsFormatPreview from "./AdsFormatPreview.vue";
+import {
+  getBrands,
+  getCities,
+  getCourses,
+  resolveCreativeInput,
+} from "../utils/creativeResolver";
+import type { BrandKey } from "../types/ads.types";
+import { validateGoogleAdsCreative } from "../validators/validateGoogleAdsCreative";
 
 const courses = getCourses();
 const cities = getCities();
 const brands = getBrands();
 
-const selectedBrand = ref<'all' | BrandKey>('all');
-const searchQuery = ref('');
+const selectedBrand = ref<"all" | BrandKey>("all");
+const searchQuery = ref("");
 
 const selectedCourseId = ref(
-  courses.find((course) => course.record_id === 'pku-barber')?.record_id ?? courses[0]?.record_id ?? '',
+  courses.find((course) => course.record_id === "pku-barber")?.record_id ??
+    courses[0]?.record_id ??
+    "",
 );
 
 const selectedCityId = ref(
-  cities.find((city) => city.city_id === 'pila')?.city_id ?? cities[0]?.city_id ?? '',
+  cities.find((city) => city.city_id === "pila")?.city_id ??
+    cities[0]?.city_id ??
+    "",
 );
 
 const quickCases = [
   {
-    label: 'Krótki tekst',
-    courseId: 'pku-barber',
-    cityId: 'pila',
+    label: "Krótki tekst",
+    courseId: "pku-barber",
+    cityId: "pila",
   },
   {
-    label: 'Średni tekst',
-    courseId: 'sp-technik-dentystyczny-z-technologia-cad-cam',
-    cityId: 'poznan',
+    label: "Średni tekst",
+    courseId: "sp-technik-dentystyczny-z-technologia-cad-cam",
+    cityId: "poznan",
   },
   {
-    label: 'Długi tekst',
-    courseId: 'sp-technik-uslug-kosmetycznych-z-certyfikatem-bielenda-professional',
-    cityId: 'piotrkow-trybunalski',
+    label: "Długi tekst",
+    courseId:
+      "sp-technik-uslug-kosmetycznych-z-certyfikatem-bielenda-professional",
+    cityId: "piotrkow-trybunalski",
   },
 ];
 
@@ -42,7 +53,7 @@ const filteredCourses = computed(() => {
 
   return courses.filter((course) => {
     const matchesBrand =
-      selectedBrand.value === 'all' || course.brand_key === selectedBrand.value;
+      selectedBrand.value === "all" || course.brand_key === selectedBrand.value;
 
     const searchable = [
       course.record_id,
@@ -53,7 +64,7 @@ const filteredCourses = computed(() => {
       course.brand_key,
     ]
       .filter(Boolean)
-      .join(' ')
+      .join(" ")
       .toLowerCase();
 
     const matchesSearch = !query || searchable.includes(query);
@@ -67,7 +78,9 @@ watch(
   (items) => {
     if (!items.length) return;
 
-    const selectedStillExists = items.some((course) => course.record_id === selectedCourseId.value);
+    const selectedStillExists = items.some(
+      (course) => course.record_id === selectedCourseId.value,
+    );
 
     if (!selectedStillExists) {
       selectedCourseId.value = items[0].record_id;
@@ -79,15 +92,26 @@ watch(
 const resolvedState = computed(() => {
   try {
     return {
-      creative: resolveCreativeInput(selectedCourseId.value, selectedCityId.value),
-      error: '',
+      creative: resolveCreativeInput(
+        selectedCourseId.value,
+        selectedCityId.value,
+      ),
+      error: "",
     };
   } catch (error) {
     return {
       creative: null,
-      error: error instanceof Error ? error.message : 'Unknown resolver error',
+      error: error instanceof Error ? error.message : "Unknown resolver error",
     };
   }
+});
+
+const validation = computed(() => {
+  if (!resolvedState.value.creative) {
+    return null;
+  }
+
+  return validateGoogleAdsCreative(resolvedState.value.creative);
 });
 
 const selectedCourse = computed(() => {
@@ -120,8 +144,8 @@ function applyQuickCase(courseId: string, cityId: string) {
         <p class="eyebrow">TEB Creative Stack Generator</p>
         <h1>Google Ads playground</h1>
         <p>
-          Panel testowy do sprawdzania, jak dane kierunku, miasta, brandu i zdjęcia
-          składają się w 3 formaty Google Ads.
+          Panel testowy do sprawdzania, jak dane kierunku, miasta, brandu i
+          zdjęcia składają się w 3 formaty Google Ads.
         </p>
       </div>
 
@@ -150,7 +174,11 @@ function applyQuickCase(courseId: string, cityId: string) {
         <label for="brand">Brand</label>
         <select id="brand" v-model="selectedBrand">
           <option value="all">Wszystkie brandy</option>
-          <option v-for="brand in brands" :key="brand.brand_key" :value="brand.brand_key">
+          <option
+            v-for="brand in brands"
+            :key="brand.brand_key"
+            :value="brand.brand_key"
+          >
             {{ brand.brand_label }}
           </option>
         </select>
@@ -182,7 +210,11 @@ function applyQuickCase(courseId: string, cityId: string) {
       <div class="control">
         <label for="city">Miasto</label>
         <select id="city" v-model="selectedCityId">
-          <option v-for="city in cities" :key="city.city_id" :value="city.city_id">
+          <option
+            v-for="city in cities"
+            :key="city.city_id"
+            :value="city.city_id"
+          >
             {{ city.city_display }}
           </option>
         </select>
@@ -228,10 +260,30 @@ function applyQuickCase(courseId: string, cityId: string) {
         <strong>{{ resolvedState.creative.imagePath }}</strong>
       </div>
 
+      <div v-if="validation" :class="['validationStatus', validation.status]">
+        <span>Status walidacji</span>
+        <strong>{{ validation.status.toUpperCase() }}</strong>
+      </div>
+
+      <div v-if="validation?.messages.length" class="warnings">
+        <span>Walidacja</span>
+        <ul>
+          <li
+            v-for="message in validation.messages"
+            :key="`${message.field}-${message.message}`"
+          >
+            <strong>{{ message.field }}:</strong> {{ message.message }}
+          </li>
+        </ul>
+      </div>
+
       <div v-if="resolvedState.creative.meta.warnings.length" class="warnings">
         <span>Uwagi</span>
         <ul>
-          <li v-for="warning in resolvedState.creative.meta.warnings" :key="warning">
+          <li
+            v-for="warning in resolvedState.creative.meta.warnings"
+            :key="warning"
+          >
             {{ warning }}
           </li>
         </ul>
@@ -255,7 +307,7 @@ function applyQuickCase(courseId: string, cityId: string) {
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    "Segoe UI",
     sans-serif;
 }
 
@@ -417,6 +469,21 @@ button:hover {
   font-size: 14px;
   line-height: 1.35;
   word-break: break-word;
+}
+
+.validationStatus.ok {
+  background: #eefbf2 !important;
+  color: #14532d;
+}
+
+.validationStatus.warning {
+  background: #fff7e6 !important;
+  color: #6b4300;
+}
+
+.validationStatus.error {
+  background: #ffecec !important;
+  color: #9d1c1c;
 }
 
 .warnings {
