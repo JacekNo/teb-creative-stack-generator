@@ -138,8 +138,8 @@ function applyQuickCase(courseId: string, cityId: string) {
 </script>
 
 <template>
-  <main class="page">
-    <section class="hero">
+  <main class="app-page ads-playground">
+    <section class="app-container playground-hero">
       <div>
         <p class="eyebrow">TEB Creative Stack Generator</p>
         <h1>Google Ads playground</h1>
@@ -169,7 +169,7 @@ function applyQuickCase(courseId: string, cityId: string) {
       </div>
     </section>
 
-    <section class="controls">
+    <section class="app-container playground-controls">
       <div class="control">
         <label for="brand">Brand</label>
         <select id="brand" v-model="selectedBrand">
@@ -221,7 +221,7 @@ function applyQuickCase(courseId: string, cityId: string) {
       </div>
     </section>
 
-    <section class="quickCases">
+    <section class="app-container quick-cases">
       <button
         v-for="item in quickCases"
         :key="item.label"
@@ -232,12 +232,12 @@ function applyQuickCase(courseId: string, cityId: string) {
       </button>
     </section>
 
-    <section v-if="resolvedState.error" class="error">
+    <section v-if="resolvedState.error" class="app-container app-error">
       <strong>Błąd resolvera:</strong>
       <span>{{ resolvedState.error }}</span>
     </section>
 
-    <section v-else-if="resolvedState.creative" class="summary">
+    <section v-else-if="resolvedState.creative" class="app-container playground-summary">
       <div>
         <span>Wybrany kierunek</span>
         <strong>{{ selectedCourse?.course_name_raw }}</strong>
@@ -290,28 +290,19 @@ function applyQuickCase(courseId: string, cityId: string) {
       </div>
     </section>
 
-    <section v-if="resolvedState.creative" class="preview">
+    <section v-if="resolvedState.creative" class="app-container playground-preview">
       <AdsFormatPreview :creative="resolvedState.creative" />
     </section>
   </main>
 </template>
 
 <style scoped>
-.page {
+.ads-playground {
   min-height: 100vh;
-  padding: 40px;
-  background: #f6f7fb;
   color: #102d69;
-  font-family:
-    Inter,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
 }
 
-.hero {
+.playground-hero {
   max-width: 1280px;
   margin: 0 auto 24px;
   display: grid;
@@ -336,7 +327,7 @@ h1 {
   letter-spacing: -0.05em;
 }
 
-.hero p:not(.eyebrow) {
+.playground-hero p:not(.eyebrow) {
   max-width: 720px;
   margin: 0;
   color: #42526e;
@@ -370,17 +361,8 @@ h1 {
   font-size: 13px;
 }
 
-.controls,
-.summary,
-.quickCases,
-.preview,
-.error {
-  max-width: 1280px;
-  margin-left: auto;
-  margin-right: auto;
-}
 
-.controls {
+.playground-controls {
   display: grid;
   grid-template-columns: 220px minmax(260px, 1fr);
   gap: 16px;
@@ -418,7 +400,7 @@ input {
   font: inherit;
 }
 
-.quickCases {
+.quick-cases {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -440,21 +422,21 @@ button:hover {
   filter: brightness(1.08);
 }
 
-.summary {
+.playground-summary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
   margin-top: 18px;
 }
 
-.summary > div {
+.playground-summary > div {
   padding: 16px;
   border-radius: 20px;
   background: #fff;
   box-shadow: 0 12px 40px rgba(16, 45, 105, 0.07);
 }
 
-.summary span {
+.playground-summary span {
   display: block;
   margin-bottom: 6px;
   color: #6b778c;
@@ -464,7 +446,7 @@ button:hover {
   letter-spacing: 0.06em;
 }
 
-.summary strong {
+.playground-summary strong {
   display: block;
   font-size: 14px;
   line-height: 1.35;
@@ -497,41 +479,25 @@ button:hover {
   padding-left: 18px;
 }
 
-.preview {
+.playground-preview {
   margin-top: 24px;
 }
 
-.error {
-  margin-top: 18px;
-  padding: 18px 20px;
-  border-radius: 20px;
-  background: #ffecec;
-  color: #9d1c1c;
-}
-
-.error strong,
-.error span {
-  display: block;
-}
-
-.error span {
-  margin-top: 6px;
-}
 
 @media (max-width: 980px) {
-  .page {
+  .app-page {
     padding: 24px;
   }
 
-  .hero {
+  .playground-hero {
     grid-template-columns: 1fr;
   }
 
-  .controls {
+  .playground-controls {
     grid-template-columns: 1fr;
   }
 
-  .summary {
+  .playground-summary {
     grid-template-columns: 1fr;
   }
 }
