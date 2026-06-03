@@ -1,31 +1,144 @@
-# Backlog — TEB Creative Stack Generator
+# BACKLOG.md
 
 ## Now
 
-- Podpiąć prawdziwe logo SVG TEB Edukacja.
-- Dodać lokalny font Roc Grotesk do podglądu.
-- Poprawić layout tekstu dla krótkich i długich nazw.
-- Dodać reguły text fittingu.
-- Dodać wybór kierunku i miasta w UI.
+### 1. Refactor app styles and SVG renderer structure
+
+Cel: rozdzielić UI aplikacji od systemu generowania grafik SVG.
+
+Zadania:
+
+* Utworzyć globalne pliki CSS:
+
+  * `src/styles/tokens.css`
+  * `src/styles/base.css`
+  * `src/styles/components.css`
+* Przenieść powtarzalne style z komponentów Vue do globalnych klas UI.
+* Zostawić style specyficzne dla komponentów tylko tam, gdzie faktycznie są potrzebne.
+* Rozbić renderer SVG na mniejsze pliki:
+
+  * `renderAdSvg.ts`
+  * `renderPattern.ts`
+  * `renderPhoto.ts`
+  * `renderTitleCard.ts`
+  * `renderActionRow.ts`
+* Utrzymać layouty reklam w `googleAdsLayouts.ts`.
+* Sprawdzić `npm run build`.
+
+Proponowany commit:
+
+```txt
+Refactor app styles and SVG renderer structure
+```
+
+---
+
+### 2. Layout calibration Google Ads v0.2
+
+Cel: skalibrować proporcje 3 formatów Google Ads na podstawie podglądu i danych z Figmy.
+
+Zadania:
+
+* Dopracować format 1200×628, który obecnie wymaga największej korekty.
+* Ustawić docelowe proporcje:
+
+  * zdjęcia,
+  * białej karty tytułu,
+  * action row,
+  * logo.
+* Ustalić safe area dla każdego formatu.
+* Przenieść wartości z Figma Dev Mode do `googleAdsLayouts.ts`.
+* Przetestować layout na najtrudniejszych nazwach kierunków i miast.
+
+---
+
+### 3. Typography and text fitting v0.2
+
+Cel: poprawić jakość składu tekstu.
+
+Zadania:
+
+* Podpiąć lokalny font Roc Grotesk.
+* Ulepszyć text fitting dla tytułów i dopisków.
+* Dodać warianty dla klas długości:
+
+  * `short`
+  * `medium`
+  * `long`
+  * `very-long`
+* Poprawić obsługę długich miast w action row.
+* Rozszerzyć walidator o ostrzeżenia dla minimalnych rozmiarów fontów.
+
+---
 
 ## Next
 
-- [ ] Przygotować strukturę modułu `ads-generator`.
-- [ ] Utworzyć konfigurację brand tokens.
-- [ ] Utworzyć pierwszy szablon SVG dla formatu 1200×1200.
-- [ ] Dodać funkcję text fitting dla nazwy kierunku.
-- [ ] Dodać funkcję odmiany miasta / pobierania `city_display`.
-- [ ] Wyrenderować pierwszy zestaw testowy do PNG.
-- [ ] Dodać podgląd 3 formatów w UI.
+### 4. Export PNG v0.1
+
+Cel: wygenerować realne pliki graficzne z SVG.
+
+Zadania:
+
+* Wybrać metodę renderowania SVG do PNG.
+* Przygotować eksport pojedynczej kreacji.
+* Przygotować eksport 3 formatów dla jednego kierunku.
+* Ustalić nazewnictwo plików eksportowych.
+* Dodać raport eksportu.
+
+---
+
+### 5. Batch generation
+
+Cel: przygotować generator do realnej pracy produkcyjnej.
+
+Zadania:
+
+* Dodać wybór wielu kierunków.
+* Dodać wybór wielu miast.
+* Dodać eksport paczki ZIP.
+* Rozdzielić eksport:
+
+  * tylko OK,
+  * OK + WARNING,
+  * wszystko oprócz ERROR.
+
+---
 
 ## Later
 
-- [ ] Eksport ZIP.
-- [ ] Ręczna korekta focal point zdjęcia.
-- [ ] Panel walidacji jakości.
-- [ ] Obsługa wyjątków typograficznych.
-- [ ] Szablony social media.
-- [ ] Dane kampanijne dla social media.
-- [ ] Obsługa przewag, partnerów, startów i certyfikatów.
-- [ ] Integracja z biblioteką assetów PAW Generator.
+### 6. Social media module
 
+Cel: rozszerzyć Creative Stack Generator poza Google Ads.
+
+Zadania:
+
+* Dodać formaty social media.
+* Wykorzystać pola:
+
+  * `start_label`
+  * `advantages`
+  * `partners`
+  * `certificates`
+  * `claims`
+  * `social_headline`
+  * `social_subheadline`
+* Przygotować osobne layouty social media.
+* Rozważyć szablony postów, stories i karuzel.
+
+---
+
+## Done
+
+* Utworzono repo `teb-creative-stack-generator`.
+* Dodano projekt Vue 3 + TypeScript + Vite.
+* Dodano strukturę modułu `ads-generator`.
+* Uporządkowano bibliotekę zdjęć.
+* Dodano dane kierunków, miast, brandów i mapę zdjęć.
+* Dodano resolver danych.
+* Dodano smoke test danych.
+* Dodano podgląd SVG w 3 formatach Google Ads.
+* Podpięto logo TEB Edukacja SVG.
+* Dodano roboczy układ: zdjęcie + brandowe tło + karta tytułu + action row.
+* Dodano text fitting v0.1.
+* Dodano walidator jakości kreacji.
+* Dodano Quality Overview dla całej bazy kierunków.
