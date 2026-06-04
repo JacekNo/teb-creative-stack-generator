@@ -52,17 +52,17 @@ export function renderActionRow(
   const logoPath = creative.logoPath || '/creative-stack/logos/teb-edukacja.svg';
 
   /**
-   * CTA na tym etapie traktujemy jako stały element layoutu.
-   * Nie pobieramy go z creative, żeby przypadkiem nie podmienić go miastem.
+   * CTA jest stałą akcją layoutu.
+   * Miasto jest dynamicznym kontekstem lokalizacyjnym.
    */
   const ctaText = 'rozpocznij naukę';
   const cityText = creative.cityDisplay;
 
   const ctaX = row.x;
 
-  const ctaPaddingX = cta.paddingX ?? 22;
+  const ctaPaddingX = cta.paddingX ?? 24;
   const ctaMinWidth = cta.minWidth ?? cta.width ?? 120;
-  const ctaMaxWidth = cta.maxWidth ?? cta.width ?? 320;
+  const ctaMaxWidth = cta.maxWidth ?? cta.width ?? 340;
 
   const ctaTextWidth = estimateTextWidth(ctaText, cta.fontSize, 0.56);
 
@@ -72,9 +72,13 @@ export function renderActionRow(
     ctaMaxWidth,
   );
 
+  /**
+   * LocalCTA: CTA + miasto jako jedna lewa grupa.
+   * Logo zostaje osobnym BrandAnchor po prawej.
+   */
   const cityX = ctaX + ctaWidth + row.gap;
 
-  const cityPaddingX = city.paddingX ?? 22;
+  const cityPaddingX = city.paddingX ?? 20;
 
   const maxCityWidthBeforeLogo = Math.max(
     city.minWidth,
@@ -83,10 +87,12 @@ export function renderActionRow(
 
   const safeCityMaxWidth = Math.min(city.maxWidth, maxCityWidthBeforeLogo);
 
+  const cityVisualFontSize = Math.round(city.fontSize * 0.9);
+
   const cityFit = fitSingleLineText({
     text: cityText,
     maxWidth: safeCityMaxWidth - cityPaddingX * 2,
-    maxFontSize: city.fontSize,
+    maxFontSize: cityVisualFontSize,
     minFontSize: 13,
     averageCharWidthRatio: 0.54,
   });
@@ -97,8 +103,17 @@ export function renderActionRow(
     safeCityMaxWidth,
   );
 
-  const radius = row.height / 2;
-  const textCenterY = row.y + row.height / 2;
+  const ctaRadius = row.height / 2;
+  const ctaCenterY = row.y + row.height / 2;
+
+  /**
+   * Miasto nie jest drugim CTA.
+   * Dlatego jego apla jest niższa, spokojniejsza i bardziej etykietowa.
+   */
+  const cityHeight = Math.round(row.height * 0.72);
+  const cityY = row.y + (row.height - cityHeight) / 2;
+  const cityRadius = cityHeight / 2;
+  const cityCenterY = cityY + cityHeight / 2;
 
   const logoPaddingX = logo.paddingX ?? 18;
   const logoPaddingY = logo.paddingY ?? 10;
@@ -112,7 +127,7 @@ export function renderActionRow(
         y="${row.y}"
         width="${ctaWidth}"
         height="${row.height}"
-        rx="${radius}"
+        rx="${ctaRadius}"
         fill="#0941A1"
       />
 
@@ -121,14 +136,14 @@ export function renderActionRow(
         y="${row.y + 2}"
         width="${ctaWidth - 4}"
         height="${Math.round(row.height * 0.42)}"
-        rx="${Math.max(8, radius - 2)}"
+        rx="${Math.max(8, ctaRadius - 2)}"
         fill="#ffffff"
         opacity="0.10"
       />
 
       <text
         x="${ctaX + ctaWidth / 2}"
-        y="${textCenterY}"
+        y="${ctaCenterY}"
         text-anchor="middle"
         dominant-baseline="middle"
         font-family="Roc Grotesk, Arial, sans-serif"
@@ -140,34 +155,24 @@ export function renderActionRow(
 
       <rect
         x="${cityX}"
-        y="${row.y}"
+        y="${cityY}"
         width="${cityWidth}"
-        height="${row.height}"
-        rx="${radius}"
+        height="${cityHeight}"
+        rx="${cityRadius}"
         fill="${cityFill}"
         stroke="#0941A1"
-        stroke-opacity="0.12"
+        stroke-opacity="0.10"
         stroke-width="1"
-      />
-
-      <rect
-        x="${cityX + 2}"
-        y="${row.y + 2}"
-        width="${cityWidth - 4}"
-        height="${Math.round(row.height * 0.40)}"
-        rx="${Math.max(8, radius - 2)}"
-        fill="#ffffff"
-        opacity="0.18"
       />
 
       <text
         x="${cityX + cityWidth / 2}"
-        y="${textCenterY}"
+        y="${cityCenterY}"
         text-anchor="middle"
         dominant-baseline="middle"
         font-family="Roc Grotesk, Arial, sans-serif"
         font-size="${cityFit.fontSize}"
-        font-weight="850"
+        font-weight="800"
         fill="#0941A1"
         letter-spacing="-0.2"
       >${escapeXml(cityFit.text)}</text>
