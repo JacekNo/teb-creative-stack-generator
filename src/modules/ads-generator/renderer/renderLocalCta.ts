@@ -1,8 +1,9 @@
-import type { ResolvedCreativeInput } from '../types/ads.types';
-import type { GoogleAdsFormat } from './googleAdsFormats';
-import { getGoogleAdsLayout } from './googleAdsLayouts';
-import { estimateTextWidth, fitSingleLineText } from './textFit';
-import { escapeXml } from './svgUtils';
+import { resolveLocalCtaVariant } from "./localCtaVariant";
+import type { ResolvedCreativeInput } from "../types/ads.types";
+import type { GoogleAdsFormat } from "./googleAdsFormats";
+import { getGoogleAdsLayout } from "./googleAdsLayouts";
+import { estimateTextWidth, fitSingleLineText } from "./textFit";
+import { escapeXml } from "./svgUtils";
 
 type FlexibleCtaLayout = {
   width?: number;
@@ -53,8 +54,9 @@ export function renderLocalCta(
    * CTA jest stałą akcją layoutu.
    * Miasto jest dynamicznym kontekstem lokalizacyjnym.
    */
-  const ctaText = 'rozpocznij naukę';
+  const ctaText = "rozpocznij naukę";
   const cityText = creative.cityDisplay;
+  const localCtaDecision = resolveLocalCtaVariant(cityText, format);
 
   const ctaX = row.x;
 
@@ -113,10 +115,14 @@ export function renderLocalCta(
   const cityRadius = cityHeight / 2;
   const cityCenterY = cityY + cityHeight / 2;
 
-  const cityFill = colors.soft ?? '#FFF7EF';
+  const cityFill = colors.soft ?? "#FFF7EF";
 
   return `
-    <g id="local-cta-${format.id}">
+    <g
+      id="local-cta-${format.id}"
+      data-variant="${localCtaDecision.variant}"
+      data-recommended-variant="${localCtaDecision.recommendedVariant}"
+    >
       <rect
         x="${ctaX}"
         y="${row.y}"
