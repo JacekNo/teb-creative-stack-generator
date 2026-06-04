@@ -17,6 +17,7 @@ export function renderTextLines(options: {
   weight?: number;
   letterSpacing?: number;
   dominantBaseline?: 'alphabetic' | 'middle' | 'central';
+  fontFamily?: string;
 }): string {
   const {
     lines,
@@ -25,9 +26,10 @@ export function renderTextLines(options: {
     fontSize,
     lineHeight,
     fill,
-    weight = 800,
+    weight = 700,
     letterSpacing = -1.2,
     dominantBaseline = 'alphabetic',
+    fontFamily = '"Roc Grotesk", Arial, sans-serif',
   } = options;
 
   return lines
@@ -38,7 +40,7 @@ export function renderTextLines(options: {
         <text
           x="${x}"
           y="${lineY}"
-          font-family="Roc Grotesk, Arial, sans-serif"
+          font-family="${fontFamily}"
           font-size="${fontSize}"
           font-weight="${weight}"
           letter-spacing="${letterSpacing}"
