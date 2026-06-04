@@ -31,7 +31,7 @@ export interface TitleCardLayout {
   minHeight: number;
   maxHeight: number;
 
-  contentVerticalAlign?: 'top' | 'center';
+  contentVerticalAlign?: "top" | "center";
 }
 
 export interface ActionRowLayout {
@@ -63,6 +63,25 @@ export interface ActionRowLayout {
     paddingY?: number;
   };
 }
+export interface PatternArrowLayout {
+  x: number;
+  y: number;
+  scale: number;
+  rotate?: number;
+  opacity?: number;
+}
+
+export interface PatternLayout {
+  color: string;
+  columns: number;
+  gap: number;
+  rowGap: number;
+  insetX: number;
+  insetY: number;
+  opacity: number;
+  rotate?: number;
+  stagger?: boolean;
+}
 
 export interface GoogleAdsLayout {
   formatId: GoogleAdsFormatId;
@@ -77,6 +96,7 @@ export interface GoogleAdsLayout {
   subtitle: TextLayout;
 
   actionRow: ActionRowLayout;
+  pattern: PatternLayout;
 }
 
 const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
@@ -109,68 +129,79 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       height: 628,
     },
 
-titleCard: {
-  x: 48,
-  y: 148,
-  radius: 12,
+    titleCard: {
+      x: 48,
+      y: 132,
+      radius: 12,
 
-  paddingX: 20,
-  paddingY: 18,
+      paddingX: 22,
+      paddingY: 20,
 
-  minWidth: 160,
-  maxWidth: 500,
+      minWidth: 170,
+      maxWidth: 500,
 
-  minHeight: 76,
-  maxHeight: 260,
+      minHeight: 82,
+      maxHeight: 260,
 
-  contentVerticalAlign: "center",
-},
+      contentVerticalAlign: "center",
+    },
 
-title: {
-  x: 68,
-  y: 194,
-  maxChars: 18,
-  maxLines: 4,
-  fontSize: 42,
-  lineHeight: 38,
-},
+    title: {
+      x: 70,
+      y: 194,
+      maxChars: 18,
+      maxLines: 4,
+      fontSize: 46,
+      lineHeight: 41,
+    },
 
-subtitle: {
-  x: 68,
-  y: 316,
-  maxChars: 30,
-  maxLines: 2,
-  fontSize: 30,
-  lineHeight: 36,
-},
+    subtitle: {
+      x: 70,
+      y: 316,
+      maxChars: 30,
+      maxLines: 2,
+      fontSize: 34,
+      lineHeight: 34,
+    },
 
     actionRow: {
       x: 49,
       y: 505,
-      height: 89,
-      gap: 11,
+      height: 104,
+      gap: 12,
 
       cta: {
-        minWidth: 110,
-        maxWidth: 291,
-        paddingX: 22,
-        fontSize: 30,
+        minWidth: 150,
+        maxWidth: 360,
+        paddingX: 32,
+        fontSize: 36,
       },
 
       city: {
-        minWidth: 90,
+        minWidth: 120,
         maxWidth: 450,
-        paddingX: 22,
-        fontSize: 30,
+        paddingX: 28,
+        fontSize: 32,
       },
 
       logo: {
-  x: 953,
-  y: 495,
-  width: 230,
-  height: 119,
-},
+        x: 953,
+        y: 495,
+        width: 230,
+        height: 119,
+      },
     },
+    pattern: {
+  color: "#FFFFFF",
+  columns: 17,
+  gap: 8,
+  rowGap: 8,
+  insetX: 18,
+  insetY: 18,
+  opacity: 0.35,
+  rotate: 0,
+  stagger: true,
+},
   },
 
   portrait_960x1200: {
@@ -203,65 +234,78 @@ subtitle: {
     },
 
     titleCard: {
-      x: 38,
-      y: 738,
-   
+      x: 50,
+      y: 710,
+      radius: 14,
 
-      radius: 12,
-      paddingX: 30,
-      paddingY: 28,
-      minWidth: 280,
-      maxWidth: 873,
-      minHeight: 126,
-      maxHeight: 220,
+      paddingX: 28,
+      paddingY: 24,
+
+      minWidth: 220,
+      maxWidth: 810,
+
+      minHeight: 92,
+      maxHeight: 280,
+
       contentVerticalAlign: "center",
     },
 
     title: {
-      x: 68,
-      y: 802,
+      x: 78,
+      y: 728,
       maxChars: 22,
-      maxLines: 3,
-      fontSize: 48,
-      lineHeight: 52,
+      maxLines: 4,
+      fontSize: 60,
+      lineHeight: 54,
     },
 
     subtitle: {
-      x: 68,
-      y: 878,
+      x: 78,
+      y: 868,
       maxChars: 32,
       maxLines: 2,
-      fontSize: 28,
-      lineHeight: 32,
+      fontSize: 42,
+      lineHeight: 40,
     },
 
     actionRow: {
       x: 38,
       y: 1063,
-      height: 89,
-      gap: 11,
+      height: 104,
+      gap: 14,
 
       cta: {
-        minWidth: 110,
-        maxWidth: 291,
-        paddingX: 22,
-        fontSize: 30,
+        minWidth: 160,
+        maxWidth: 340,
+        paddingX: 32,
+        fontSize: 38,
       },
 
       city: {
-        minWidth: 90,
-        maxWidth: 347,
-        paddingX: 22,
-        fontSize: 26,
+        minWidth: 120,
+        maxWidth: 370,
+        paddingX: 28,
+        fontSize: 34,
       },
 
       logo: {
-  x: 699,
-  y: 1049,
-  width: 230,
-  height: 119,
-},
+        x: 699,
+        y: 1049,
+        width: 230,
+        height: 119,
+      },
     },
+    pattern: {
+  color: "#FFFFFF",
+  columns: 10,
+  gap: 10,
+  rowGap: 10,
+  insetX: 20,
+  insetY: 20,
+  opacity: 0.35,
+  rotate: 0,
+  stagger: true,
+},
   },
 
   square_1200x1200: {
@@ -294,65 +338,78 @@ subtitle: {
     },
 
     titleCard: {
-      x: 49,
-      y: 725,
+      x: 50,
+      y: 706,
+      radius: 14,
 
+      paddingX: 28,
+      paddingY: 24,
 
-      radius: 12,
-      paddingX: 30,
-      paddingY: 28,
-      minWidth: 284,
-      maxWidth: 1100,
-      minHeight: 126,
-      maxHeight: 290,
+      minWidth: 220,
+      maxWidth: 980,
+
+      minHeight: 92,
+      maxHeight: 260,
+
       contentVerticalAlign: "center",
     },
 
     title: {
-      x: 79,
-      y: 790,
+      x: 78,
+      y: 778,
       maxChars: 24,
       maxLines: 3,
-      fontSize: 52,
-      lineHeight: 56,
+      fontSize: 58,
+      lineHeight: 52,
     },
 
     subtitle: {
-      x: 79,
-      y: 868,
+      x: 78,
+      y: 896,
       maxChars: 38,
       maxLines: 2,
-      fontSize: 30,
-      lineHeight: 34,
+      fontSize: 42,
+      lineHeight: 38,
     },
 
     actionRow: {
       x: 50,
       y: 1038,
-      height: 89,
-      gap: 10,
+      height: 104,
+      gap: 14,
 
       cta: {
-        minWidth: 130,
-        maxWidth: 376,
-        paddingX: 28,
-        fontSize: 34,
+        minWidth: 170,
+        maxWidth: 420,
+        paddingX: 34,
+        fontSize: 40,
       },
 
       city: {
-        minWidth: 100,
-        maxWidth: 437,
-        paddingX: 28,
-        fontSize: 30,
+        minWidth: 130,
+        maxWidth: 460,
+        paddingX: 30,
+        fontSize: 34,
       },
 
       logo: {
-  x: 923,
-  y: 1024,
-  width: 230,
-  height: 119,
-},
+        x: 923,
+        y: 1024,
+        width: 230,
+        height: 119,
+      },
     },
+pattern: {
+  color: "#FFFFFF",
+  columns: 13,
+  gap: 10,
+  rowGap: 10,
+  insetX: 20,
+  insetY: 20,
+  opacity: 0.35,
+  rotate: 0,
+  stagger: true,
+},
   },
 };
 

@@ -24,10 +24,9 @@ export function renderAdSvg(
       aria-label="${escapeXml(`${creative.title} ${creative.cityDisplay}`)}"
     >
       <defs>
-  ${renderSvgFonts()}
-  ${renderPhotoDefs(format)}
-  ${renderPattern(format, "#ffffff")}
-</defs>
+        ${renderSvgFonts()}
+        ${renderPhotoDefs(format)}
+      </defs>
 
       <rect
         x="${layout.background.x}"
@@ -37,14 +36,7 @@ export function renderAdSvg(
         fill="${creative.colors.primary}"
       />
 
-      <rect
-        x="${layout.background.x}"
-        y="${layout.background.y}"
-        width="${layout.background.width}"
-        height="${layout.background.height}"
-        fill="url(#brandPattern-${format.id})"
-        opacity="0.58"
-      />
+      ${renderPattern(layout.pattern, format)}
 
       ${renderPhoto(creative, format)}
 
