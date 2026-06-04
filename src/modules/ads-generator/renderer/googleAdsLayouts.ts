@@ -17,14 +17,21 @@ export interface TextLayout {
   lineHeight: number;
 }
 
-export interface TitleCardLayout extends RectLayout {
+export interface TitleCardLayout {
+  x: number;
+  y: number;
+  radius?: number;
+
   paddingX: number;
   paddingY: number;
-  minWidth?: number;
-  maxWidth?: number;
-  minHeight?: number;
-  maxHeight?: number;
-  contentVerticalAlign?: "top" | "center";
+
+  minWidth: number;
+  maxWidth: number;
+
+  minHeight: number;
+  maxHeight: number;
+
+  contentVerticalAlign?: 'top' | 'center';
 }
 
 export interface ActionRowLayout {
@@ -102,38 +109,40 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       height: 628,
     },
 
-    titleCard: {
-      x: 48,
-      y: 155,
-      width: 430,
-      height: 208,
-      radius: 12,
-      paddingX: 30,
-      paddingY: 28,
-      minWidth: 280,
-      maxWidth: 430,
-      minHeight: 126,
-      maxHeight: 230,
-      contentVerticalAlign: "center",
-    },
+titleCard: {
+  x: 48,
+  y: 148,
+  radius: 12,
 
-    title: {
-      x: 78,
-      y: 194,
-      maxChars: 18,
-      maxLines: 3,
-      fontSize: 42,
-      lineHeight: 45,
-    },
+  paddingX: 20,
+  paddingY: 18,
 
-    subtitle: {
-      x: 78,
-      y: 316,
-      maxChars: 30,
-      maxLines: 2,
-      fontSize: 23,
-      lineHeight: 27,
-    },
+  minWidth: 160,
+  maxWidth: 500,
+
+  minHeight: 76,
+  maxHeight: 260,
+
+  contentVerticalAlign: "center",
+},
+
+title: {
+  x: 68,
+  y: 194,
+  maxChars: 18,
+  maxLines: 4,
+  fontSize: 42,
+  lineHeight: 38,
+},
+
+subtitle: {
+  x: 68,
+  y: 316,
+  maxChars: 30,
+  maxLines: 2,
+  fontSize: 30,
+  lineHeight: 36,
+},
 
     actionRow: {
       x: 49,
@@ -196,13 +205,13 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     titleCard: {
       x: 38,
       y: 738,
-      width: 800,
-      height: 220,
+   
+
       radius: 12,
       paddingX: 30,
       paddingY: 28,
       minWidth: 280,
-      maxWidth: 800,
+      maxWidth: 873,
       minHeight: 126,
       maxHeight: 220,
       contentVerticalAlign: "center",
@@ -287,15 +296,15 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     titleCard: {
       x: 49,
       y: 725,
-      width: 977,
-      height: 190,
+
+
       radius: 12,
       paddingX: 30,
       paddingY: 28,
       minWidth: 284,
-      maxWidth: 977,
+      maxWidth: 1100,
       minHeight: 126,
-      maxHeight: 190,
+      maxHeight: 290,
       contentVerticalAlign: "center",
     },
 

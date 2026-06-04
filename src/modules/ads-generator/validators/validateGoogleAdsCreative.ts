@@ -65,8 +65,8 @@ export function validateGoogleAdsCreative(
     const layout = getGoogleAdsLayout(format);
     const card = layout.titleCard;
 
-    const contentWidth = card.width - card.paddingX * 2;
-    const contentHeight = card.height - card.paddingY * 2;
+const contentWidth = Math.max(80, card.maxWidth - card.paddingX * 2);
+const contentHeight = Math.max(40, card.maxHeight - card.paddingY * 2);
 
     const hasSubtitle = Boolean(creative.subtitle);
     const gap = hasSubtitle ? 10 : 0;
