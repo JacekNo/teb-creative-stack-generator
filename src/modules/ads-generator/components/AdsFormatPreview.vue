@@ -3,6 +3,7 @@ import { computed, ref } from 'vue';
 import type { ResolvedCreativeInput } from '../types/ads.types';
 import { GOOGLE_ADS_FORMATS } from '../renderer/googleAdsFormats';
 import { renderAdSvg } from '../renderer/renderAdSvg';
+import { downloadCreativePngSet } from '../export/downloadSvgPngSet';
 
 const props = defineProps<{
   creative: ResolvedCreativeInput;
@@ -27,6 +28,8 @@ const scaleOptions = [
 ] as const;
 
 const previewScale = ref<(typeof scaleOptions)[number]['value']>(0.25);
+const isExporting = ref(false);
+const exportError = ref('');
 
 const activeScaleDescription = computed(() => {
   return scaleOptions.find((option) => option.value === previewScale.value)?.description;
@@ -40,6 +43,24 @@ const previews = computed(() => {
     scaledHeight: Math.round(format.height * previewScale.value),
   }));
 });
+
+async function handleDownloadSet() {
+  if (isExporting.value) return;
+
+  isExporting.value = true;
+  exportError.value = '';
+
+  try {
+    await downloadCreativePngSet(props.creative);
+  } catch (error) {
+    exportError.value =
+      error instanceof Error
+        ? error.message
+        : 'Nie udało się wyeksportować setu PNG.';
+  } finally {
+    isExporting.value = false;
+  }
+}
 </script>
 
 <template>
@@ -50,24 +71,39 @@ const previews = computed(() => {
         <h2>Formaty eksportowe</h2>
       </div>
 
-      <div class="scaleControl" aria-label="Skala podglądu">
-        <span class="scaleLabel">Skala</span>
+      <div class="toolbarActions">
+        <div class="scaleControl" aria-label="Skala podglądu">
+          <span class="scaleLabel">Skala</span>
 
-        <div class="scaleButtons">
-          <button
-            v-for="option in scaleOptions"
-            :key="option.value"
-            type="button"
-            :class="{ active: previewScale === option.value }"
-            @click="previewScale = option.value"
-          >
-            {{ option.label }}
-          </button>
+          <div class="scaleButtons">
+            <button
+              v-for="option in scaleOptions"
+              :key="option.value"
+              type="button"
+              :class="{ active: previewScale === option.value }"
+              @click="previewScale = option.value"
+            >
+              {{ option.label }}
+            </button>
+          </div>
+
+          <span class="scaleHint">{{ activeScaleDescription }}</span>
         </div>
 
-        <span class="scaleHint">{{ activeScaleDescription }}</span>
+        <button
+          type="button"
+          class="exportButton"
+          :disabled="isExporting"
+          @click="handleDownloadSet"
+        >
+          {{ isExporting ? 'Eksportuję…' : 'Pobierz set PNG' }}
+        </button>
       </div>
     </header>
+
+    <p v-if="exportError" class="exportError">
+      {{ exportError }}
+    </p>
 
     <div class="formats">
       <article v-for="preview in previews" :key="preview.format.id" class="formatCard">
@@ -258,7 +294,48 @@ h2 {
   width: var(--preview-width);
   height: var(--preview-height);
 }
+.toolbarActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
 
+.exportButton {
+  min-height: 38px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 16px;
+  background: #0941a1;
+  color: #ffffff;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(9, 65, 161, 0.2);
+}
+
+.exportButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(9, 65, 161, 0.26);
+}
+
+.exportButton:disabled {
+  cursor: wait;
+  opacity: 0.68;
+}
+
+.exportError {
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid rgba(157, 28, 28, 0.12);
+  border-radius: 16px;
+  background: #ffecec;
+  color: #9d1c1c;
+  font-size: 13px;
+  font-weight: 750;
+}
 @media (max-width: 1100px) {
   .previewToolbar {
     align-items: start;
@@ -268,7 +345,9 @@ h2 {
   .scaleControl {
     justify-content: flex-start;
   }
-
+.toolbarActions {
+  justify-content: flex-start;
+}
   .formats {
     grid-template-columns: 1fr;
   }
