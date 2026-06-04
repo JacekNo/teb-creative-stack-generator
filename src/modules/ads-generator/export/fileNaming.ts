@@ -12,12 +12,26 @@ function slugify(value: string): string {
     .replace(/-{2,}/g, '-');
 }
 
+function getCityCode(creative: ResolvedCreativeInput): string {
+  const cityCode = creative.city.city_code;
+
+  if (cityCode) {
+    return slugify(cityCode);
+  }
+
+  return slugify(creative.city.city_id || creative.cityDisplay || 'miasto');
+}
+
+function getCourseCode(creative: ResolvedCreativeInput): string {
+  return slugify(creative.course.record_id || creative.title || 'kierunek');
+}
+
 export function getCreativeExportBaseName(creative: ResolvedCreativeInput): string {
   const brand = slugify(creative.brandKey || 'teb');
-  const city = slugify(creative.cityDisplay || 'miasto');
-  const title = slugify(creative.title || 'kierunek');
+  const city = getCityCode(creative);
+  const course = getCourseCode(creative);
 
-  return [brand, city, title].filter(Boolean).join('_');
+  return [brand, city, course].filter(Boolean).join('_');
 }
 
 export function getCreativePngFileName(
