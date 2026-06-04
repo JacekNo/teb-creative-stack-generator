@@ -165,32 +165,32 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 49,
-      y: 505,
-      height: 104,
-      gap: 12,
+  x: 49,
+  y: 505,
+  height: 98,
+  gap: 12,
 
-      cta: {
-        minWidth: 150,
-        maxWidth: 360,
-        paddingX: 32,
-        fontSize: 36,
-      },
+  cta: {
+    minWidth: 150,
+    maxWidth: 360,
+    paddingX: 28,
+    fontSize: 34,
+  },
 
-      city: {
-        minWidth: 120,
-        maxWidth: 450,
-        paddingX: 28,
-        fontSize: 32,
-      },
+  city: {
+    minWidth: 120,
+    maxWidth: 430,
+    paddingX: 24,
+    fontSize: 30,
+  },
 
-      logo: {
-        x: 953,
-        y: 495,
-        width: 230,
-        height: 119,
-      },
-    },
+  logo: {
+    x: 953,
+    y: 495,
+    width: 230,
+    height: 119,
+  },
+},
     pattern: {
   color: "#FFFFFF",
   columns: 17,
@@ -269,32 +269,32 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 38,
-      y: 1063,
-      height: 104,
-      gap: 14,
+  x: 38,
+  y: 1063,
+  height: 100,
+  gap: 14,
 
-      cta: {
-        minWidth: 160,
-        maxWidth: 340,
-        paddingX: 32,
-        fontSize: 38,
-      },
+  cta: {
+    minWidth: 160,
+    maxWidth: 370,
+    paddingX: 30,
+    fontSize: 36,
+  },
 
-      city: {
-        minWidth: 120,
-        maxWidth: 370,
-        paddingX: 28,
-        fontSize: 34,
-      },
+  city: {
+    minWidth: 120,
+    maxWidth: 390,
+    paddingX: 26,
+    fontSize: 30,
+  },
 
-      logo: {
-        x: 699,
-        y: 1049,
-        width: 230,
-        height: 119,
-      },
-    },
+  logo: {
+    x: 699,
+    y: 1049,
+    width: 230,
+    height: 119,
+  },
+},
     pattern: {
   color: "#FFFFFF",
   columns: 10,
@@ -373,32 +373,32 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 50,
-      y: 1038,
-      height: 104,
-      gap: 14,
+  x: 50,
+  y: 1038,
+  height: 100,
+  gap: 14,
 
-      cta: {
-        minWidth: 170,
-        maxWidth: 420,
-        paddingX: 34,
-        fontSize: 40,
-      },
+  cta: {
+    minWidth: 170,
+    maxWidth: 410,
+    paddingX: 32,
+    fontSize: 38,
+  },
 
-      city: {
-        minWidth: 130,
-        maxWidth: 460,
-        paddingX: 30,
-        fontSize: 34,
-      },
+  city: {
+    minWidth: 130,
+    maxWidth: 450,
+    paddingX: 28,
+    fontSize: 32,
+  },
 
-      logo: {
-        x: 923,
-        y: 1024,
-        width: 230,
-        height: 119,
-      },
-    },
+  logo: {
+    x: 923,
+    y: 1024,
+    width: 230,
+    height: 119,
+  },
+},
 pattern: {
   color: "#FFFFFF",
   columns: 13,

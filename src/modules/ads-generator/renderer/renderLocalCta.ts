@@ -6,6 +6,7 @@ import { estimateTextWidth, fitSingleLineText } from "./textFit";
 import { escapeXml } from "./svgUtils";
 
 const BODY_FONT_FAMILY = "'Roc Grotesk', Arial, sans-serif";
+const CTA_TEXT = "rozpocznij naukę";
 
 type FlexibleCtaLayout = {
   width?: number;
@@ -157,32 +158,16 @@ export function renderLocalCta(
     text?: string;
   };
 
-  const ctaText = "rozpocznij naukę";
   const cityText = creative.cityDisplay;
   const localCtaDecision = resolveLocalCtaVariant(cityText, format);
 
   const ctaX = row.x;
 
-  /**
-   * Stałe wysokości komponentów.
-   * Nie spłaszczamy CTA przy wariancie stacked.
-   */
   const ctaHeight = row.height;
-  const cityHeight = Math.round(row.height * 0.76);
-  const stackedGapY = Math.max(8, Math.round(row.height * 0.12));
+  const cityHeight = Math.round(row.height * 0.72);
+  const stackedGapY = Math.max(10, Math.round(row.height * 0.12));
 
-  /**
-   * Dolną krawędź LocalCTA wyrównujemy do dolnej krawędzi BrandAnchor.
-   * Dzięki temu CTA / miasto siedzą optycznie na tej samej linii co logo.
-   */
   const localCtaBottomY = logo.y + logo.height;
-
-  /**
-   * Stałe fonty.
-   * Długie miasta zmieniają wariant układu, ale nie zmniejszają fontu.
-   */
-  const ctaFontSize = cta.fontSize;
-  const cityFontSize = city.fontSize;
 
   const ctaPaddingX = cta.paddingX ?? 24;
   const cityPaddingX = city.paddingX ?? 20;
@@ -190,19 +175,23 @@ export function renderLocalCta(
   const ctaMinWidth = cta.minWidth ?? cta.width ?? 120;
   const ctaMaxWidth = cta.maxWidth ?? cta.width ?? 340;
 
+  const ctaFit = fitSingleLineText({
+    text: CTA_TEXT,
+    maxWidth: Math.max(40, ctaMaxWidth - ctaPaddingX * 2),
+    maxFontSize: cta.fontSize,
+    minFontSize: Math.max(24, Math.round(cta.fontSize * 0.82)),
+    averageCharWidthRatio: 0.56,
+  });
+
   const ctaWidth = getPillWidth({
-    text: ctaText,
-    fontSize: ctaFontSize,
+    text: ctaFit.text,
+    fontSize: ctaFit.fontSize,
     paddingX: ctaPaddingX,
     minWidth: ctaMinWidth,
     maxWidth: ctaMaxWidth,
     averageCharWidthRatio: 0.56,
   });
 
-  /**
-   * Pozycja miasta dla wariantu poziomego.
-   * Używamy jej też do sprawdzenia, czy miasto zmieści się między CTA a logo.
-   */
   const buttonCityX = ctaX + ctaWidth + row.gap;
 
   const maxCityWidthBeforeLogo = Math.max(
@@ -213,13 +202,9 @@ export function renderLocalCta(
   const safeCityMaxWidth = Math.min(city.maxWidth, maxCityWidthBeforeLogo);
 
   const cityRequiredWidth = Math.ceil(
-    estimateTextWidth(cityText, cityFontSize, 0.54) + cityPaddingX * 2,
+    estimateTextWidth(cityText, city.fontSize, 0.54) + cityPaddingX * 2,
   );
 
-  /**
-   * Jeżeli miasto nie mieści się obok CTA przy stałym font-size,
-   * nie przycinamy go wielokropkiem — przełączamy LocalCTA na stacked.
-   */
   const resolvedLocalCtaVariant =
     localCtaDecision.variant !== "stacked" &&
     cityRequiredWidth > safeCityMaxWidth
@@ -229,13 +214,6 @@ export function renderLocalCta(
   const cityFill = colors.soft ?? "#FFF7EF";
 
   if (resolvedLocalCtaVariant === "stacked") {
-    /**
-     * Wariant stacked:
-     * - CTA zachowuje pełną wysokość i formę.
-     * - Miasto ma stałą wysokość.
-     * - Całą grupę podnosimy w górę.
-     * - Miasto siedzi w dolnej pozycji LocalCTA, CTA nad nim.
-     */
     const cityX = ctaX;
     const cityY = localCtaBottomY - cityHeight;
     const ctaY = cityY - stackedGapY - ctaHeight;
@@ -245,16 +223,16 @@ export function renderLocalCta(
     const cityFit = fitSingleLineText({
       text: cityText,
       maxWidth: Math.max(20, availableWidth - cityPaddingX * 2),
-      maxFontSize: cityFontSize,
-      minFontSize: cityFontSize,
+      maxFontSize: city.fontSize,
+      minFontSize: Math.max(22, Math.round(city.fontSize * 0.86)),
       averageCharWidthRatio: 0.54,
     });
 
     const cityWidth = getPillWidth({
       text: cityFit.text,
-      fontSize: cityFontSize,
+      fontSize: cityFit.fontSize,
       paddingX: cityPaddingX,
-      minWidth: city.minWidth,
+      minWidth: Math.max(city.minWidth, ctaWidth),
       maxWidth: availableWidth,
       averageCharWidthRatio: 0.54,
     });
@@ -264,14 +242,16 @@ export function renderLocalCta(
         id="local-cta-${format.id}"
         data-variant="${resolvedLocalCtaVariant}"
         data-recommended-variant="${localCtaDecision.recommendedVariant}"
+        data-city-required-width="${cityRequiredWidth}"
+        data-city-safe-width="${safeCityMaxWidth}"
       >
         ${renderCtaButton({
           x: ctaX,
           y: ctaY,
           width: ctaWidth,
           height: ctaHeight,
-          text: ctaText,
-          fontSize: ctaFontSize,
+          text: ctaFit.text,
+          fontSize: ctaFit.fontSize,
         })}
 
         ${renderCityPill({
@@ -280,32 +260,27 @@ export function renderLocalCta(
           width: cityWidth,
           height: cityHeight,
           text: cityFit.text,
-          fontSize: cityFontSize,
+          fontSize: cityFit.fontSize,
           fill: cityFill,
         })}
       </g>
     `;
   }
 
-  /**
-   * Wariant button-plus-city:
-   * CTA i miasto stoją obok siebie.
-   * Oba mają stałą wysokość.
-   */
   const cityX = buttonCityX;
   const cityY = localCtaBottomY - cityHeight;
 
   const cityFit = fitSingleLineText({
     text: cityText,
     maxWidth: Math.max(20, safeCityMaxWidth - cityPaddingX * 2),
-    maxFontSize: cityFontSize,
-    minFontSize: cityFontSize,
+    maxFontSize: city.fontSize,
+    minFontSize: Math.max(22, Math.round(city.fontSize * 0.86)),
     averageCharWidthRatio: 0.54,
   });
 
   const cityWidth = getPillWidth({
     text: cityFit.text,
-    fontSize: cityFontSize,
+    fontSize: cityFit.fontSize,
     paddingX: cityPaddingX,
     minWidth: city.minWidth,
     maxWidth: safeCityMaxWidth,
@@ -317,14 +292,16 @@ export function renderLocalCta(
       id="local-cta-${format.id}"
       data-variant="${resolvedLocalCtaVariant}"
       data-recommended-variant="${localCtaDecision.recommendedVariant}"
+      data-city-required-width="${cityRequiredWidth}"
+      data-city-safe-width="${safeCityMaxWidth}"
     >
       ${renderCtaButton({
         x: ctaX,
         y: localCtaBottomY - ctaHeight,
         width: ctaWidth,
         height: ctaHeight,
-        text: ctaText,
-        fontSize: ctaFontSize,
+        text: ctaFit.text,
+        fontSize: ctaFit.fontSize,
       })}
 
       ${renderCityPill({
@@ -333,7 +310,7 @@ export function renderLocalCta(
         width: cityWidth,
         height: cityHeight,
         text: cityFit.text,
-        fontSize: cityFontSize,
+        fontSize: cityFit.fontSize,
         fill: cityFill,
       })}
     </g>
