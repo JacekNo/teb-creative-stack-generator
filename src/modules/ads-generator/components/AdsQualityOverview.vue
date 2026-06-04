@@ -19,7 +19,23 @@ import type {
 } from '../validators/validateGoogleAdsCreative';
 
 type StatusFilter = 'all' | CreativeValidationLevel;
+type ValidationFieldFilter =
+  | 'all'
+  | 'title'
+  | 'subtitle'
+  | 'city'
+  | 'cta'
+  | 'layout'
+  | 'image'
+  | 'course'
+  | 'city-data'
+  | 'brand';
 
+type FormatFilter =
+  | 'all'
+  | 'square_1200x1200'
+  | 'landscape_1200x628'
+  | 'portrait_960x1200';
 interface QualityRow {
   course: CourseRecord;
   creative: ResolvedCreativeInput | null;
@@ -38,7 +54,8 @@ const selectedCityId = ref(
     cities[0]?.city_id ??
     '',
 );
-
+const selectedValidationField = ref<ValidationFieldFilter>('all');
+const selectedFormat = ref<FormatFilter>('all');
 const selectedBrand = ref<'all' | BrandKey>('all');
 const selectedStatus = ref<StatusFilter>('all');
 const searchQuery = ref('');
@@ -119,7 +136,31 @@ const allRows = computed<QualityRow[]>(() => {
     }
   });
 });
+const validationFieldOptions: Array<{
+  label: string;
+  value: ValidationFieldFilter;
+}> = [
+  { label: 'Wszystkie pola', value: 'all' },
+  { label: 'Tytuł', value: 'title' },
+  { label: 'Dopisek', value: 'subtitle' },
+  { label: 'Miasto', value: 'city' },
+  { label: 'CTA', value: 'cta' },
+  { label: 'Layout', value: 'layout' },
+  { label: 'Zdjęcie', value: 'image' },
+  { label: 'Kierunek', value: 'course' },
+  { label: 'Dane miasta', value: 'city-data' },
+  { label: 'Brand', value: 'brand' },
+];
 
+const formatFilterOptions: Array<{
+  label: string;
+  value: FormatFilter;
+}> = [
+  { label: 'Wszystkie formaty', value: 'all' },
+  { label: 'Square 1200×1200', value: 'square_1200x1200' },
+  { label: 'Landscape 1200×628', value: 'landscape_1200x628' },
+  { label: 'Portrait 960×1200', value: 'portrait_960x1200' },
+];
 const filteredRows = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
 
@@ -143,8 +184,18 @@ const filteredRows = computed(() => {
       .toLowerCase();
 
     const matchesSearch = !query || searchable.includes(query);
+const matchesValidationField =
+  selectedValidationField.value === 'all' ||
+  row.validation?.messages.some(
+    (message) => message.field === selectedValidationField.value,
+  );
 
-    return matchesStatus && matchesBrand && matchesSearch;
+const matchesFormat =
+  selectedFormat.value === 'all' ||
+  row.validation?.messages.some(
+    (message) => message.formatId === selectedFormat.value,
+  );
+    return matchesStatus && matchesBrand && matchesSearch && matchesValidationField && matchesFormat;
   });
 });
 
@@ -181,6 +232,37 @@ const stats = computed(() => {
     error: allRows.value.filter((row) => row.status === 'error').length,
   };
 });
+
+const validationDiagnostics = computed(() => {
+  const fieldCounts = new Map<string, number>();
+  const formatCounts = new Map<string, number>();
+
+  for (const row of allRows.value) {
+    const messages = row.validation?.messages ?? [];
+
+    for (const message of messages) {
+      fieldCounts.set(message.field, (fieldCounts.get(message.field) ?? 0) + 1);
+
+      if (message.formatId) {
+        formatCounts.set(
+          message.formatId,
+          (formatCounts.get(message.formatId) ?? 0) + 1,
+        );
+      }
+    }
+  }
+
+  return {
+    byField: Array.from(fieldCounts.entries())
+      .map(([field, count]) => ({ field, count }))
+      .sort((a, b) => b.count - a.count),
+
+    byFormat: Array.from(formatCounts.entries())
+      .map(([formatId, count]) => ({ formatId, count }))
+      .sort((a, b) => b.count - a.count),
+  };
+});
+
 const selectedValidationGroups = computed(() => {
   const messages = selectedRow.value?.validation?.messages ?? [];
 
@@ -214,6 +296,8 @@ function selectCourse(courseId: string) {
 function resetFilters() {
   selectedBrand.value = 'all';
   selectedStatus.value = 'all';
+  selectedValidationField.value = 'all';
+  selectedFormat.value = 'all';
   searchQuery.value = '';
 }
 
@@ -325,6 +409,35 @@ function applyStressCase(testCase: (typeof stressCases)[number]) {
           </button>
         </div>
       </section>
+<section class="railSection">
+  <h2>Filtr diagnostyczny</h2>
+
+  <div class="controlGroup">
+    <label for="validationField">Pole walidacji</label>
+    <select id="validationField" v-model="selectedValidationField">
+      <option
+        v-for="option in validationFieldOptions"
+        :key="option.value"
+        :value="option.value"
+      >
+        {{ option.label }}
+      </option>
+    </select>
+  </div>
+
+  <div class="controlGroup">
+    <label for="formatFilter">Format</label>
+    <select id="formatFilter" v-model="selectedFormat">
+      <option
+        v-for="option in formatFilterOptions"
+        :key="option.value"
+        :value="option.value"
+      >
+        {{ option.label }}
+      </option>
+    </select>
+  </div>
+</section>
 
       <section class="railSection">
         <h2>Statystyki</h2>
@@ -351,6 +464,47 @@ function applyStressCase(testCase: (typeof stressCases)[number]) {
           </div>
         </div>
       </section>
+
+      <section class="railSection">
+  <h2>Diagnostyka</h2>
+
+  <div class="diagnosticsBlock">
+    <div>
+      <h3>Według pola</h3>
+
+      <p v-if="!validationDiagnostics.byField.length" class="emptyHint">
+        Brak komunikatów walidacji.
+      </p>
+
+      <div
+        v-for="item in validationDiagnostics.byField"
+        :key="item.field"
+        class="diagnosticRow"
+      >
+        <span>{{ item.field }}</span>
+        <strong>{{ item.count }}</strong>
+      </div>
+    </div>
+
+    <div>
+      <h3>Według formatu</h3>
+
+      <p v-if="!validationDiagnostics.byFormat.length" class="emptyHint">
+        Brak komunikatów formatowych.
+      </p>
+
+      <div
+        v-for="item in validationDiagnostics.byFormat"
+        :key="item.formatId"
+        class="diagnosticRow"
+      >
+        <span>{{ item.formatId }}</span>
+        <strong>{{ item.count }}</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
     </aside>
 
     <aside class="courseRail" aria-label="Lista kierunków">
@@ -918,6 +1072,66 @@ input:focus {
   font-size: 13px;
   line-height: 1.35;
   word-break: break-word;
+}
+
+.diagnosticsBlock {
+  display: grid;
+  gap: 14px;
+}
+
+.diagnosticsBlock h3 {
+  margin: 0 0 8px;
+  color: #516078;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.diagnosticRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 11px;
+  background: #ffffff;
+  color: #102d69;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.diagnosticRow + .diagnosticRow {
+  margin-top: 6px;
+}
+
+.diagnosticRow span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.diagnosticRow strong {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 22px;
+  border-radius: 999px;
+  background: #edf1f7;
+  color: #516078;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.emptyHint {
+  margin: 0;
+  color: #8a95a8;
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .validationPanel {
