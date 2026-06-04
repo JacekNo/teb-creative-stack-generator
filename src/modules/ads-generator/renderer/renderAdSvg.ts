@@ -1,11 +1,12 @@
-import type { ResolvedCreativeInput } from '../types/ads.types';
-import type { GoogleAdsFormat } from './googleAdsFormats';
-import { getGoogleAdsLayout } from './googleAdsLayouts';
-import { renderActionRow } from './renderActionRow';
-import { renderPattern } from './renderPattern';
-import { renderPhoto, renderPhotoDefs } from './renderPhoto';
-import { renderTitleCard } from './renderTitleCard';
-import { escapeXml } from './svgUtils';
+import type { ResolvedCreativeInput } from "../types/ads.types";
+import type { GoogleAdsFormat } from "./googleAdsFormats";
+import { getGoogleAdsLayout } from "./googleAdsLayouts";
+import { renderActionRow } from "./renderActionRow";
+import { renderPattern } from "./renderPattern";
+import { renderPhoto, renderPhotoDefs } from "./renderPhoto";
+import { renderTitleCard } from "./renderTitleCard";
+import { escapeXml } from "./svgUtils";
+import { renderSvgFonts } from "./renderSvgFonts";
 
 export function renderAdSvg(
   creative: ResolvedCreativeInput,
@@ -23,9 +24,10 @@ export function renderAdSvg(
       aria-label="${escapeXml(`${creative.title} ${creative.cityDisplay}`)}"
     >
       <defs>
-        ${renderPhotoDefs(format)}
-        ${renderPattern(format, '#ffffff')}
-      </defs>
+  ${renderSvgFonts()}
+  ${renderPhotoDefs(format)}
+  ${renderPattern(format, "#ffffff")}
+</defs>
 
       <rect
         x="${layout.background.x}"
