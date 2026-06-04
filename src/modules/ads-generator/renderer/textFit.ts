@@ -33,15 +33,33 @@ export interface FitSingleLineResult {
   truncated: boolean;
 }
 
+const FORBIDDEN_LINE_ENDINGS = new Set([
+  'i',
+  'a',
+  'o',
+  'u',
+  'w',
+  'z',
+  'we',
+  'ze',
+  'do',
+  'od',
+  'po',
+  'na',
+  'za',
+  'oraz',
+  'lub',
+  'albo',
+
+]);
+
 export function normalizeText(text: string): string {
   return text.trim().replace(/\s+/g, ' ');
 }
 
 /**
- * SVG generujemy jako string, więc nie mamy tu dostępu do prawdziwego
- * Canvas TextMetrics. Ta funkcja jest konserwatywną estymacją szerokości.
- *
- * Cel: lepiej zawinąć tekst odrobinę wcześniej niż pozwolić mu wyjść poza aplę.
+ * SVG generujemy jako string, więc nie mamy dostępu do prawdziwego Canvas TextMetrics.
+ * Ta funkcja jest konserwatywną estymacją szerokości tekstu.
  */
 function getCharWidthRatio(char: string, fallbackRatio: number): number {
   if (char === ' ') return 0.32;
@@ -78,14 +96,60 @@ export function estimateTextWidth(
     return sum + getCharWidthRatio(char, averageCharWidthRatio);
   }, 0);
 
-  /**
-   * Guard bezpieczeństwa.
-   * Roc Grotesk / Arial w SVG może optycznie zajmować więcej miejsca
-   * niż prosta estymacja znaków.
-   */
   const widthGuard = 1.07;
 
   return Math.ceil(ratioSum * fontSize * widthGuard);
+}
+
+function normalizeToken(token: string): string {
+  return token
+    .trim()
+    .toLowerCase()
+    .replace(/[.,;:!?]+$/g, '');
+}
+
+function shouldAvoidLineEnding(word: string): boolean {
+  return FORBIDDEN_LINE_ENDINGS.has(normalizeToken(word));
+}
+
+function improvePolishLineBreaks(options: {
+  lines: string[];
+  fontSize: number;
+  maxWidth: number;
+  averageCharWidthRatio: number;
+}): string[] {
+  const { fontSize, maxWidth, averageCharWidthRatio } = options;
+  const lines = [...options.lines];
+
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    const words = lines[index].split(/\s+/).filter(Boolean);
+
+    if (words.length <= 1) {
+      continue;
+    }
+
+    const lastWord = words[words.length - 1];
+
+    if (!shouldAvoidLineEnding(lastWord)) {
+      continue;
+    }
+
+    const currentLineCandidate = words.slice(0, -1).join(' ');
+    const nextLineCandidate = `${lastWord} ${lines[index + 1]}`;
+
+    const nextLineCandidateWidth = estimateTextWidth(
+      nextLineCandidate,
+      fontSize,
+      averageCharWidthRatio,
+    );
+
+    if (currentLineCandidate && nextLineCandidateWidth <= maxWidth) {
+      lines[index] = currentLineCandidate;
+      lines[index + 1] = nextLineCandidate;
+    }
+  }
+
+  return lines;
 }
 
 function addEllipsis(text: string): string {
@@ -188,11 +252,6 @@ function wrapText(options: {
       lines.push(currentLine);
       currentLine = word;
     } else {
-      /**
-       * Pojedyncze słowo jest szersze niż maxWidth.
-       * Na tym etapie go nie tniemy, bo fitTextBlock może jeszcze zejść
-       * z fontem. Szerokość zostanie sprawdzona później.
-       */
       lines.push(word);
       currentLine = '';
     }
@@ -280,15 +339,12 @@ export function fitTextBlock(options: FitTextBlockOptions): FitTextBlockResult {
   for (let fontSize = maxFontSize; fontSize >= minFontSize; fontSize -= 1) {
     const lineHeight = Math.round(fontSize * lineHeightRatio);
 
-    /**
-     * Nie ma sensu pozwalać na więcej linii, niż fizycznie mieści maxHeight.
-     */
     const heightLimitedMaxLines = Math.max(
       1,
       Math.min(maxLines, Math.floor(maxHeight / lineHeight)),
     );
 
-    const { lines, truncated } = wrapText({
+    const wrapped = wrapText({
       text: normalized,
       fontSize,
       maxWidth,
@@ -296,10 +352,17 @@ export function fitTextBlock(options: FitTextBlockOptions): FitTextBlockResult {
       averageCharWidthRatio,
     });
 
+    const lines = improvePolishLineBreaks({
+      lines: wrapped.lines,
+      fontSize,
+      maxWidth,
+      averageCharWidthRatio,
+    });
+
     const width = getLinesWidth(lines, fontSize, averageCharWidthRatio);
     const height = lines.length * lineHeight;
 
-    if (!truncated && width <= maxWidth && height <= maxHeight) {
+    if (!wrapped.truncated && width <= maxWidth && height <= maxHeight) {
       return {
         lines,
         fontSize,
@@ -311,10 +374,8 @@ export function fitTextBlock(options: FitTextBlockOptions): FitTextBlockResult {
     }
   }
 
-  /**
-   * Fallback: minimalny font + ewentualne przycięcie za długich linii.
-   */
   const lineHeight = Math.round(minFontSize * lineHeightRatio);
+
   const heightLimitedMaxLines = Math.max(
     1,
     Math.min(maxLines, Math.floor(maxHeight / lineHeight)),
@@ -328,8 +389,15 @@ export function fitTextBlock(options: FitTextBlockOptions): FitTextBlockResult {
     averageCharWidthRatio,
   });
 
-  const clamped = clampLinesToWidth({
+  const improvedLines = improvePolishLineBreaks({
     lines: wrapped.lines,
+    fontSize: minFontSize,
+    maxWidth,
+    averageCharWidthRatio,
+  });
+
+  const clamped = clampLinesToWidth({
+    lines: improvedLines,
     fontSize: minFontSize,
     maxWidth,
     averageCharWidthRatio,
