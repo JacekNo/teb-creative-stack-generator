@@ -142,3 +142,11 @@ Zadania:
 * Dodano text fitting v0.1.
 * Dodano walidator jakości kreacji.
 * Dodano Quality Overview dla całej bazy kierunków.
+* Rozbito renderer SVG na mniejsze pliki odpowiedzialne za osobne części kreacji.
+* Dodano wspólne helpery SVG w `svgUtils.ts`.
+* Dodano globalną strukturę stylów UI aplikacji.
+* Odchudzono style widoku `AdsGeneratorPlayground.vue`.
+* Rozbito renderer SVG na mniejsze pliki.
+* Dodano wspólne helpery SVG.
+* Dodano globalną strukturę stylów UI.
+* Uporządkowano `googleAdsLayouts.ts` jako jawny config layoutów.

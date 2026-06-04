@@ -1,5 +1,25 @@
 # 08 — Changelog
 
+
+
+## 2026-06-04
+
+- Rozbito renderer SVG na mniejsze moduły odpowiedzialne za osobne części kreacji:
+  - `renderPattern.ts`
+  - `renderPhoto.ts`
+  - `renderTitleCard.ts`
+  - `renderActionRow.ts`
+  - `svgUtils.ts`
+- `renderAdSvg.ts` pełni teraz rolę orkiestratora całego SVG.
+- Dodano globalną strukturę stylów aplikacji:
+  - `src/styles/tokens.css`
+  - `src/styles/base.css`
+  - `src/styles/components.css`
+- `src/style.css` pełni teraz rolę pliku wejściowego dla stylów.
+- Odchudzono style widoku `AdsGeneratorPlayground.vue`.
+- Uporządkowano `googleAdsLayouts.ts` jako jawny config layoutów dla formatów Google Ads.
+- Build projektu przechodzi po refactorach.
+
 ## 2026-06-02
 
 - Utworzono pakiet dokumentacji projektowej v0.1.
@@ -16,3 +36,4 @@
 - Dodano smoke test danych: kierunek + miasto + brand + zdjęcie.
 - Dodano roboczy renderer SVG dla 3 formatów Google Ads.
 - Potwierdzono działanie pipeline’u: dane → SVG preview.
+
