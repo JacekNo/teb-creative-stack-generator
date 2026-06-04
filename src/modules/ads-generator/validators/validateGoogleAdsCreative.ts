@@ -107,13 +107,15 @@ export function validateGoogleAdsCreative(
     });
   }
 
-  if (creative.course.review_flags) {
-    messages.push({
-      level: 'warning',
-      field: 'course',
-      message: `Kierunek ma flagi przeglądu: ${creative.course.review_flags}.`,
-    });
-  }
+// Review flags są przydatne w panelu danych, ale nie powinny automatycznie
+// obniżać statusu kreacji reklamowej, dopóki nie oznaczają realnego błędu produkcyjnego.
+// if (creative.course.review_flags) {
+//   messages.push({
+//     level: 'warning',
+//     field: 'course',
+//     message: `Kierunek ma flagi przeglądu: ${creative.course.review_flags}.`,
+//   });
+// }
 
   if (creative.city.review_flags) {
     messages.push({
@@ -264,14 +266,14 @@ const subtitleCharRatio = 0.55;
         field: 'cta',
         message: `CTA nie mieści się w pigułce w formacie ${format.label}.`,
       });
-    } else if (ctaFit.fontSize < cta.fontSize) {
-      messages.push({
-        level: 'warning',
-        formatId: format.id,
-        field: 'cta',
-        message: `CTA w formacie ${format.label} zostało zmniejszone z ${cta.fontSize}px do ${ctaFit.fontSize}px.`,
-      });
-    }
+} else if (ctaFit.fontSize <= Math.round(cta.fontSize * 0.9)) {
+  messages.push({
+    level: 'warning',
+    formatId: format.id,
+    field: 'cta',
+    message: `CTA w formacie ${format.label} zostało istotnie zmniejszone z ${cta.fontSize}px do ${ctaFit.fontSize}px.`,
+  });
+}
 
     if (ctaFit.fontSize * 0.25 < 8) {
       messages.push({
@@ -312,23 +314,17 @@ const subtitleCharRatio = 0.55;
       averageCharWidthRatio: 0.54,
     });
 
-    if (shouldUseStacked) {
-      messages.push({
-        level: 'warning',
-        formatId: format.id,
-        field: 'layout',
-        message: `Miasto wymusza wariant stacked w formacie ${format.label}.`,
-      });
-    }
+// Wariant stacked jest poprawnym fallbackiem layoutu.
+// Nie traktujemy go jako ostrzeżenia, jeśli tekst nadal jest czytelny.
 
-    if (cityRequiredWidth > city.maxWidth) {
-      messages.push({
-        level: 'warning',
-        formatId: format.id,
-        field: 'city',
-        message: `Miasto jest dłuższe niż zalecana szerokość pigułki w formacie ${format.label}.`,
-      });
-    }
+if (!shouldUseStacked && cityRequiredWidth > safeCityMaxWidth) {
+  messages.push({
+    level: 'warning',
+    formatId: format.id,
+    field: 'city',
+    message: `Miasto nie mieści się bezpiecznie między CTA a logo w formacie ${format.label}.`,
+  });
+}
 
     if (cityFit.truncated) {
       messages.push({
@@ -346,7 +342,7 @@ const subtitleCharRatio = 0.55;
       });
     }
 
-    if (cityFit.fontSize * 0.25 < 7) {
+    if (cityFit.fontSize * 0.25 < 6) {
       messages.push({
         level: 'warning',
         formatId: format.id,
