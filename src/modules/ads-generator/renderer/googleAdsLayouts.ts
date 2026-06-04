@@ -156,13 +156,11 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       },
 
       logo: {
-        x: 953,
-        y: 495,
-        width: 210,
-        height: 109,
-        paddingX: 18,
-        paddingY: 10,
-      },
+  x: 953,
+  y: 495,
+  width: 230,
+  height: 119,
+},
     },
   },
 
@@ -249,13 +247,11 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       },
 
       logo: {
-        x: 699,
-        y: 1049,
-        width: 227,
-        height: 117,
-        paddingX: 20,
-        paddingY: 12,
-      },
+  x: 699,
+  y: 1049,
+  width: 230,
+  height: 119,
+},
     },
   },
 
@@ -342,13 +338,11 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       },
 
       logo: {
-        x: 923,
-        y: 1024,
-        width: 227,
-        height: 117,
-        paddingX: 20,
-        paddingY: 12,
-      },
+  x: 923,
+  y: 1024,
+  width: 230,
+  height: 119,
+},
     },
   },
 };
