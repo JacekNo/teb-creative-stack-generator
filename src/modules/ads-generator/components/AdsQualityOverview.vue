@@ -71,7 +71,28 @@ const statusOptions: Array<{
     hint: 'do poprawy',
   },
 ];
-
+const stressCases = [
+  {
+    label: 'Krótki tytuł',
+    query: 'barber',
+    city: 'pila',
+  },
+  {
+    label: 'Długie miasto',
+    query: '',
+    city: 'piotrkow-trybunalski',
+  },
+  {
+    label: 'Długi kierunek',
+    query: 'asystent',
+    city: 'poznan',
+  },
+  {
+    label: 'Długi kierunek + miasto',
+    query: 'asystent',
+    city: 'piotrkow-trybunalski',
+  },
+] as const;
 const allRows = computed<QualityRow[]>(() => {
   return courses.map((course) => {
     try {
@@ -160,7 +181,32 @@ const stats = computed(() => {
     error: allRows.value.filter((row) => row.status === 'error').length,
   };
 });
+const selectedValidationGroups = computed(() => {
+  const messages = selectedRow.value?.validation?.messages ?? [];
 
+  return messages.reduce<Record<string, typeof messages>>((groups, message) => {
+    const key = message.field;
+
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+
+    groups[key].push(message);
+
+    return groups;
+  }, {});
+});
+
+const selectedValidationSummary = computed(() => {
+  const messages = selectedRow.value?.validation?.messages ?? [];
+
+  return {
+    total: messages.length,
+    errors: messages.filter((message) => message.level === 'error').length,
+    warnings: messages.filter((message) => message.level === 'warning').length,
+    ok: messages.filter((message) => message.level === 'ok').length,
+  };
+});
 function selectCourse(courseId: string) {
   selectedCourseId.value = courseId;
 }
@@ -169,6 +215,31 @@ function resetFilters() {
   selectedBrand.value = 'all';
   selectedStatus.value = 'all';
   searchQuery.value = '';
+}
+
+function applyStressCase(testCase: (typeof stressCases)[number]) {
+  selectedCityId.value = testCase.city;
+  selectedBrand.value = 'all';
+  selectedStatus.value = 'all';
+  searchQuery.value = testCase.query;
+
+  const matchingRow = allRows.value.find((row) => {
+    const searchable = [
+      row.course.course_name_raw,
+      row.course.course_title,
+      row.course.course_subtitle,
+      row.course.record_id,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+
+    return !testCase.query || searchable.includes(testCase.query.toLowerCase());
+  });
+
+  if (matchingRow) {
+    selectedCourseId.value = matchingRow.course.record_id;
+  }
 }
 </script>
 
@@ -214,7 +285,21 @@ function resetFilters() {
           </select>
         </div>
       </section>
+<section class="railSection">
+  <h2>Szybkie testy</h2>
 
+  <div class="stressCases">
+    <button
+      v-for="testCase in stressCases"
+      :key="testCase.label"
+      type="button"
+      class="stressButton"
+      @click="applyStressCase(testCase)"
+    >
+      {{ testCase.label }}
+    </button>
+  </div>
+</section>
       <section class="railSection">
         <div class="sectionHeader">
           <h2>Status</h2>
@@ -358,37 +443,69 @@ function resetFilters() {
             </div>
           </section>
 
-          <section
-            v-if="selectedRow.validation?.messages.length"
-            class="validationPanel"
-          >
-            <header>
-              <h3>Walidacja</h3>
-              <span>{{ selectedRow.validation.messages.length }} komunikatów</span>
-            </header>
 
-            <ul>
-              <li
-                v-for="message in selectedRow.validation.messages"
-                :key="`${message.field}-${message.formatId}-${message.message}`"
-                :class="message.level"
-              >
-                <strong>{{ message.level.toUpperCase() }}</strong>
-                <span>
-                  {{ message.field }}
-                  <template v-if="message.formatId"> / {{ message.formatId }}</template>:
-                  {{ message.message }}
-                </span>
-              </li>
-            </ul>
-          </section>
 
           <section class="previewCanvas">
             <AdsFormatPreview :creative="selectedRow.creative" />
           </section>
+                    <section
+  v-if="selectedRow.validation?.messages.length"
+  class="validationPanel"
+>
+  <header>
+    <div>
+      <h3>Walidacja</h3>
+      <p>
+        {{ selectedValidationSummary.total }} komunikatów dla wybranej kreacji
+      </p>
+    </div>
+
+    <div class="validationCounters">
+      <span v-if="selectedValidationSummary.errors" class="counter error">
+        {{ selectedValidationSummary.errors }} error
+      </span>
+
+      <span v-if="selectedValidationSummary.warnings" class="counter warning">
+        {{ selectedValidationSummary.warnings }} warning
+      </span>
+    </div>
+  </header>
+
+  <div class="validationGroups">
+    <details
+      v-for="(messages, field) in selectedValidationGroups"
+      :key="field"
+      class="validationGroup"
+      open
+    >
+      <summary>
+        <span>{{ field }}</span>
+        <strong>{{ messages.length }}</strong>
+      </summary>
+
+      <ul>
+        <li
+          v-for="message in messages"
+          :key="`${message.field}-${message.formatId}-${message.message}`"
+          :class="message.level"
+        >
+          <strong>{{ message.level.toUpperCase() }}</strong>
+
+          <span>
+            <template v-if="message.formatId">
+              {{ message.formatId }}:
+            </template>
+            {{ message.message }}
+          </span>
+        </li>
+      </ul>
+    </details>
+  </div>
+</section>
         </template>
       </template>
     </section>
+    
   </main>
 </template>
 
@@ -812,47 +929,132 @@ input:focus {
   box-shadow: 0 12px 30px rgba(16, 45, 105, 0.05);
 }
 
+.validationPanel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
 .validationPanel h3 {
   margin: 0;
   color: #062b6f;
   font-size: 16px;
 }
 
-.validationPanel header span {
+.validationPanel header p {
+  margin: 5px 0 0;
   color: #6b778c;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 750;
 }
 
-.validationPanel ul {
+.validationCounters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.counter {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.counter.warning {
+  background: #fff7e6;
+  color: #6b4300;
+}
+
+.counter.error {
+  background: #ffecec;
+  color: #9d1c1c;
+}
+
+.validationGroups {
   display: grid;
-  gap: 8px;
-  margin: 12px 0 0;
-  padding: 0;
+  gap: 10px;
+}
+
+.validationGroup {
+  border: 1px solid rgba(16, 45, 105, 0.07);
+  border-radius: 16px;
+  background: #f8fafc;
+  overflow: hidden;
+}
+
+.validationGroup summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 13px;
+  color: #102d69;
+  font-size: 13px;
+  font-weight: 900;
+  cursor: pointer;
   list-style: none;
 }
 
-.validationPanel li {
+.validationGroup summary::-webkit-details-marker {
+  display: none;
+}
+
+.validationGroup summary span {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.validationGroup summary strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #516078;
+  font-size: 11px;
+}
+
+.validationGroup ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0 10px 10px;
+  list-style: none;
+}
+
+.validationGroup li {
   display: grid;
   grid-template-columns: 84px minmax(0, 1fr);
   gap: 10px;
   padding: 10px 12px;
-  border-radius: 14px;
-  background: #f8fafc;
+  border-radius: 12px;
+  background: #ffffff;
   color: #102d69;
   font-size: 13px;
 }
 
-.validationPanel li.ok strong {
-  color: #14532d;
-}
-
-.validationPanel li.warning strong {
+.validationGroup li.warning strong {
   color: #6b4300;
 }
 
-.validationPanel li.error strong {
+.validationGroup li.error strong {
   color: #9d1c1c;
+}
+
+.validationGroup li.ok strong {
+  color: #14532d;
 }
 
 .previewCanvas {
@@ -905,5 +1107,35 @@ input:focus {
   .summaryStrip {
     grid-template-columns: 1fr;
   }
+}
+
+.stressCases {
+  display: grid;
+  gap: 8px;
+}
+
+.stressButton {
+  width: 100%;
+  min-height: 38px;
+  border: 1px solid rgba(16, 45, 105, 0.1);
+  border-radius: 13px;
+  padding: 0 11px;
+  background: #ffffff;
+  color: #102d69;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 850;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    transform 0.16s ease;
+}
+
+.stressButton:hover {
+  border-color: rgba(15, 68, 150, 0.28);
+  box-shadow: 0 10px 24px rgba(16, 45, 105, 0.08);
+  transform: translateY(-1px);
 }
 </style>
