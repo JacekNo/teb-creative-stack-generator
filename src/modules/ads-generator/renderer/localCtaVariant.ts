@@ -3,19 +3,8 @@ import type { GoogleAdsFormat, GoogleAdsFormatId } from './googleAdsFormats';
 export type LocalCtaVariant = 'single-button' | 'button-plus-city' | 'stacked';
 
 export interface LocalCtaVariantDecision {
-  /**
-   * Aktualnie renderowany wariant.
-   * Na razie trzymamy stabilnie button-plus-city,
-   * żeby nie zmieniać wyglądu bez osobnego commita.
-   */
   variant: LocalCtaVariant;
-
-  /**
-   * Wariant rekomendowany przez resolver.
-   * Przyda się później dla walidatora i wdrażania stacked/single-button.
-   */
   recommendedVariant: LocalCtaVariant;
-
   reason: string;
   cityLength: number;
   isLongCity: boolean;
@@ -55,13 +44,13 @@ export function resolveLocalCtaVariant(
   const recommendedVariant = getRecommendedVariant(cityLength, format.id);
 
   /**
-   * Etap 1:
-   * Zawsze renderujemy button-plus-city.
-   *
-   * Dzięki temu ten commit jest strukturalny i bezpieczny:
-   * dodaje resolver, ale nie zmienia jeszcze wyglądu kreacji.
+   * Etap 2:
+   * Włączamy tylko stacked dla długich miast.
+   * Krótkie miasta nadal renderujemy jako button-plus-city,
+   * a single-button zostawiamy na osobny, późniejszy krok.
    */
-  const variant: LocalCtaVariant = 'button-plus-city';
+  const variant: LocalCtaVariant =
+    recommendedVariant === 'stacked' ? 'stacked' : 'button-plus-city';
 
   return {
     variant,
@@ -70,7 +59,7 @@ export function resolveLocalCtaVariant(
     isLongCity: cityLength > 18,
     reason:
       recommendedVariant === variant
-        ? 'recommended-variant-is-currently-rendered'
-        : `recommended-${recommendedVariant}-will-be-enabled-later`,
+        ? 'recommended-variant-is-rendered'
+        : `recommended-${recommendedVariant}-is-not-enabled-yet`,
   };
 }
