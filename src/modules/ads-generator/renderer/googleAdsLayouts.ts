@@ -1,4 +1,4 @@
-import type { GoogleAdsFormat, GoogleAdsFormatId } from './googleAdsFormats';
+import type { GoogleAdsFormat, GoogleAdsFormatId } from "./googleAdsFormats";
 
 export interface RectLayout {
   x: number;
@@ -24,7 +24,7 @@ export interface TitleCardLayout extends RectLayout {
   maxWidth?: number;
   minHeight?: number;
   maxHeight?: number;
-  contentVerticalAlign?: 'top' | 'center';
+  contentVerticalAlign?: "top" | "center";
 }
 
 export interface ActionRowLayout {
@@ -34,13 +34,16 @@ export interface ActionRowLayout {
   gap: number;
 
   cta: {
-    width: number;
+    minWidth: number;
+    maxWidth: number;
+    paddingX: number;
     fontSize: number;
   };
 
   city: {
     minWidth: number;
     maxWidth: number;
+    paddingX: number;
     fontSize: number;
   };
 
@@ -49,6 +52,8 @@ export interface ActionRowLayout {
     y: number;
     width: number;
     height: number;
+    paddingX?: number;
+    paddingY?: number;
   };
 }
 
@@ -69,7 +74,7 @@ export interface GoogleAdsLayout {
 
 const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
   landscape_1200x628: {
-    formatId: 'landscape_1200x628',
+    formatId: "landscape_1200x628",
 
     background: {
       x: 0,
@@ -83,12 +88,12 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
      * Uwaga: docelowo warto zastąpić zwykłe rx własnym clipPath dla narożników.
      */
     photo: {
-  x: 553,
-  y: 0,
-  width: 647,
-  height: 473,
-  radius: 78,
-},
+      x: 553,
+      y: 0,
+      width: 647,
+      height: 473,
+      radius: 78,
+    },
 
     contentPanel: {
       x: 0,
@@ -109,7 +114,7 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       maxWidth: 430,
       minHeight: 126,
       maxHeight: 230,
-      contentVerticalAlign: 'center',
+      contentVerticalAlign: "center",
     },
 
     title: {
@@ -131,33 +136,38 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 48,
-      y: 503,
-      height: 93,
+      x: 49,
+      y: 505,
+      height: 89,
       gap: 11,
 
       cta: {
-        width: 294,
+        minWidth: 110,
+        maxWidth: 291,
+        paddingX: 22,
         fontSize: 30,
       },
 
       city: {
-        minWidth: 121,
+        minWidth: 90,
         maxWidth: 450,
+        paddingX: 22,
         fontSize: 30,
       },
 
       logo: {
-        x: 951,
-        y: 494,
-        width: 214,
-        height: 111,
+        x: 953,
+        y: 495,
+        width: 210,
+        height: 109,
+        paddingX: 18,
+        paddingY: 10,
       },
     },
   },
 
   portrait_960x1200: {
-    formatId: 'portrait_960x1200',
+    formatId: "portrait_960x1200",
 
     background: {
       x: 0,
@@ -171,12 +181,12 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
      * Lewy brandowy pas zostaje widoczny, zdjęcie dochodzi do prawej krawędzi.
      */
     photo: {
-  x: 50,
-  y: 0,
-  width: 910,
-  height: 680,
-  radius: 78,
-},
+      x: 50,
+      y: 0,
+      width: 910,
+      height: 680,
+      radius: 78,
+    },
 
     contentPanel: {
       x: 0,
@@ -197,7 +207,7 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       maxWidth: 800,
       minHeight: 126,
       maxHeight: 220,
-      contentVerticalAlign: 'center',
+      contentVerticalAlign: "center",
     },
 
     title: {
@@ -219,33 +229,38 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 36,
+      x: 38,
       y: 1063,
-      height: 90,
-      gap: 9,
+      height: 89,
+      gap: 11,
 
       cta: {
-        width: 294,
+        minWidth: 110,
+        maxWidth: 291,
+        paddingX: 22,
         fontSize: 30,
       },
 
       city: {
-        minWidth: 120,
-        maxWidth: 353,
+        minWidth: 90,
+        maxWidth: 347,
+        paddingX: 22,
         fontSize: 26,
       },
 
       logo: {
-        x: 696,
+        x: 699,
         y: 1049,
-        width: 232,
-        height: 119,
+        width: 227,
+        height: 117,
+        paddingX: 20,
+        paddingY: 12,
       },
     },
   },
 
   square_1200x1200: {
-    formatId: 'square_1200x1200',
+    formatId: "square_1200x1200",
 
     background: {
       x: 0,
@@ -258,13 +273,13 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
      * Stały slot zdjęcia według referencji Figma 1200x1200.
      * Zdjęcie jest duże, dociągnięte do góry i prawej krawędzi.
      */
- photo: {
-  x: 50,
-  y: 0,
-  width: 1150,
-  height: 680,
-  radius: 78,
-},
+    photo: {
+      x: 50,
+      y: 0,
+      width: 1150,
+      height: 680,
+      radius: 78,
+    },
 
     contentPanel: {
       x: 0,
@@ -285,7 +300,7 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       maxWidth: 977,
       minHeight: 126,
       maxHeight: 190,
-      contentVerticalAlign: 'center',
+      contentVerticalAlign: "center",
     },
 
     title: {
@@ -307,27 +322,32 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     actionRow: {
-      x: 49,
-      y: 1033,
-      height: 100,
-      gap: 24,
+      x: 50,
+      y: 1038,
+      height: 89,
+      gap: 10,
 
       cta: {
-        width: 379,
+        minWidth: 130,
+        maxWidth: 376,
+        paddingX: 28,
         fontSize: 34,
       },
 
       city: {
-        minWidth: 118,
-        maxWidth: 446,
+        minWidth: 100,
+        maxWidth: 437,
+        paddingX: 28,
         fontSize: 30,
       },
 
       logo: {
         x: 923,
-        y: 1020,
-        width: 230,
-        height: 122,
+        y: 1024,
+        width: 227,
+        height: 117,
+        paddingX: 20,
+        paddingY: 12,
       },
     },
   },
