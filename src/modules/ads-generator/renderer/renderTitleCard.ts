@@ -13,18 +13,22 @@ function clamp(value: number, min: number, max: number): number {
 
 function getTitleMinFontSize(format: GoogleAdsFormat): number {
   if (format.id === "landscape_1200x628") {
+    return 34;
+  }
+
+  if (format.id === "portrait_960x1200") {
     return 40;
   }
 
-  return 46;
+  return 40;
 }
 
 function getSubtitleMinFontSize(format: GoogleAdsFormat): number {
   if (format.id === "landscape_1200x628") {
-    return 30;
+    return 26;
   }
 
-  return 36;
+  return 30;
 }
 
 function getTitleCharRatio(format: GoogleAdsFormat): number {
@@ -34,10 +38,10 @@ function getTitleCharRatio(format: GoogleAdsFormat): number {
    * np. "farmaceutyczny" albo "niepełnosprawnej".
    */
   if (format.id === "landscape_1200x628") {
-    return 0.54;
+    return 0.52;
   }
 
-  return 0.56;
+  return 0.54;
 }
 
 function getInlineGuard(format: GoogleAdsFormat): number {
@@ -151,7 +155,11 @@ export function renderTitleCard(
   );
 
   const hasSubtitle = Boolean(creative.subtitle);
-  const gap = hasSubtitle ? 10 : 0;
+  const gap = hasSubtitle
+  ? format.id === "landscape_1200x628"
+    ? 8
+    : 10
+  : 0;
 
   const titleCharRatio = getTitleCharRatio(format);
   const subtitleCharRatio = 0.55;

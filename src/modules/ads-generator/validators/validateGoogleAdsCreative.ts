@@ -31,7 +31,37 @@ export interface CreativeValidationResult {
 }
 
 const CTA_TEXT = 'rozpocznij naukę';
+function getTitleMinFontSize(formatId: string): number {
+  if (formatId === 'landscape_1200x628') {
+    return 34;
+  }
 
+  return 40;
+}
+
+function getSubtitleMinFontSize(formatId: string): number {
+  if (formatId === 'landscape_1200x628') {
+    return 26;
+  }
+
+  return 30;
+}
+
+function getTitleCharRatio(formatId: string): number {
+  if (formatId === 'landscape_1200x628') {
+    return 0.52;
+  }
+
+  return 0.54;
+}
+
+function getInlineGuard(formatId: string): number {
+  if (formatId === 'landscape_1200x628') {
+    return 6;
+  }
+
+  return 10;
+}
 function getWorstStatus(messages: CreativeValidationMessage[]): CreativeValidationLevel {
   if (messages.some((message) => message.level === 'error')) return 'error';
   if (messages.some((message) => message.level === 'warning')) return 'warning';
@@ -103,13 +133,31 @@ export function validateGoogleAdsCreative(
 
   for (const format of GOOGLE_ADS_FORMATS) {
     const layout = getGoogleAdsLayout(format);
-    const card = layout.titleCard;
+const card = layout.titleCard;
 
-    const contentWidth = Math.max(80, card.maxWidth - card.paddingX * 2);
-    const contentHeight = Math.max(40, card.maxHeight - card.paddingY * 2);
+const inlineGuard = getInlineGuard(format.id);
+const blockGuard = 4;
 
-    const hasSubtitle = Boolean(creative.subtitle);
-    const gap = hasSubtitle ? 10 : 0;
+const contentWidth = Math.max(
+  80,
+  card.maxWidth - card.paddingX * 2 - inlineGuard,
+);
+
+const contentHeight = Math.max(
+  40,
+  card.maxHeight - card.paddingY * 2 - blockGuard,
+);
+
+const hasSubtitle = Boolean(creative.subtitle);
+
+const gap = hasSubtitle
+  ? format.id === 'landscape_1200x628'
+    ? 8
+    : 10
+  : 0;
+
+const titleCharRatio = getTitleCharRatio(format.id);
+const subtitleCharRatio = 0.55;
 
     const subtitleFit = hasSubtitle
       ? fitTextBlock({
@@ -118,9 +166,9 @@ export function validateGoogleAdsCreative(
           maxHeight: Math.max(34, Math.round(contentHeight * 0.36)),
           maxLines: layout.subtitle.maxLines,
           maxFontSize: layout.subtitle.fontSize,
-          minFontSize: 16,
+          minFontSize: getSubtitleMinFontSize(format.id),
           lineHeightRatio: layout.subtitle.lineHeight / layout.subtitle.fontSize,
-          averageCharWidthRatio: 0.52,
+          averageCharWidthRatio: subtitleCharRatio,
         })
       : null;
 
@@ -135,9 +183,9 @@ export function validateGoogleAdsCreative(
       maxHeight: titleMaxHeight,
       maxLines: layout.title.maxLines,
       maxFontSize: layout.title.fontSize,
-      minFontSize: 22,
+      minFontSize: getTitleMinFontSize(format.id),
       lineHeightRatio: layout.title.lineHeight / layout.title.fontSize,
-      averageCharWidthRatio: 0.54,
+      averageCharWidthRatio: titleCharRatio,
     });
 
     if (titleFit.truncated) {
@@ -147,7 +195,7 @@ export function validateGoogleAdsCreative(
         field: 'title',
         message: `Tytuł nie mieści się w formacie ${format.label}.`,
       });
-    } else if (titleFit.fontSize <= 24) {
+    } else if (titleFit.fontSize <= getTitleMinFontSize(format.id) + 2) {
       messages.push({
         level: 'warning',
         formatId: format.id,

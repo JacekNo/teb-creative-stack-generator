@@ -130,39 +130,39 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     titleCard: {
-      x: 48,
-      y: 132,
-      radius: 12,
+  x: 48,
+  y: 132,
+  radius: 12,
 
-      paddingX: 22,
-      paddingY: 20,
+  paddingX: 22,
+  paddingY: 18,
 
-      minWidth: 170,
-      maxWidth: 500,
+  minWidth: 170,
+  maxWidth: 520,
 
-      minHeight: 82,
-      maxHeight: 260,
+  minHeight: 82,
+  maxHeight: 284,
 
-      contentVerticalAlign: "center",
-    },
+  contentVerticalAlign: "center",
+},
 
-    title: {
-      x: 70,
-      y: 194,
-      maxChars: 18,
-      maxLines: 4,
-      fontSize: 46,
-      lineHeight: 41,
-    },
+title: {
+  x: 70,
+  y: 194,
+  maxChars: 18,
+  maxLines: 4,
+  fontSize: 44,
+  lineHeight: 42,
+},
 
-    subtitle: {
-      x: 70,
-      y: 316,
-      maxChars: 30,
-      maxLines: 2,
-      fontSize: 34,
-      lineHeight: 34,
-    },
+subtitle: {
+  x: 70,
+  y: 316,
+  maxChars: 30,
+  maxLines: 2,
+  fontSize: 31,
+  lineHeight: 32,
+},
 
     actionRow: {
   x: 49,
@@ -234,40 +234,39 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
     },
 
     titleCard: {
-      x: 50,
-      y: 710,
-      radius: 14,
+  x: 50,
+  y: 710,
+  radius: 14,
 
-      paddingX: 28,
-      paddingY: 24,
+  paddingX: 28,
+  paddingY: 24,
 
-      minWidth: 220,
-      maxWidth: 810,
+  minWidth: 220,
+  maxWidth: 810,
 
-      minHeight: 92,
-      maxHeight: 280,
+  minHeight: 92,
+  maxHeight: 310,
 
-      contentVerticalAlign: "center",
-    },
+  contentVerticalAlign: "center",
+},
 
-    title: {
-      x: 78,
-      y: 728,
-      maxChars: 22,
-      maxLines: 4,
-      fontSize: 60,
-      lineHeight: 54,
-    },
+title: {
+  x: 78,
+  y: 728,
+  maxChars: 22,
+  maxLines: 4,
+  fontSize: 58,
+  lineHeight: 56,
+},
 
-    subtitle: {
-      x: 78,
-      y: 868,
-      maxChars: 32,
-      maxLines: 2,
-      fontSize: 42,
-      lineHeight: 40,
-    },
-
+subtitle: {
+  x: 78,
+  y: 868,
+  maxChars: 32,
+  maxLines: 2,
+  fontSize: 38,
+  lineHeight: 38,
+},
     actionRow: {
   x: 38,
   y: 1063,
@@ -337,40 +336,40 @@ const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
       height: 520,
     },
 
-    titleCard: {
-      x: 50,
-      y: 706,
-      radius: 14,
+   titleCard: {
+  x: 50,
+  y: 706,
+  radius: 14,
 
-      paddingX: 28,
-      paddingY: 24,
+  paddingX: 28,
+  paddingY: 24,
 
-      minWidth: 220,
-      maxWidth: 980,
+  minWidth: 220,
+  maxWidth: 980,
 
-      minHeight: 92,
-      maxHeight: 260,
+  minHeight: 92,
+  maxHeight: 300,
 
-      contentVerticalAlign: "center",
-    },
+  contentVerticalAlign: "center",
+},
 
-    title: {
-      x: 78,
-      y: 778,
-      maxChars: 24,
-      maxLines: 3,
-      fontSize: 58,
-      lineHeight: 52,
-    },
+title: {
+  x: 78,
+  y: 778,
+  maxChars: 24,
+  maxLines: 4,
+  fontSize: 56,
+  lineHeight: 54,
+},
 
-    subtitle: {
-      x: 78,
-      y: 896,
-      maxChars: 38,
-      maxLines: 2,
-      fontSize: 42,
-      lineHeight: 38,
-    },
+subtitle: {
+  x: 78,
+  y: 896,
+  maxChars: 38,
+  maxLines: 2,
+  fontSize: 38,
+  lineHeight: 38,
+},
 
     actionRow: {
   x: 50,
