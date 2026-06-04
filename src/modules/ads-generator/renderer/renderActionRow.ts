@@ -40,6 +40,7 @@ export function renderActionRow(
   );
 
   const radius = row.height / 2;
+  const textCenterY = row.y + row.height / 2;
 
   return `
     <g id="action-row-${format.id}">
@@ -54,8 +55,9 @@ export function renderActionRow(
 
       <text
         x="${ctaX + row.cta.width / 2}"
-        y="${row.y + row.height / 2 + row.cta.fontSize * 0.34}"
+        y="${textCenterY}"
         text-anchor="middle"
+        dominant-baseline="middle"
         font-family="Roc Grotesk, Arial, sans-serif"
         font-size="${row.cta.fontSize}"
         font-weight="900"
@@ -75,8 +77,9 @@ export function renderActionRow(
 
       <text
         x="${cityX + cityWidth / 2}"
-        y="${row.y + row.height / 2 + cityFit.fontSize * 0.34}"
+        y="${textCenterY}"
         text-anchor="middle"
+        dominant-baseline="middle"
         font-family="Roc Grotesk, Arial, sans-serif"
         font-size="${cityFit.fontSize}"
         font-weight="800"

@@ -2,17 +2,51 @@ import type { ResolvedCreativeInput } from '../types/ads.types';
 import type { GoogleAdsFormat } from './googleAdsFormats';
 import { getGoogleAdsLayout } from './googleAdsLayouts';
 
+function renderBottomLeftRoundedPath(options: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  radius: number;
+}): string {
+  const { x, y, width, height } = options;
+  const radius = Math.max(0, Math.min(options.radius, width / 2, height / 2));
+
+  const right = x + width;
+  const bottom = y + height;
+
+  /**
+   * Ścieżka:
+   * - start od lewego górnego rogu
+   * - góra idzie do prawego górnego rogu, więc narożnik styka się z layoutem
+   * - prawa i dolna krawędź są ostre
+   * - zaokrąglamy tylko lewy dolny narożnik
+   */
+  return [
+    `M ${x} ${y}`,
+    `H ${right}`,
+    `V ${bottom}`,
+    `H ${x + radius}`,
+    `Q ${x} ${bottom} ${x} ${bottom - radius}`,
+    `V ${y}`,
+    'Z',
+  ].join(' ');
+}
+
 export function renderPhotoDefs(format: GoogleAdsFormat): string {
   const layout = getGoogleAdsLayout(format);
+  const radius = layout.photo.radius ?? 0;
 
   return `
     <clipPath id="photoClip-${format.id}">
-      <rect
-        x="${layout.photo.x}"
-        y="${layout.photo.y}"
-        width="${layout.photo.width}"
-        height="${layout.photo.height}"
-        rx="${layout.photo.radius ?? 0}"
+      <path
+        d="${renderBottomLeftRoundedPath({
+          x: layout.photo.x,
+          y: layout.photo.y,
+          width: layout.photo.width,
+          height: layout.photo.height,
+          radius,
+        })}"
       />
     </clipPath>
 

@@ -16,6 +16,7 @@ export function renderTextLines(options: {
   fill: string;
   weight?: number;
   letterSpacing?: number;
+  dominantBaseline?: 'alphabetic' | 'middle' | 'central';
 }): string {
   const {
     lines,
@@ -26,6 +27,7 @@ export function renderTextLines(options: {
     fill,
     weight = 800,
     letterSpacing = -1.2,
+    dominantBaseline = 'alphabetic',
   } = options;
 
   return lines
@@ -41,6 +43,7 @@ export function renderTextLines(options: {
           font-weight="${weight}"
           letter-spacing="${letterSpacing}"
           fill="${fill}"
+          dominant-baseline="${dominantBaseline}"
         >${escapeXml(line)}</text>
       `;
     })
