@@ -3,6 +3,10 @@ import type { GoogleAdsFormat } from '../renderer/googleAdsFormats';
 import { GOOGLE_ADS_FORMATS } from '../renderer/googleAdsFormats';
 import { renderAdSvg } from '../renderer/renderAdSvg';
 import { getCreativePngFileName } from './fileNaming';
+import {
+  formatFileSize,
+  getGoogleAdsAssetSizeStatus,
+} from './googleAdsAssetLimits';
 
 type SvgExportItem = {
   format: GoogleAdsFormat;
@@ -178,7 +182,23 @@ export async function downloadCreativePngSet(
   for (const item of exportItems) {
     const pngBlob = await svgToPngBlob(item.svg, item.format);
 
-    downloadBlob(pngBlob, item.fileName);
+const sizeStatus = getGoogleAdsAssetSizeStatus(pngBlob.size);
+
+if (sizeStatus === 'error') {
+  throw new Error(
+    `Plik ${item.fileName} przekracza limit Google Ads: ${formatFileSize(
+      pngBlob.size,
+    )} / 5 MB.`,
+  );
+}
+if (sizeStatus === 'warning') {
+  console.warn(
+    `Plik ${item.fileName} jest blisko limitu Google Ads: ${formatFileSize(
+      pngBlob.size,
+    )} / 5 MB.`,
+  );
+}
+downloadBlob(pngBlob, item.fileName);
 
     /**
      * Mały odstęp ogranicza ryzyko, że przeglądarka potraktuje
