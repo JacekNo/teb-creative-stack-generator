@@ -1,8 +1,12 @@
+import JSZip from 'jszip';
 import type { ResolvedCreativeInput } from '../types/ads.types';
 import type { GoogleAdsFormat } from '../renderer/googleAdsFormats';
 import { GOOGLE_ADS_FORMATS } from '../renderer/googleAdsFormats';
 import { renderAdSvg } from '../renderer/renderAdSvg';
-import { getCreativePngFileName } from './fileNaming';
+import {
+  getCreativePngFileName,
+  getCreativeZipFileName,
+} from './fileNaming';
 import {
   formatFileSize,
   getGoogleAdsAssetSizeStatus,
@@ -13,12 +17,6 @@ type SvgExportItem = {
   svg: string;
   fileName: string;
 };
-
-function delay(ms: number): Promise<void> {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, ms);
-  });
-}
 
 function downloadBlob(blob: Blob, fileName: string): void {
   const url = URL.createObjectURL(blob);
@@ -178,32 +176,38 @@ export async function downloadCreativePngSet(
   creative: ResolvedCreativeInput,
 ): Promise<void> {
   const exportItems = getExportItems(creative);
+  const zip = new JSZip();
 
   for (const item of exportItems) {
     const pngBlob = await svgToPngBlob(item.svg, item.format);
+    const sizeStatus = getGoogleAdsAssetSizeStatus(pngBlob.size);
 
-const sizeStatus = getGoogleAdsAssetSizeStatus(pngBlob.size);
+    if (sizeStatus === 'error') {
+      throw new Error(
+        `Plik ${item.fileName} przekracza limit Google Ads: ${formatFileSize(
+          pngBlob.size,
+        )} / 5 MB.`,
+      );
+    }
 
-if (sizeStatus === 'error') {
-  throw new Error(
-    `Plik ${item.fileName} przekracza limit Google Ads: ${formatFileSize(
-      pngBlob.size,
-    )} / 5 MB.`,
-  );
-}
-if (sizeStatus === 'warning') {
-  console.warn(
-    `Plik ${item.fileName} jest blisko limitu Google Ads: ${formatFileSize(
-      pngBlob.size,
-    )} / 5 MB.`,
-  );
-}
-downloadBlob(pngBlob, item.fileName);
+    if (sizeStatus === 'warning') {
+      console.warn(
+        `Plik ${item.fileName} jest blisko limitu Google Ads: ${formatFileSize(
+          pngBlob.size,
+        )} / 5 MB.`,
+      );
+    }
 
-    /**
-     * Mały odstęp ogranicza ryzyko, że przeglądarka potraktuje
-     * 3 pobrania jako jedną zbyt agresywną akcję.
-     */
-    await delay(180);
+    zip.file(item.fileName, pngBlob);
   }
+
+  const zipBlob = await zip.generateAsync({
+    type: 'blob',
+    compression: 'DEFLATE',
+    compressionOptions: {
+      level: 6,
+    },
+  });
+
+  downloadBlob(zipBlob, getCreativeZipFileName(creative));
 }

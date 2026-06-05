@@ -42,3 +42,8 @@ export function getCreativePngFileName(
 
   return `${baseName}_${format.width}x${format.height}.png`;
 }
+export function getCreativeZipFileName(creative: ResolvedCreativeInput): string {
+  const baseName = getCreativeExportBaseName(creative);
+
+  return `${baseName}_google-ads-set.zip`;
+}
