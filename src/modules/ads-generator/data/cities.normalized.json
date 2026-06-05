@@ -1,6 +1,7 @@
 [
   {
     "city_id": "belchatow",
+    "city_code": "BEL",
     "city_raw": "Bełchatów",
     "city": "Bełchatów",
     "city_locative": "Bełchatowie",
@@ -14,6 +15,7 @@
   },
   {
     "city_id": "bialystok",
+    "city_code": "BIA",
     "city_raw": "Białystok",
     "city": "Białystok",
     "city_locative": "Białymstoku",
@@ -27,6 +29,7 @@
   },
   {
     "city_id": "bielsko-biala",
+    "city_code": "BIE",
     "city_raw": "Bielsko Biała",
     "city": "Bielsko-Biała",
     "city_locative": "Bielsku-Białej",
@@ -40,6 +43,7 @@
   },
   {
     "city_id": "bydgoszcz",
+    "city_code": "BYD",
     "city_raw": "Bydgoszcz",
     "city": "Bydgoszcz",
     "city_locative": "Bydgoszczy",
@@ -53,6 +57,7 @@
   },
   {
     "city_id": "czestochowa",
+    "city_code": "CZE",
     "city_raw": "Częstochowa",
     "city": "Częstochowa",
     "city_locative": "Częstochowie",
@@ -66,6 +71,7 @@
   },
   {
     "city_id": "gdansk",
+    "city_code": "GDA",
     "city_raw": "Gdańsk",
     "city": "Gdańsk",
     "city_locative": "Gdańsku",
@@ -79,6 +85,7 @@
   },
   {
     "city_id": "gdynia",
+    "city_code": "GDY",
     "city_raw": "Gdynia",
     "city": "Gdynia",
     "city_locative": "Gdyni",
@@ -92,6 +99,7 @@
   },
   {
     "city_id": "gliwice",
+    "city_code": "GLI",
     "city_raw": "Gliwice",
     "city": "Gliwice",
     "city_locative": "Gliwicach",
@@ -105,6 +113,7 @@
   },
   {
     "city_id": "gniezno",
+    "city_code": "GNI",
     "city_raw": "Gniezno",
     "city": "Gniezno",
     "city_locative": "Gnieźnie",
@@ -118,6 +127,7 @@
   },
   {
     "city_id": "gorzow-wielkopolski",
+    "city_code": "GOR",
     "city_raw": "Gorzów Wielkopolski",
     "city": "Gorzów Wielkopolski",
     "city_locative": "Gorzowie Wielkopolskim",
@@ -131,6 +141,7 @@
   },
   {
     "city_id": "grudziadz",
+    "city_code": "GRU",
     "city_raw": "Grudziądz",
     "city": "Grudziądz",
     "city_locative": "Grudziądzu",
@@ -144,6 +155,7 @@
   },
   {
     "city_id": "jastrzebie-zdroj",
+    "city_code": "JAS",
     "city_raw": "Jastrzębie Zdrój",
     "city": "Jastrzębie-Zdrój",
     "city_locative": "Jastrzębiu-Zdroju",
@@ -157,6 +169,7 @@
   },
   {
     "city_id": "jelenia-gora",
+    "city_code": "JEL",
     "city_raw": "Jelenia Góra",
     "city": "Jelenia Góra",
     "city_locative": "Jeleniej Górze",
@@ -170,6 +183,7 @@
   },
   {
     "city_id": "kalisz",
+    "city_code": "KAL",
     "city_raw": "Kalisz",
     "city": "Kalisz",
     "city_locative": "Kaliszu",
@@ -183,6 +197,7 @@
   },
   {
     "city_id": "katowice",
+    "city_code": "KAT",
     "city_raw": "Katowice",
     "city": "Katowice",
     "city_locative": "Katowicach",
@@ -196,6 +211,7 @@
   },
   {
     "city_id": "kielce",
+    "city_code": "KIE",
     "city_raw": "Kielce",
     "city": "Kielce",
     "city_locative": "Kielcach",
@@ -209,6 +225,7 @@
   },
   {
     "city_id": "koszalin",
+    "city_code": "KOS",
     "city_raw": "Koszalin",
     "city": "Koszalin",
     "city_locative": "Koszalinie",
@@ -222,6 +239,7 @@
   },
   {
     "city_id": "krakow",
+    "city_code": "KRA",
     "city_raw": "Kraków",
     "city": "Kraków",
     "city_locative": "Krakowie",
@@ -235,6 +253,7 @@
   },
   {
     "city_id": "legnica",
+    "city_code": "LEG",
     "city_raw": "Legnica",
     "city": "Legnica",
     "city_locative": "Legnicy",
@@ -248,6 +267,7 @@
   },
   {
     "city_id": "leszno",
+    "city_code": "LES",
     "city_raw": "Leszno",
     "city": "Leszno",
     "city_locative": "Lesznie",
@@ -261,6 +281,7 @@
   },
   {
     "city_id": "lubin",
+    "city_code": "LUB",
     "city_raw": "Lubin",
     "city": "Lubin",
     "city_locative": "Lubinie",
@@ -274,6 +295,7 @@
   },
   {
     "city_id": "lublin",
+    "city_code": "LUI",
     "city_raw": "Lublin",
     "city": "Lublin",
     "city_locative": "Lublinie",
@@ -287,6 +309,7 @@
   },
   {
     "city_id": "lodz",
+    "city_code": "LOD",
     "city_raw": "Łódź",
     "city": "Łódź",
     "city_locative": "Łodzi",
@@ -300,6 +323,7 @@
   },
   {
     "city_id": "nowy-sacz",
+    "city_code": "NOS",
     "city_raw": "Nowy Sącz",
     "city": "Nowy Sącz",
     "city_locative": "Nowym Sączu",
@@ -313,6 +337,7 @@
   },
   {
     "city_id": "olsztyn",
+    "city_code": "OLS",
     "city_raw": "Olsztyn",
     "city": "Olsztyn",
     "city_locative": "Olsztynie",
@@ -326,6 +351,7 @@
   },
   {
     "city_id": "opole",
+    "city_code": "OPO",
     "city_raw": "Opole",
     "city": "Opole",
     "city_locative": "Opolu",
@@ -339,6 +365,7 @@
   },
   {
     "city_id": "ostrow-wielkopolski",
+    "city_code": "OST",
     "city_raw": "Ostrów Wielkopolski",
     "city": "Ostrów Wielkopolski",
     "city_locative": "Ostrowie Wielkopolskim",
@@ -352,6 +379,7 @@
   },
   {
     "city_id": "pila",
+    "city_code": "PIL",
     "city_raw": "Piła",
     "city": "Piła",
     "city_locative": "Pile",
@@ -365,6 +393,7 @@
   },
   {
     "city_id": "piotrkow-trybunalski",
+    "city_code": "PIO",
     "city_raw": "Piotrków Trybunalski",
     "city": "Piotrków Trybunalski",
     "city_locative": "Piotrkowie Trybunalskim",
@@ -378,6 +407,7 @@
   },
   {
     "city_id": "plock",
+    "city_code": "PLO",
     "city_raw": "Płock",
     "city": "Płock",
     "city_locative": "Płocku",
@@ -391,6 +421,7 @@
   },
   {
     "city_id": "poznan",
+    "city_code": "POZ",
     "city_raw": "Poznań",
     "city": "Poznań",
     "city_locative": "Poznaniu",
@@ -404,6 +435,7 @@
   },
   {
     "city_id": "raciborz",
+    "city_code": "RAC",
     "city_raw": "Racibórz",
     "city": "Racibórz",
     "city_locative": "Raciborzu",
@@ -417,6 +449,7 @@
   },
   {
     "city_id": "radom",
+    "city_code": "RAD",
     "city_raw": "Radom",
     "city": "Radom",
     "city_locative": "Radomiu",
@@ -430,6 +463,7 @@
   },
   {
     "city_id": "rybnik",
+    "city_code": "RYB",
     "city_raw": "Rybnik",
     "city": "Rybnik",
     "city_locative": "Rybniku",
@@ -443,6 +477,7 @@
   },
   {
     "city_id": "rzeszow",
+    "city_code": "RZE",
     "city_raw": "Rzeszów",
     "city": "Rzeszów",
     "city_locative": "Rzeszowie",
@@ -456,6 +491,7 @@
   },
   {
     "city_id": "slupsk",
+    "city_code": "SLU",
     "city_raw": "Słupsk",
     "city": "Słupsk",
     "city_locative": "Słupsku",
@@ -469,6 +505,7 @@
   },
   {
     "city_id": "starogard-gdanski",
+    "city_code": "STA",
     "city_raw": "Starogard Gd.",
     "city": "Starogard Gdański",
     "city_locative": "Starogardzie Gdańskim",
@@ -482,6 +519,7 @@
   },
   {
     "city_id": "szczecin",
+    "city_code": "SZC",
     "city_raw": "Szczecin",
     "city": "Szczecin",
     "city_locative": "Szczecinie",
@@ -495,6 +533,7 @@
   },
   {
     "city_id": "swidnica",
+    "city_code": "SWI",
     "city_raw": "Świdnica",
     "city": "Świdnica",
     "city_locative": "Świdnicy",
@@ -508,6 +547,7 @@
   },
   {
     "city_id": "torun",
+    "city_code": "TOR",
     "city_raw": "Toruń",
     "city": "Toruń",
     "city_locative": "Toruniu",
@@ -521,6 +561,7 @@
   },
   {
     "city_id": "tychy",
+    "city_code": "TYC",
     "city_raw": "Tychy",
     "city": "Tychy",
     "city_locative": "Tychach",
@@ -534,6 +575,7 @@
   },
   {
     "city_id": "walbrzych",
+    "city_code": "WAL",
     "city_raw": "Wałbrzych",
     "city": "Wałbrzych",
     "city_locative": "Wałbrzychu",
@@ -547,6 +589,7 @@
   },
   {
     "city_id": "warszawa",
+    "city_code": "WAR",
     "city_raw": "Warszawa",
     "city": "Warszawa",
     "city_locative": "Warszawie",
@@ -560,6 +603,7 @@
   },
   {
     "city_id": "wodzislaw-slaski",
+    "city_code": "WOD",
     "city_raw": "Wodzisław Śląski",
     "city": "Wodzisław Śląski",
     "city_locative": "Wodzisławiu Śląskim",
@@ -573,6 +617,7 @@
   },
   {
     "city_id": "wroclaw",
+    "city_code": "WRO",
     "city_raw": "Wrocław",
     "city": "Wrocław",
     "city_locative": "Wrocławiu",
@@ -586,6 +631,7 @@
   },
   {
     "city_id": "zamosc",
+    "city_code": "ZAM",
     "city_raw": "Zamość",
     "city": "Zamość",
     "city_locative": "Zamościu",
