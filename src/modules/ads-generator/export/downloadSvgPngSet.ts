@@ -4,6 +4,7 @@ import type { GoogleAdsFormat } from '../renderer/googleAdsFormats';
 import { GOOGLE_ADS_FORMATS } from '../renderer/googleAdsFormats';
 import { renderAdSvg } from '../renderer/renderAdSvg';
 import {
+  getCreativeFolderName,
   getCreativePngFileName,
   getCreativeZipFileName,
 } from './fileNaming';
@@ -16,6 +17,10 @@ type SvgExportItem = {
   format: GoogleAdsFormat;
   svg: string;
   fileName: string;
+};
+
+type BatchExportOptions = {
+  zipFileName: string;
 };
 
 function downloadBlob(blob: Blob, fileName: string): void {
@@ -172,11 +177,20 @@ function getExportItems(creative: ResolvedCreativeInput): SvgExportItem[] {
   }));
 }
 
-export async function downloadCreativePngSet(
+async function addCreativePngSetToZip(
+  zip: JSZip,
   creative: ResolvedCreativeInput,
+  options?: {
+    folderName?: string;
+  },
 ): Promise<void> {
   const exportItems = getExportItems(creative);
-  const zip = new JSZip();
+  const folderName = options?.folderName ?? getCreativeFolderName(creative);
+  const folder = zip.folder(folderName);
+
+  if (!folder) {
+    throw new Error(`Nie udało się utworzyć folderu ZIP: ${folderName}`);
+  }
 
   for (const item of exportItems) {
     const pngBlob = await svgToPngBlob(item.svg, item.format);
@@ -198,9 +212,11 @@ export async function downloadCreativePngSet(
       );
     }
 
-    zip.file(item.fileName, pngBlob);
+    folder.file(item.fileName, pngBlob);
   }
+}
 
+async function generateAndDownloadZip(zip: JSZip, fileName: string): Promise<void> {
   const zipBlob = await zip.generateAsync({
     type: 'blob',
     compression: 'DEFLATE',
@@ -209,5 +225,36 @@ export async function downloadCreativePngSet(
     },
   });
 
-  downloadBlob(zipBlob, getCreativeZipFileName(creative));
+  downloadBlob(zipBlob, fileName);
+}
+
+export async function downloadCreativePngSet(
+  creative: ResolvedCreativeInput,
+): Promise<void> {
+  const zip = new JSZip();
+
+  await addCreativePngSetToZip(zip, creative, {
+    folderName: getCreativeFolderName(creative),
+  });
+
+  await generateAndDownloadZip(zip, getCreativeZipFileName(creative));
+}
+
+export async function downloadCreativeBatchPngSet(
+  creatives: ResolvedCreativeInput[],
+  options: BatchExportOptions,
+): Promise<void> {
+  if (!creatives.length) {
+    throw new Error('Brak kreacji do eksportu.');
+  }
+
+  const zip = new JSZip();
+
+  for (const creative of creatives) {
+    await addCreativePngSetToZip(zip, creative, {
+      folderName: getCreativeFolderName(creative),
+    });
+  }
+
+  await generateAndDownloadZip(zip, options.zipFileName);
 }

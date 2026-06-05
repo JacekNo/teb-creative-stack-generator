@@ -1,7 +1,15 @@
 import type { ResolvedCreativeInput } from '../types/ads.types';
 import type { GoogleAdsFormat } from '../renderer/googleAdsFormats';
 
-function slugify(value: string): string {
+type CityLike = {
+  city_code?: string;
+  city_id?: string;
+  city?: string;
+  city_raw?: string;
+  city_display?: string;
+};
+
+export function slugify(value: string): string {
   return value
     .toLowerCase()
     .normalize('NFD')
@@ -12,14 +20,28 @@ function slugify(value: string): string {
     .replace(/-{2,}/g, '-');
 }
 
-function getCityCode(creative: ResolvedCreativeInput): string {
-  const cityCode = creative.city.city_code;
-
-  if (cityCode) {
-    return slugify(cityCode);
+export function getCityExportCode(city: CityLike | null | undefined): string {
+  if (city?.city_code) {
+    return slugify(city.city_code);
   }
 
-  return slugify(creative.city.city_id || creative.cityDisplay || 'miasto');
+  if (city?.city_id) {
+    return slugify(city.city_id);
+  }
+
+  if (city?.city) {
+    return slugify(city.city);
+  }
+
+  if (city?.city_raw) {
+    return slugify(city.city_raw);
+  }
+
+  if (city?.city_display) {
+    return slugify(city.city_display);
+  }
+
+  return 'miasto';
 }
 
 function getCourseCode(creative: ResolvedCreativeInput): string {
@@ -28,10 +50,14 @@ function getCourseCode(creative: ResolvedCreativeInput): string {
 
 export function getCreativeExportBaseName(creative: ResolvedCreativeInput): string {
   const brand = slugify(creative.brandKey || 'teb');
-  const city = getCityCode(creative);
+  const city = getCityExportCode(creative.city);
   const course = getCourseCode(creative);
 
   return [brand, city, course].filter(Boolean).join('_');
+}
+
+export function getCreativeFolderName(creative: ResolvedCreativeInput): string {
+  return getCreativeExportBaseName(creative);
 }
 
 export function getCreativePngFileName(
@@ -42,8 +68,21 @@ export function getCreativePngFileName(
 
   return `${baseName}_${format.width}x${format.height}.png`;
 }
+
 export function getCreativeZipFileName(creative: ResolvedCreativeInput): string {
   const baseName = getCreativeExportBaseName(creative);
 
   return `${baseName}_google-ads-set.zip`;
+}
+
+export function getBatchZipFileName(options: {
+  city?: CityLike | null;
+  brand?: string;
+  count?: number;
+}): string {
+  const city = getCityExportCode(options.city);
+  const brand = slugify(options.brand || 'all-brands');
+  const count = options.count ? `${options.count}-kierunkow` : 'batch';
+
+  return `google-ads_${city}_${brand}_${count}.zip`;
 }

@@ -17,6 +17,12 @@ import type {
   CreativeValidationLevel,
   CreativeValidationResult,
 } from '../validators/validateGoogleAdsCreative';
+import {
+  downloadCreativeBatchPngSet,
+} from '../export/downloadSvgPngSet';
+import {
+  getBatchZipFileName,
+} from '../export/fileNaming';
 
 type StatusFilter = 'all' | CreativeValidationLevel;
 type ValidationFieldFilter =
@@ -61,6 +67,12 @@ const selectedStatus = ref<StatusFilter>('all');
 const searchQuery = ref('');
 
 const selectedCourseId = ref(courses[0]?.record_id ?? '');
+const isBatchExporting = ref(false);
+const batchExportError = ref('');
+
+const selectedCity = computed(() => {
+  return cities.find((city) => city.city_id === selectedCityId.value);
+});
 
 const statusOptions: Array<{
   label: string;
@@ -218,10 +230,14 @@ watch(
 const selectedRow = computed(() => {
   return allRows.value.find((row) => row.course.record_id === selectedCourseId.value) ?? null;
 });
-
-const selectedCity = computed(() => {
-  return cities.find((city) => city.city_id === selectedCityId.value);
+const batchExportCreatives = computed(() => {
+  return filteredRows.value
+    .filter((row): row is QualityRow & { creative: ResolvedCreativeInput } => {
+      return Boolean(row.creative) && row.status !== 'error';
+    })
+    .map((row) => row.creative);
 });
+
 
 const stats = computed(() => {
   return {
@@ -292,7 +308,32 @@ const selectedValidationSummary = computed(() => {
 function selectCourse(courseId: string) {
   selectedCourseId.value = courseId;
 }
+async function handleBatchExport() {
+  if (isBatchExporting.value) return;
 
+  isBatchExporting.value = true;
+  batchExportError.value = '';
+
+    try {
+    const brand =
+      selectedBrand.value === 'all' ? 'all-brands' : selectedBrand.value;
+
+    await downloadCreativeBatchPngSet(batchExportCreatives.value, {
+      zipFileName: getBatchZipFileName({
+  city: selectedCity.value,
+  brand,
+  count: batchExportCreatives.value.length,
+}),
+    });
+  } catch (error) {
+    batchExportError.value =
+      error instanceof Error
+        ? error.message
+        : 'Nie udało się wyeksportować widocznych kreacji.';
+  } finally {
+    isBatchExporting.value = false;
+  }
+}
 function resetFilters() {
   selectedBrand.value = 'all';
   selectedStatus.value = 'all';
@@ -509,11 +550,24 @@ function applyStressCase(testCase: (typeof stressCases)[number]) {
 
     <aside class="courseRail" aria-label="Lista kierunków">
       <header class="courseRailHeader">
-        <div>
-          <p class="eyebrow">Kierunki</p>
-          <h2>{{ stats.filtered }} w filtrze</h2>
-        </div>
-      </header>
+  <div>
+    <p class="eyebrow">Kierunki</p>
+    <h2>{{ stats.filtered }} w filtrze</h2>
+  </div>
+
+  <button
+    type="button"
+    class="batchExportButton"
+    :disabled="isBatchExporting || !batchExportCreatives.length"
+    @click="handleBatchExport"
+  >
+    {{ isBatchExporting ? 'Eksportuję…' : 'Eksportuj widoczne' }}
+  </button>
+</header>
+
+<p v-if="batchExportError" class="batchExportError">
+  {{ batchExportError }}
+</p>
 
       <div class="searchBox">
         <label for="search">Szukaj kierunku</label>
@@ -1351,5 +1405,42 @@ input:focus {
   border-color: rgba(15, 68, 150, 0.28);
   box-shadow: 0 10px 24px rgba(16, 45, 105, 0.08);
   transform: translateY(-1px);
+}
+
+.batchExportButton {
+  flex: 0 0 auto;
+  min-height: 32px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 12px;
+  background: #0941a1;
+  color: #ffffff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(9, 65, 161, 0.18);
+}
+
+.batchExportButton:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(9, 65, 161, 0.24);
+}
+
+.batchExportButton:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.batchExportError {
+  margin: 0 8px 10px;
+  padding: 10px 12px;
+  border: 1px solid rgba(157, 28, 28, 0.12);
+  border-radius: 14px;
+  background: #ffecec;
+  color: #9d1c1c;
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.4;
 }
 </style>
