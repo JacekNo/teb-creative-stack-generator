@@ -13,6 +13,7 @@ export interface FitTextBlockResult {
   lines: string[];
   fontSize: number;
   lineHeight: number;
+  width: number;
   height: number;
   truncated: boolean;
 }
@@ -32,8 +33,52 @@ export interface FitSingleLineResult {
   truncated: boolean;
 }
 
+const FORBIDDEN_LINE_ENDINGS = new Set([
+  'i',
+  'a',
+  'o',
+  'u',
+  'w',
+  'z',
+  'we',
+  'ze',
+  'do',
+  'od',
+  'po',
+  'na',
+  'za',
+  'oraz',
+  'lub',
+  'albo',
+
+]);
+
 export function normalizeText(text: string): string {
   return text.trim().replace(/\s+/g, ' ');
+}
+
+/**
+ * SVG generujemy jako string, więc nie mamy dostępu do prawdziwego Canvas TextMetrics.
+ * Ta funkcja jest konserwatywną estymacją szerokości tekstu.
+ */
+function getCharWidthRatio(char: string, fallbackRatio: number): number {
+  if (char === ' ') return 0.32;
+
+  if (/[.,;:!|'"`]/.test(char)) return 0.24;
+  if (/[ijlI1]/.test(char)) return 0.3;
+  if (/[ft]/.test(char)) return 0.42;
+  if (/[r]/.test(char)) return 0.44;
+  if (/[mwMW]/.test(char)) return 0.86;
+
+  if (/[A-ZĄĆĘŁŃÓŚŹŻ]/.test(char)) {
+    return Math.max(fallbackRatio, 0.64);
+  }
+
+  if (/[0-9]/.test(char)) {
+    return Math.max(fallbackRatio, 0.56);
+  }
+
+  return fallbackRatio;
 }
 
 export function estimateTextWidth(
@@ -41,7 +86,70 @@ export function estimateTextWidth(
   fontSize: number,
   averageCharWidthRatio = 0.55,
 ): number {
-  return Math.ceil(normalizeText(text).length * fontSize * averageCharWidthRatio);
+  const normalized = normalizeText(text);
+
+  if (!normalized) {
+    return 0;
+  }
+
+  const ratioSum = Array.from(normalized).reduce((sum, char) => {
+    return sum + getCharWidthRatio(char, averageCharWidthRatio);
+  }, 0);
+
+  const widthGuard = 1.07;
+
+  return Math.ceil(ratioSum * fontSize * widthGuard);
+}
+
+function normalizeToken(token: string): string {
+  return token
+    .trim()
+    .toLowerCase()
+    .replace(/[.,;:!?]+$/g, '');
+}
+
+function shouldAvoidLineEnding(word: string): boolean {
+  return FORBIDDEN_LINE_ENDINGS.has(normalizeToken(word));
+}
+
+function improvePolishLineBreaks(options: {
+  lines: string[];
+  fontSize: number;
+  maxWidth: number;
+  averageCharWidthRatio: number;
+}): string[] {
+  const { fontSize, maxWidth, averageCharWidthRatio } = options;
+  const lines = [...options.lines];
+
+  for (let index = 0; index < lines.length - 1; index += 1) {
+    const words = lines[index].split(/\s+/).filter(Boolean);
+
+    if (words.length <= 1) {
+      continue;
+    }
+
+    const lastWord = words[words.length - 1];
+
+    if (!shouldAvoidLineEnding(lastWord)) {
+      continue;
+    }
+
+    const currentLineCandidate = words.slice(0, -1).join(' ');
+    const nextLineCandidate = `${lastWord} ${lines[index + 1]}`;
+
+    const nextLineCandidateWidth = estimateTextWidth(
+      nextLineCandidate,
+      fontSize,
+      averageCharWidthRatio,
+    );
+
+    if (currentLineCandidate && nextLineCandidateWidth <= maxWidth) {
+      lines[index] = currentLineCandidate;
+      lines[index + 1] = nextLineCandidate;
+    }
+  }
+
+  return lines;
 }
 
 function addEllipsis(text: string): string {
@@ -51,7 +159,61 @@ function addEllipsis(text: string): string {
     return normalized;
   }
 
-  return `${normalized.replace(/[.,;:!?-]+$/, '').slice(0, Math.max(1, normalized.length - 1))}…`;
+  const cleaned = normalized.replace(/[.,;:!?-]+$/, '');
+  const shortened = cleaned.slice(0, Math.max(1, cleaned.length - 1));
+
+  return `${shortened}…`;
+}
+
+function truncateTextToWidth(options: {
+  text: string;
+  fontSize: number;
+  maxWidth: number;
+  averageCharWidthRatio: number;
+}): string {
+  const { fontSize, maxWidth, averageCharWidthRatio } = options;
+
+  let text = normalizeText(options.text);
+
+  if (!text || maxWidth <= 0) {
+    return '';
+  }
+
+  if (estimateTextWidth(text, fontSize, averageCharWidthRatio) <= maxWidth) {
+    return text;
+  }
+
+  while (
+    text.length > 1 &&
+    estimateTextWidth(addEllipsis(text), fontSize, averageCharWidthRatio) >
+      maxWidth
+  ) {
+    text = text.slice(0, -1);
+  }
+
+  const truncated = addEllipsis(text);
+
+  if (estimateTextWidth(truncated, fontSize, averageCharWidthRatio) <= maxWidth) {
+    return truncated;
+  }
+
+  return '';
+}
+
+function getLinesWidth(
+  lines: string[],
+  fontSize: number,
+  averageCharWidthRatio: number,
+): number {
+  if (!lines.length) {
+    return 0;
+  }
+
+  return Math.max(
+    ...lines.map((line) =>
+      estimateTextWidth(line, fontSize, averageCharWidthRatio),
+    ),
+  );
 }
 
 function wrapText(options: {
@@ -65,12 +227,21 @@ function wrapText(options: {
 
   const words = normalizeText(text).split(/\s+/).filter(Boolean);
   const lines: string[] = [];
+
   let currentLine = '';
   let truncated = false;
 
+  if (!words.length || maxLines <= 0) {
+    return { lines: [], truncated: false };
+  }
+
   for (const word of words) {
     const nextLine = currentLine ? `${currentLine} ${word}` : word;
-    const nextWidth = estimateTextWidth(nextLine, fontSize, averageCharWidthRatio);
+    const nextWidth = estimateTextWidth(
+      nextLine,
+      fontSize,
+      averageCharWidthRatio,
+    );
 
     if (nextWidth <= maxWidth) {
       currentLine = nextLine;
@@ -107,6 +278,39 @@ function wrapText(options: {
   return { lines, truncated };
 }
 
+function clampLinesToWidth(options: {
+  lines: string[];
+  fontSize: number;
+  maxWidth: number;
+  averageCharWidthRatio: number;
+}): { lines: string[]; truncated: boolean } {
+  const { lines, fontSize, maxWidth, averageCharWidthRatio } = options;
+
+  let truncated = false;
+
+  const fittedLines = lines.map((line) => {
+    const width = estimateTextWidth(line, fontSize, averageCharWidthRatio);
+
+    if (width <= maxWidth) {
+      return line;
+    }
+
+    truncated = true;
+
+    return truncateTextToWidth({
+      text: line,
+      fontSize,
+      maxWidth,
+      averageCharWidthRatio,
+    });
+  });
+
+  return {
+    lines: fittedLines.filter(Boolean),
+    truncated,
+  };
+}
+
 export function fitTextBlock(options: FitTextBlockOptions): FitTextBlockResult {
   const {
     text,
@@ -126,6 +330,7 @@ export function fitTextBlock(options: FitTextBlockOptions): FitTextBlockResult {
       lines: [],
       fontSize: maxFontSize,
       lineHeight: Math.round(maxFontSize * lineHeightRatio),
+      width: 0,
       height: 0,
       truncated: false,
     };
@@ -133,21 +338,36 @@ export function fitTextBlock(options: FitTextBlockOptions): FitTextBlockResult {
 
   for (let fontSize = maxFontSize; fontSize >= minFontSize; fontSize -= 1) {
     const lineHeight = Math.round(fontSize * lineHeightRatio);
-    const { lines, truncated } = wrapText({
+
+    const heightLimitedMaxLines = Math.max(
+      1,
+      Math.min(maxLines, Math.floor(maxHeight / lineHeight)),
+    );
+
+    const wrapped = wrapText({
       text: normalized,
       fontSize,
       maxWidth,
-      maxLines,
+      maxLines: heightLimitedMaxLines,
       averageCharWidthRatio,
     });
 
+    const lines = improvePolishLineBreaks({
+      lines: wrapped.lines,
+      fontSize,
+      maxWidth,
+      averageCharWidthRatio,
+    });
+
+    const width = getLinesWidth(lines, fontSize, averageCharWidthRatio);
     const height = lines.length * lineHeight;
 
-    if (!truncated && height <= maxHeight) {
+    if (!wrapped.truncated && width <= maxWidth && height <= maxHeight) {
       return {
         lines,
         fontSize,
         lineHeight,
+        width,
         height,
         truncated: false,
       };
@@ -155,24 +375,50 @@ export function fitTextBlock(options: FitTextBlockOptions): FitTextBlockResult {
   }
 
   const lineHeight = Math.round(minFontSize * lineHeightRatio);
-  const { lines, truncated } = wrapText({
+
+  const heightLimitedMaxLines = Math.max(
+    1,
+    Math.min(maxLines, Math.floor(maxHeight / lineHeight)),
+  );
+
+  const wrapped = wrapText({
     text: normalized,
     fontSize: minFontSize,
     maxWidth,
-    maxLines,
+    maxLines: heightLimitedMaxLines,
     averageCharWidthRatio,
   });
+
+  const improvedLines = improvePolishLineBreaks({
+    lines: wrapped.lines,
+    fontSize: minFontSize,
+    maxWidth,
+    averageCharWidthRatio,
+  });
+
+  const clamped = clampLinesToWidth({
+    lines: improvedLines,
+    fontSize: minFontSize,
+    maxWidth,
+    averageCharWidthRatio,
+  });
+
+  const lines = clamped.lines;
+  const width = getLinesWidth(lines, minFontSize, averageCharWidthRatio);
 
   return {
     lines,
     fontSize: minFontSize,
     lineHeight,
+    width,
     height: lines.length * lineHeight,
-    truncated,
+    truncated: wrapped.truncated || clamped.truncated,
   };
 }
 
-export function fitSingleLineText(options: FitSingleLineOptions): FitSingleLineResult {
+export function fitSingleLineText(
+  options: FitSingleLineOptions,
+): FitSingleLineResult {
   const {
     text,
     maxWidth,
@@ -182,6 +428,15 @@ export function fitSingleLineText(options: FitSingleLineOptions): FitSingleLineR
   } = options;
 
   const normalized = normalizeText(text);
+
+  if (!normalized) {
+    return {
+      text: '',
+      fontSize: maxFontSize,
+      width: 0,
+      truncated: false,
+    };
+  }
 
   for (let fontSize = maxFontSize; fontSize >= minFontSize; fontSize -= 1) {
     const width = estimateTextWidth(normalized, fontSize, averageCharWidthRatio);
@@ -196,16 +451,12 @@ export function fitSingleLineText(options: FitSingleLineOptions): FitSingleLineR
     }
   }
 
-  let truncatedText = normalized;
-
-  while (
-    truncatedText.length > 1 &&
-    estimateTextWidth(addEllipsis(truncatedText), minFontSize, averageCharWidthRatio) > maxWidth
-  ) {
-    truncatedText = truncatedText.slice(0, -1);
-  }
-
-  const finalText = addEllipsis(truncatedText);
+  const finalText = truncateTextToWidth({
+    text: normalized,
+    fontSize: minFontSize,
+    maxWidth,
+    averageCharWidthRatio,
+  });
 
   return {
     text: finalText,

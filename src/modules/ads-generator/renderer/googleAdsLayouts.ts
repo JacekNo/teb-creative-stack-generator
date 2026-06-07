@@ -1,4 +1,4 @@
-import type { GoogleAdsFormat, GoogleAdsFormatId } from './googleAdsFormats';
+import type { GoogleAdsFormat, GoogleAdsFormatId } from "./googleAdsFormats";
 
 export interface RectLayout {
   x: number;
@@ -17,6 +17,23 @@ export interface TextLayout {
   lineHeight: number;
 }
 
+export interface TitleCardLayout {
+  x: number;
+  y: number;
+  radius?: number;
+
+  paddingX: number;
+  paddingY: number;
+
+  minWidth: number;
+  maxWidth: number;
+
+  minHeight: number;
+  maxHeight: number;
+
+  contentVerticalAlign?: "top" | "center";
+}
+
 export interface ActionRowLayout {
   x: number;
   y: number;
@@ -24,20 +41,46 @@ export interface ActionRowLayout {
   gap: number;
 
   cta: {
-    width: number;
+    minWidth: number;
+    maxWidth: number;
+    paddingX: number;
     fontSize: number;
   };
 
   city: {
     minWidth: number;
     maxWidth: number;
+    paddingX: number;
     fontSize: number;
   };
 
   logo: {
+    x: number;
+    y: number;
     width: number;
     height: number;
+    paddingX?: number;
+    paddingY?: number;
   };
+}
+export interface PatternArrowLayout {
+  x: number;
+  y: number;
+  scale: number;
+  rotate?: number;
+  opacity?: number;
+}
+
+export interface PatternLayout {
+  color: string;
+  columns: number;
+  gap: number;
+  rowGap: number;
+  insetX: number;
+  insetY: number;
+  opacity: number;
+  rotate?: number;
+  stagger?: boolean;
 }
 
 export interface GoogleAdsLayout {
@@ -47,21 +90,18 @@ export interface GoogleAdsLayout {
   photo: RectLayout;
   contentPanel: RectLayout;
 
-  titleCard: RectLayout & {
-    paddingX: number;
-    paddingY: number;
-  };
+  titleCard: TitleCardLayout;
 
   title: TextLayout;
   subtitle: TextLayout;
 
   actionRow: ActionRowLayout;
+  pattern: PatternLayout;
 }
 
-export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
-  if (format.id === 'landscape_1200x628') {
-  return {
-    formatId: format.id,
+const GOOGLE_ADS_LAYOUTS: Record<GoogleAdsFormatId, GoogleAdsLayout> = {
+  landscape_1200x628: {
+    formatId: "landscape_1200x628",
 
     background: {
       x: 0,
@@ -70,12 +110,16 @@ export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
       height: 628,
     },
 
+    /**
+     * Stały slot zdjęcia według referencji Figma 1200x628.
+     * Uwaga: docelowo warto zastąpić zwykłe rx własnym clipPath dla narożników.
+     */
     photo: {
-      x: 610,
-      y: 72,
-      width: 500,
-      height: 330,
-      radius: 28,
+      x: 553,
+      y: 0,
+      width: 647,
+      height: 473,
+      radius: 78,
     },
 
     contentPanel: {
@@ -86,139 +130,185 @@ export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
     },
 
     titleCard: {
-      x: 74,
-      y: 132,
-      width: 430,
-      height: 208,
-      radius: 20,
-      paddingX: 30,
-      paddingY: 32,
-    },
+  x: 48,
+  y: 132,
+  radius: 12,
 
-    title: {
-      x: 104,
-      y: 194,
-      maxChars: 18,
-      maxLines: 3,
-      fontSize: 42,
-      lineHeight: 45,
-    },
+  paddingX: 22,
+  paddingY: 18,
 
-    subtitle: {
-      x: 104,
-      y: 316,
-      maxChars: 30,
-      maxLines: 2,
-      fontSize: 23,
-      lineHeight: 27,
-    },
+  minWidth: 170,
+  maxWidth: 520,
+
+  minHeight: 82,
+  maxHeight: 284,
+
+  contentVerticalAlign: "center",
+},
+
+title: {
+  x: 70,
+  y: 194,
+  maxChars: 18,
+  maxLines: 4,
+  fontSize: 44,
+  lineHeight: 42,
+},
+
+subtitle: {
+  x: 70,
+  y: 316,
+  maxChars: 30,
+  maxLines: 2,
+  fontSize: 31,
+  lineHeight: 32,
+},
 
     actionRow: {
-      x: 74,
-      y: 488,
-      height: 58,
-      gap: 12,
+  x: 49,
+  y: 505,
+  height: 98,
+  gap: 12,
 
-      cta: {
-        width: 180,
-        fontSize: 21,
-      },
+  cta: {
+    minWidth: 150,
+    maxWidth: 360,
+    paddingX: 28,
+    fontSize: 34,
+  },
 
-      city: {
-        minWidth: 250,
-        maxWidth: 390,
-        fontSize: 19,
-      },
+  city: {
+    minWidth: 120,
+    maxWidth: 430,
+    paddingX: 24,
+    fontSize: 30,
+  },
 
-      logo: {
-        width: 190,
-        height: 58,
-      },
+  logo: {
+    x: 953,
+    y: 495,
+    width: 230,
+    height: 119,
+  },
+},
+    pattern: {
+  color: "#FFFFFF",
+  columns: 17,
+  gap: 8,
+  rowGap: 8,
+  insetX: 18,
+  insetY: 18,
+  opacity: 0.35,
+  rotate: 0,
+  stagger: true,
+},
+  },
+
+  portrait_960x1200: {
+    formatId: "portrait_960x1200",
+
+    background: {
+      x: 0,
+      y: 0,
+      width: 960,
+      height: 1200,
     },
-  };
-}
 
-  if (format.id === 'portrait_960x1200') {
-    return {
-      formatId: format.id,
+    /**
+     * Stały slot zdjęcia według referencji Figma 960x1200.
+     * Lewy brandowy pas zostaje widoczny, zdjęcie dochodzi do prawej krawędzi.
+     */
+    photo: {
+      x: 50,
+      y: 0,
+      width: 910,
+      height: 680,
+      radius: 78,
+    },
 
-      background: {
-        x: 0,
-        y: 0,
-        width: 960,
-        height: 1200,
-      },
+    contentPanel: {
+      x: 0,
+      y: 700,
+      width: 960,
+      height: 500,
+    },
 
-      photo: {
-        x: 86,
-        y: 72,
-        width: 788,
-        height: 520,
-        radius: 34,
-      },
+    titleCard: {
+  x: 50,
+  y: 710,
+  radius: 14,
 
-      contentPanel: {
-        x: 0,
-        y: 520,
-        width: 960,
-        height: 680,
-      },
+  paddingX: 28,
+  paddingY: 24,
 
-      titleCard: {
-        x: 86,
-        y: 660,
-        width: 720,
-        height: 220,
-        radius: 22,
-        paddingX: 34,
-        paddingY: 38,
-      },
+  minWidth: 220,
+  maxWidth: 810,
 
-      title: {
-        x: 120,
-        y: 728,
-        maxChars: 22,
-        maxLines: 3,
-        fontSize: 48,
-        lineHeight: 52,
-      },
+  minHeight: 92,
+  maxHeight: 310,
 
-      subtitle: {
-        x: 120,
-        y: 868,
-        maxChars: 32,
-        maxLines: 2,
-        fontSize: 28,
-        lineHeight: 32,
-      },
+  contentVerticalAlign: "center",
+},
 
-      actionRow: {
-        x: 86,
-        y: 1072,
-        height: 58,
-        gap: 12,
+title: {
+  x: 78,
+  y: 728,
+  maxChars: 22,
+  maxLines: 4,
+  fontSize: 58,
+  lineHeight: 56,
+},
 
-        cta: {
-          width: 230,
-          fontSize: 23,
-        },
+subtitle: {
+  x: 78,
+  y: 868,
+  maxChars: 32,
+  maxLines: 2,
+  fontSize: 38,
+  lineHeight: 38,
+},
+    actionRow: {
+  x: 38,
+  y: 1063,
+  height: 100,
+  gap: 14,
 
-        city: {
-          minWidth: 280,
-          maxWidth: 390,
-          fontSize: 20,
-        },
+  cta: {
+    minWidth: 160,
+    maxWidth: 370,
+    paddingX: 30,
+    fontSize: 36,
+  },
 
-        logo: {
-          width: 190,
-          height: 58,
-        },
-      },
-    };
-  }
+  city: {
+    minWidth: 120,
+    maxWidth: 390,
+    paddingX: 26,
+    fontSize: 30,
+  },
 
-  return {
-    formatId: format.id,
+  logo: {
+    x: 699,
+    y: 1049,
+    width: 230,
+    height: 119,
+  },
+},
+    pattern: {
+  color: "#FFFFFF",
+  columns: 10,
+  gap: 10,
+  rowGap: 10,
+  insetX: 20,
+  insetY: 20,
+  opacity: 0.35,
+  rotate: 0,
+  stagger: true,
+},
+  },
+
+  square_1200x1200: {
+    formatId: "square_1200x1200",
 
     background: {
       x: 0,
@@ -227,70 +317,101 @@ export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
       height: 1200,
     },
 
+    /**
+     * Stały slot zdjęcia według referencji Figma 1200x1200.
+     * Zdjęcie jest duże, dociągnięte do góry i prawej krawędzi.
+     */
     photo: {
-      x: 86,
-      y: 86,
-      width: 1028,
-      height: 560,
-      radius: 34,
+      x: 50,
+      y: 0,
+      width: 1150,
+      height: 680,
+      radius: 78,
     },
 
     contentPanel: {
       x: 0,
-      y: 560,
+      y: 680,
       width: 1200,
-      height: 640,
+      height: 520,
     },
 
-    titleCard: {
-      x: 86,
-      y: 710,
-      width: 760,
-      height: 190,
-      radius: 22,
-      paddingX: 34,
-      paddingY: 36,
-    },
+   titleCard: {
+  x: 50,
+  y: 706,
+  radius: 14,
 
-    title: {
-      x: 120,
-      y: 778,
-      maxChars: 24,
-      maxLines: 3,
-      fontSize: 52,
-      lineHeight: 56,
-    },
+  paddingX: 28,
+  paddingY: 24,
 
-    subtitle: {
-      x: 120,
-      y: 896,
-      maxChars: 38,
-      maxLines: 2,
-      fontSize: 30,
-      lineHeight: 34,
-    },
+  minWidth: 220,
+  maxWidth: 980,
+
+  minHeight: 92,
+  maxHeight: 300,
+
+  contentVerticalAlign: "center",
+},
+
+title: {
+  x: 78,
+  y: 778,
+  maxChars: 24,
+  maxLines: 4,
+  fontSize: 56,
+  lineHeight: 54,
+},
+
+subtitle: {
+  x: 78,
+  y: 896,
+  maxChars: 38,
+  maxLines: 2,
+  fontSize: 38,
+  lineHeight: 38,
+},
 
     actionRow: {
-      x: 86,
-      y: 1066,
-      height: 62,
-      gap: 14,
+  x: 50,
+  y: 1038,
+  height: 100,
+  gap: 14,
 
-      cta: {
-        width: 240,
-        fontSize: 24,
-      },
+  cta: {
+    minWidth: 170,
+    maxWidth: 410,
+    paddingX: 32,
+    fontSize: 38,
+  },
 
-      city: {
-        minWidth: 300,
-        maxWidth: 430,
-        fontSize: 21,
-      },
+  city: {
+    minWidth: 130,
+    maxWidth: 450,
+    paddingX: 28,
+    fontSize: 32,
+  },
 
-      logo: {
-        width: 204,
-        height: 62,
-      },
-    },
-  };
+  logo: {
+    x: 923,
+    y: 1024,
+    width: 230,
+    height: 119,
+  },
+},
+pattern: {
+  color: "#FFFFFF",
+  columns: 13,
+  gap: 10,
+  rowGap: 10,
+  insetX: 20,
+  insetY: 20,
+  opacity: 0.35,
+  rotate: 0,
+  stagger: true,
+},
+  },
+};
+
+export function getGoogleAdsLayout(format: GoogleAdsFormat): GoogleAdsLayout {
+  return GOOGLE_ADS_LAYOUTS[format.id];
 }

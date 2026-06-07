@@ -43,6 +43,7 @@ export interface CityRecord {
   phone?: string;
   email?: string;
   review_flags?: string;
+  city_code?: string;
 }
 
 export interface BrandToken {

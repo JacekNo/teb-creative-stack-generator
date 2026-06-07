@@ -1,144 +1,118 @@
-# BACKLOG.md
+# Backlog — TEB Creative Stack Generator
 
-## Now
+## Done
 
-### 1. Refactor app styles and SVG renderer structure
-
-Cel: rozdzielić UI aplikacji od systemu generowania grafik SVG.
-
-Zadania:
-
-* Utworzyć globalne pliki CSS:
+* Rozbito renderer SVG na mniejsze moduły.
+* Dodano wspólne helpery SVG w `svgUtils.ts`.
+* Dodano globalną strukturę stylów aplikacji:
 
   * `src/styles/tokens.css`
   * `src/styles/base.css`
   * `src/styles/components.css`
-* Przenieść powtarzalne style z komponentów Vue do globalnych klas UI.
-* Zostawić style specyficzne dla komponentów tylko tam, gdzie faktycznie są potrzebne.
-* Rozbić renderer SVG na mniejsze pliki:
+  * `src/styles/fonts.css`
+* Uporządkowano `googleAdsLayouts.ts` jako centralny config layoutów Google Ads.
+* Przebudowano `CourseTitleCard` w kierunku logiki `hug content`.
+* Dostosowano walidator do nowego modelu `titleCard` opartego o `minWidth`, `maxWidth`, `minHeight`, `maxHeight`.
+* Dodano poprawki polskiego łamania tekstu, aby unikać wdów i bękartów na końcach linii.
+* Wydzielono dolny pasek na:
 
-  * `renderAdSvg.ts`
-  * `renderPattern.ts`
-  * `renderPhoto.ts`
-  * `renderTitleCard.ts`
-  * `renderActionRow.ts`
-* Utrzymać layouty reklam w `googleAdsLayouts.ts`.
-* Sprawdzić `npm run build`.
+  * `LocalCTA`
+  * `BrandAnchor`
+* Dodano resolver wariantów `LocalCTA`.
+* Dodano wariant `stacked` dla długich miast.
+* Dodano fallback do `stacked`, gdy miasto nie mieści się między CTA a logo.
+* Ustabilizowano rozmiar CTA, miasta i logo.
+* Usunięto dodatkową aplę pod logo SVG.
+* Podmieniono zdjęcia kierunków na wersje HD `1920×1280`.
+* Dodano fonty Roc Grotesk do projektu i SVG.
 
-Proponowany commit:
+## Now
 
-```txt
-Refactor app styles and SVG renderer structure
-```
+### 1. Finalna kalibracja typografii i layoutu
 
----
+Cel: dopracować skalę typograficzną oraz odstępy w trzech formatach Google Ads.
 
-### 2. Layout calibration Google Ads v0.2
+Zakres:
 
-Cel: skalibrować proporcje 3 formatów Google Ads na podstawie podglądu i danych z Figmy.
+* sprawdzić tytuły krótkie, średnie i bardzo długie,
+* dopracować `title.fontSize`, `lineHeight`, `maxLines`,
+* dopracować `subtitle.fontSize`,
+* dopracować `LocalCTA` dla:
 
-Zadania:
+  * krótkich miast,
+  * średnich miast,
+  * długich miast,
+* sprawdzić, czy `stacked` nie koliduje z title card i logo,
+* ustalić finalne użycie:
 
-* Dopracować format 1200×628, który obecnie wymaga największej korekty.
-* Ustawić docelowe proporcje:
+  * `Roc Grotesk Bold`,
+  * `Roc Grotesk Medium`,
+  * opcjonalnie `Roc Grotesk Wide`.
 
-  * zdjęcia,
-  * białej karty tytułu,
-  * action row,
-  * logo.
-* Ustalić safe area dla każdego formatu.
-* Przenieść wartości z Figma Dev Mode do `googleAdsLayouts.ts`.
-* Przetestować layout na najtrudniejszych nazwach kierunków i miast.
+### 2. Walidator czytelności
 
----
+Cel: generator powinien informować, które kreacje są bezpieczne, a które wymagają ręcznej kontroli.
 
-### 3. Typography and text fitting v0.2
+Planowane ostrzeżenia:
 
-Cel: poprawić jakość składu tekstu.
+* tytuł osiągnął minimalny font,
+* tytuł został przycięty,
+* miasto zostało przycięte,
+* użyto wariantu `stacked`,
+* nazwa kierunku przekroczyła zalecaną liczbę linii,
+* tekst po skalowaniu do 25% może być zbyt mały,
+* zdjęcie używa fallbackowego cropu lub wymaga korekty focal point.
 
-Zadania:
+### 3. Podgląd skalowania
 
-* Podpiąć lokalny font Roc Grotesk.
-* Ulepszyć text fitting dla tytułów i dopisków.
-* Dodać warianty dla klas długości:
+Cel: dodać w UI podgląd grafik w skalach:
 
-  * `short`
-  * `medium`
-  * `long`
-  * `very-long`
-* Poprawić obsługę długich miast w action row.
-* Rozszerzyć walidator o ostrzeżenia dla minimalnych rozmiarów fontów.
+* 100%,
+* 50%,
+* 25%.
 
----
+Pozwoli to szybciej oceniać czytelność po skalowaniu Google Ads.
 
 ## Next
 
-### 4. Export PNG v0.1
+### 1. Eksport PNG
 
-Cel: wygenerować realne pliki graficzne z SVG.
+Cel: przygotować eksport gotowych grafik z SVG do PNG.
 
-Zadania:
+Preferowany kierunek:
 
-* Wybrać metodę renderowania SVG do PNG.
-* Przygotować eksport pojedynczej kreacji.
-* Przygotować eksport 3 formatów dla jednego kierunku.
-* Ustalić nazewnictwo plików eksportowych.
-* Dodać raport eksportu.
+* `SVG` jako format master,
+* `PNG` jako format eksportowy,
+* później eksport paczki ZIP.
 
----
+Do sprawdzenia:
 
-### 5. Batch generation
+* `@resvg/resvg-js`,
+* `sharp`,
+* obsługa fontów w eksporcie,
+* obsługa obrazów lokalnych,
+* nazewnictwo plików eksportowych.
 
-Cel: przygotować generator do realnej pracy produkcyjnej.
+### 2. Batch export
 
-Zadania:
+Cel: wygenerować zestawy grafik dla wielu kierunków i miast.
 
-* Dodać wybór wielu kierunków.
-* Dodać wybór wielu miast.
-* Dodać eksport paczki ZIP.
-* Rozdzielić eksport:
+Zakres:
 
-  * tylko OK,
-  * OK + WARNING,
-  * wszystko oprócz ERROR.
+* wybór kampanii,
+* wybór brandu,
+* wybór miasta,
+* wybór listy kierunków,
+* generowanie 3 formatów Google Ads,
+* raport błędów i ostrzeżeń.
 
----
+### 3. Clean Google asset mode
 
-## Later
+Cel: przygotować alternatywny tryb eksportu bez tekstu, CTA i logo dla assetowego modelu Google Ads / Performance Max.
 
-### 6. Social media module
+Zakres:
 
-Cel: rozszerzyć Creative Stack Generator poza Google Ads.
-
-Zadania:
-
-* Dodać formaty social media.
-* Wykorzystać pola:
-
-  * `start_label`
-  * `advantages`
-  * `partners`
-  * `certificates`
-  * `claims`
-  * `social_headline`
-  * `social_subheadline`
-* Przygotować osobne layouty social media.
-* Rozważyć szablony postów, stories i karuzel.
-
----
-
-## Done
-
-* Utworzono repo `teb-creative-stack-generator`.
-* Dodano projekt Vue 3 + TypeScript + Vite.
-* Dodano strukturę modułu `ads-generator`.
-* Uporządkowano bibliotekę zdjęć.
-* Dodano dane kierunków, miast, brandów i mapę zdjęć.
-* Dodano resolver danych.
-* Dodano smoke test danych.
-* Dodano podgląd SVG w 3 formatach Google Ads.
-* Podpięto logo TEB Edukacja SVG.
-* Dodano roboczy układ: zdjęcie + brandowe tło + karta tytułu + action row.
-* Dodano text fitting v0.1.
-* Dodano walidator jakości kreacji.
-* Dodano Quality Overview dla całej bazy kierunków.
+* samo zdjęcie,
+* opcjonalny subtelny brand frame,
+* bez tekstów na grafice,
+* zgodność z rekomendacjami assetowymi Google Ads.
