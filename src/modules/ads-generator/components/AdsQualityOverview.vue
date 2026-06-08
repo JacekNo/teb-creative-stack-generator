@@ -1470,4 +1470,71 @@ input:focus {
   font-weight: 750;
   line-height: 1.4;
 }
+
+.diagnosticDrawer {
+  margin-top: 14px;
+  border-top: 1px solid rgba(16, 45, 105, 0.08);
+}
+
+.diagnosticDrawer summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 48px;
+  padding: 14px 0;
+  color: #102d69;
+  cursor: pointer;
+  list-style: none;
+}
+
+.diagnosticDrawer summary::-webkit-details-marker {
+  display: none;
+}
+
+.diagnosticDrawer summary::after {
+  content: '↓';
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  background: #edf1f7;
+  color: #516078;
+  font-size: 13px;
+  font-weight: 900;
+  transition: transform 0.16s ease;
+}
+
+.diagnosticDrawer[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.diagnosticDrawer summary strong {
+  display: block;
+  color: #062b6f;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.diagnosticDrawer summary small {
+  display: block;
+  margin-top: 3px;
+  color: #6b778c;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.diagnosticDrawerContent {
+  display: grid;
+  gap: 0;
+  padding-bottom: 10px;
+}
+
+.railSection.compact {
+  padding: 14px 0;
+}
 </style>
