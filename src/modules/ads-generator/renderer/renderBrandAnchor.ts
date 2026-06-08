@@ -2,6 +2,7 @@ import type { ResolvedCreativeInput } from '../types/ads.types';
 import type { GoogleAdsFormat } from './googleAdsFormats';
 import { getGoogleAdsLayout } from './googleAdsLayouts';
 import { escapeXml } from './svgUtils';
+import { getPublicAssetPath } from '../utils/publicAssetPath';
 
 type FlexibleLogoLayout = {
   x: number;
@@ -18,7 +19,7 @@ export function renderBrandAnchor(
   const row = layout.actionRow;
 
   const logo = row.logo as FlexibleLogoLayout;
-  const logoPath = creative.logoPath || '/creative-stack/logos/teb-edukacja.svg';
+  const logoPath = getPublicAssetPath(creative.logoPath || '/creative-stack/logos/teb-edukacja.svg');
 
   return `
     <g id="brand-anchor-${format.id}">

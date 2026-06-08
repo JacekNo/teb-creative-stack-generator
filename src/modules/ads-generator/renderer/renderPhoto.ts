@@ -1,6 +1,7 @@
 import type { ResolvedCreativeInput } from '../types/ads.types';
 import type { GoogleAdsFormat } from './googleAdsFormats';
 import { getGoogleAdsLayout } from './googleAdsLayouts';
+import { getPublicAssetPath } from '../utils/publicAssetPath';
 
 function renderBottomLeftRoundedPath(options: {
   x: number;
@@ -65,7 +66,7 @@ export function renderPhoto(
 
   return `
     <image
-      href="${creative.imagePath}"
+      href="${getPublicAssetPath(creative.imagePath)}"
       x="${layout.photo.x}"
       y="${layout.photo.y}"
       width="${layout.photo.width}"
