@@ -1,47 +1,43 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import AdsFormatPreview from './AdsFormatPreview.vue';
+import { computed, ref, watch } from "vue";
+import AdsFormatPreview from "./AdsFormatPreview.vue";
 import {
   getBrands,
   getCities,
   getCourses,
   resolveCreativeInput,
-} from '../utils/creativeResolver';
-import { validateGoogleAdsCreative } from '../validators/validateGoogleAdsCreative';
+} from "../utils/creativeResolver";
+import { validateGoogleAdsCreative } from "../validators/validateGoogleAdsCreative";
 import type {
   BrandKey,
   CourseRecord,
   ResolvedCreativeInput,
-} from '../types/ads.types';
+} from "../types/ads.types";
 import type {
   CreativeValidationLevel,
   CreativeValidationResult,
-} from '../validators/validateGoogleAdsCreative';
-import {
-  downloadCreativeBatchPngSet,
-} from '../export/downloadSvgPngSet';
-import {
-  getBatchZipFileName,
-} from '../export/fileNaming';
+} from "../validators/validateGoogleAdsCreative";
+import { downloadCreativeBatchPngSet } from "../export/downloadSvgPngSet";
+import { getBatchZipFileName } from "../export/fileNaming";
 
-type StatusFilter = 'all' | CreativeValidationLevel;
+type StatusFilter = "all" | CreativeValidationLevel;
 type ValidationFieldFilter =
-  | 'all'
-  | 'title'
-  | 'subtitle'
-  | 'city'
-  | 'cta'
-  | 'layout'
-  | 'image'
-  | 'course'
-  | 'city-data'
-  | 'brand';
+  | "all"
+  | "title"
+  | "subtitle"
+  | "city"
+  | "cta"
+  | "layout"
+  | "image"
+  | "course"
+  | "city-data"
+  | "brand";
 
 type FormatFilter =
-  | 'all'
-  | 'square_1200x1200'
-  | 'landscape_1200x628'
-  | 'portrait_960x1200';
+  | "all"
+  | "square_1200x1200"
+  | "landscape_1200x628"
+  | "portrait_960x1200";
 interface QualityRow {
   course: CourseRecord;
   creative: ResolvedCreativeInput | null;
@@ -56,19 +52,19 @@ const cities = getCities();
 const brands = getBrands();
 
 const selectedCityId = ref(
-  cities.find((city) => city.city_id === 'piotrkow-trybunalski')?.city_id ??
+  cities.find((city) => city.city_id === "piotrkow-trybunalski")?.city_id ??
     cities[0]?.city_id ??
-    '',
+    "",
 );
-const selectedValidationField = ref<ValidationFieldFilter>('all');
-const selectedFormat = ref<FormatFilter>('all');
-const selectedBrand = ref<'all' | BrandKey>('all');
-const selectedStatus = ref<StatusFilter>('all');
-const searchQuery = ref('');
+const selectedValidationField = ref<ValidationFieldFilter>("all");
+const selectedFormat = ref<FormatFilter>("all");
+const selectedBrand = ref<"all" | BrandKey>("all");
+const selectedStatus = ref<StatusFilter>("all");
+const searchQuery = ref("");
 
-const selectedCourseId = ref(courses[0]?.record_id ?? '');
+const selectedCourseId = ref(courses[0]?.record_id ?? "");
 const isBatchExporting = ref(false);
-const batchExportError = ref('');
+const batchExportError = ref("");
 
 const selectedCity = computed(() => {
   return cities.find((city) => city.city_id === selectedCityId.value);
@@ -80,52 +76,55 @@ const statusOptions: Array<{
   hint: string;
 }> = [
   {
-    label: 'Wszystkie',
-    value: 'all',
-    hint: 'pełna baza',
+    label: "Wszystkie",
+    value: "all",
+    hint: "pełna baza",
   },
   {
-    label: 'OK',
-    value: 'ok',
-    hint: 'bez uwag',
+    label: "OK",
+    value: "ok",
+    hint: "bez uwag",
   },
   {
-    label: 'Warning',
-    value: 'warning',
-    hint: 'do kontroli',
+    label: "Warning",
+    value: "warning",
+    hint: "do kontroli",
   },
   {
-    label: 'Error',
-    value: 'error',
-    hint: 'do poprawy',
+    label: "Error",
+    value: "error",
+    hint: "do poprawy",
   },
 ];
 const stressCases = [
   {
-    label: 'Krótki tytuł',
-    query: 'barber',
-    city: 'pila',
+    label: "Krótki tytuł",
+    query: "barber",
+    city: "pila",
   },
   {
-    label: 'Długie miasto',
-    query: '',
-    city: 'piotrkow-trybunalski',
+    label: "Długie miasto",
+    query: "",
+    city: "piotrkow-trybunalski",
   },
   {
-    label: 'Długi kierunek',
-    query: 'asystent',
-    city: 'poznan',
+    label: "Długi kierunek",
+    query: "asystent",
+    city: "poznan",
   },
   {
-    label: 'Długi kierunek + miasto',
-    query: 'asystent',
-    city: 'piotrkow-trybunalski',
+    label: "Długi kierunek + miasto",
+    query: "asystent",
+    city: "piotrkow-trybunalski",
   },
 ] as const;
 const allRows = computed<QualityRow[]>(() => {
   return courses.map((course) => {
     try {
-      const creative = resolveCreativeInput(course.record_id, selectedCityId.value);
+      const creative = resolveCreativeInput(
+        course.record_id,
+        selectedCityId.value,
+      );
       const validation = validateGoogleAdsCreative(creative);
 
       return {
@@ -134,16 +133,17 @@ const allRows = computed<QualityRow[]>(() => {
         validation,
         status: validation.status,
         messagesCount: validation.messages.length,
-        error: '',
+        error: "",
       };
     } catch (error) {
       return {
         course,
         creative: null,
         validation: null,
-        status: 'error',
+        status: "error",
         messagesCount: 1,
-        error: error instanceof Error ? error.message : 'Unknown resolver error',
+        error:
+          error instanceof Error ? error.message : "Unknown resolver error",
       };
     }
   });
@@ -152,36 +152,37 @@ const validationFieldOptions: Array<{
   label: string;
   value: ValidationFieldFilter;
 }> = [
-  { label: 'Wszystkie pola', value: 'all' },
-  { label: 'Tytuł', value: 'title' },
-  { label: 'Dopisek', value: 'subtitle' },
-  { label: 'Miasto', value: 'city' },
-  { label: 'CTA', value: 'cta' },
-  { label: 'Layout', value: 'layout' },
-  { label: 'Zdjęcie', value: 'image' },
-  { label: 'Kierunek', value: 'course' },
-  { label: 'Dane miasta', value: 'city-data' },
-  { label: 'Brand', value: 'brand' },
+  { label: "Wszystkie pola", value: "all" },
+  { label: "Tytuł", value: "title" },
+  { label: "Dopisek", value: "subtitle" },
+  { label: "Miasto", value: "city" },
+  { label: "CTA", value: "cta" },
+  { label: "Layout", value: "layout" },
+  { label: "Zdjęcie", value: "image" },
+  { label: "Kierunek", value: "course" },
+  { label: "Dane miasta", value: "city-data" },
+  { label: "Brand", value: "brand" },
 ];
 
 const formatFilterOptions: Array<{
   label: string;
   value: FormatFilter;
 }> = [
-  { label: 'Wszystkie formaty', value: 'all' },
-  { label: 'Square 1200×1200', value: 'square_1200x1200' },
-  { label: 'Landscape 1200×628', value: 'landscape_1200x628' },
-  { label: 'Portrait 960×1200', value: 'portrait_960x1200' },
+  { label: "Wszystkie formaty", value: "all" },
+  { label: "Square 1200×1200", value: "square_1200x1200" },
+  { label: "Landscape 1200×628", value: "landscape_1200x628" },
+  { label: "Portrait 960×1200", value: "portrait_960x1200" },
 ];
 const filteredRows = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
 
   return allRows.value.filter((row) => {
     const matchesStatus =
-      selectedStatus.value === 'all' || row.status === selectedStatus.value;
+      selectedStatus.value === "all" || row.status === selectedStatus.value;
 
     const matchesBrand =
-      selectedBrand.value === 'all' || row.course.brand_key === selectedBrand.value;
+      selectedBrand.value === "all" ||
+      row.course.brand_key === selectedBrand.value;
 
     const searchable = [
       row.course.record_id,
@@ -192,22 +193,28 @@ const filteredRows = computed(() => {
       row.course.course_subtitle,
     ]
       .filter(Boolean)
-      .join(' ')
+      .join(" ")
       .toLowerCase();
 
     const matchesSearch = !query || searchable.includes(query);
-const matchesValidationField =
-  selectedValidationField.value === 'all' ||
-  row.validation?.messages.some(
-    (message) => message.field === selectedValidationField.value,
-  );
+    const matchesValidationField =
+      selectedValidationField.value === "all" ||
+      row.validation?.messages.some(
+        (message) => message.field === selectedValidationField.value,
+      );
 
-const matchesFormat =
-  selectedFormat.value === 'all' ||
-  row.validation?.messages.some(
-    (message) => message.formatId === selectedFormat.value,
-  );
-    return matchesStatus && matchesBrand && matchesSearch && matchesValidationField && matchesFormat;
+    const matchesFormat =
+      selectedFormat.value === "all" ||
+      row.validation?.messages.some(
+        (message) => message.formatId === selectedFormat.value,
+      );
+    return (
+      matchesStatus &&
+      matchesBrand &&
+      matchesSearch &&
+      matchesValidationField &&
+      matchesFormat
+    );
   });
 });
 
@@ -228,24 +235,27 @@ watch(
 );
 
 const selectedRow = computed(() => {
-  return allRows.value.find((row) => row.course.record_id === selectedCourseId.value) ?? null;
+  return (
+    allRows.value.find(
+      (row) => row.course.record_id === selectedCourseId.value,
+    ) ?? null
+  );
 });
 const batchExportCreatives = computed(() => {
   return filteredRows.value
     .filter((row): row is QualityRow & { creative: ResolvedCreativeInput } => {
-      return Boolean(row.creative) && row.status !== 'error';
+      return Boolean(row.creative) && row.status !== "error";
     })
     .map((row) => row.creative);
 });
-
 
 const stats = computed(() => {
   return {
     total: allRows.value.length,
     filtered: filteredRows.value.length,
-    ok: allRows.value.filter((row) => row.status === 'ok').length,
-    warning: allRows.value.filter((row) => row.status === 'warning').length,
-    error: allRows.value.filter((row) => row.status === 'error').length,
+    ok: allRows.value.filter((row) => row.status === "ok").length,
+    warning: allRows.value.filter((row) => row.status === "warning").length,
+    error: allRows.value.filter((row) => row.status === "error").length,
   };
 });
 
@@ -300,9 +310,9 @@ const selectedValidationSummary = computed(() => {
 
   return {
     total: messages.length,
-    errors: messages.filter((message) => message.level === 'error').length,
-    warnings: messages.filter((message) => message.level === 'warning').length,
-    ok: messages.filter((message) => message.level === 'ok').length,
+    errors: messages.filter((message) => message.level === "error").length,
+    warnings: messages.filter((message) => message.level === "warning").length,
+    ok: messages.filter((message) => message.level === "ok").length,
   };
 });
 function selectCourse(courseId: string) {
@@ -312,40 +322,40 @@ async function handleBatchExport() {
   if (isBatchExporting.value) return;
 
   isBatchExporting.value = true;
-  batchExportError.value = '';
+  batchExportError.value = "";
 
-    try {
+  try {
     const brand =
-      selectedBrand.value === 'all' ? 'all-brands' : selectedBrand.value;
+      selectedBrand.value === "all" ? "all-brands" : selectedBrand.value;
 
     await downloadCreativeBatchPngSet(batchExportCreatives.value, {
       zipFileName: getBatchZipFileName({
-  city: selectedCity.value,
-  brand,
-  count: batchExportCreatives.value.length,
-}),
+        city: selectedCity.value,
+        brand,
+        count: batchExportCreatives.value.length,
+      }),
     });
   } catch (error) {
     batchExportError.value =
       error instanceof Error
         ? error.message
-        : 'Nie udało się wyeksportować widocznych kreacji.';
+        : "Nie udało się wyeksportować widocznych kreacji.";
   } finally {
     isBatchExporting.value = false;
   }
 }
 function resetFilters() {
-  selectedBrand.value = 'all';
-  selectedStatus.value = 'all';
-  selectedValidationField.value = 'all';
-  selectedFormat.value = 'all';
-  searchQuery.value = '';
+  selectedBrand.value = "all";
+  selectedStatus.value = "all";
+  selectedValidationField.value = "all";
+  selectedFormat.value = "all";
+  searchQuery.value = "";
 }
 
 function applyStressCase(testCase: (typeof stressCases)[number]) {
   selectedCityId.value = testCase.city;
-  selectedBrand.value = 'all';
-  selectedStatus.value = 'all';
+  selectedBrand.value = "all";
+  selectedStatus.value = "all";
   searchQuery.value = testCase.query;
 
   const matchingRow = allRows.value.find((row) => {
@@ -356,7 +366,7 @@ function applyStressCase(testCase: (typeof stressCases)[number]) {
       row.course.record_id,
     ]
       .filter(Boolean)
-      .join(' ')
+      .join(" ")
       .toLowerCase();
 
     return !testCase.query || searchable.includes(testCase.query.toLowerCase());
@@ -375,16 +385,16 @@ function applyStressCase(testCase: (typeof stressCases)[number]) {
         <p class="eyebrow">TEB Creative Stack</p>
         <h1>Quality overview</h1>
         <p>
-          Roboczy widok kontroli kreacji Google Ads: miasto, brand, status,
-          lista kierunków i szeroki podgląd wybranej kreacji.
+          Roboczy widok kontroli kreacji Google Ads: miasto, brand, lista
+          kierunków i szeroki podgląd wybranej kreacji.
         </p>
       </header>
 
       <section class="railSection">
-        <h2>Test</h2>
+        <h2>Ustawienia eksportu</h2>
 
         <div class="controlGroup">
-          <label for="city">Miasto testowe</label>
+          <label for="city">Miasto</label>
           <select id="city" v-model="selectedCityId">
             <option
               v-for="city in cities"
@@ -410,164 +420,177 @@ function applyStressCase(testCase: (typeof stressCases)[number]) {
           </select>
         </div>
       </section>
-<section class="railSection">
-  <h2>Szybkie testy</h2>
 
-  <div class="stressCases">
-    <button
-      v-for="testCase in stressCases"
-      :key="testCase.label"
-      type="button"
-      class="stressButton"
-      @click="applyStressCase(testCase)"
-    >
-      {{ testCase.label }}
-    </button>
-  </div>
-</section>
-      <section class="railSection">
-        <div class="sectionHeader">
-          <h2>Status</h2>
-          <button type="button" class="ghostButton" @click="resetFilters">
-            Reset
-          </button>
+      <details class="diagnosticDrawer">
+        <summary>
+          <span>
+            <strong>Narzędzia diagnostyczne</strong>
+            <small>Statusy, szybkie testy, filtry i statystyki</small>
+          </span>
+        </summary>
+
+        <div class="diagnosticDrawerContent">
+          <section class="railSection compact">
+            <h2>Szybkie testy</h2>
+
+            <div class="stressCases">
+              <button
+                v-for="testCase in stressCases"
+                :key="testCase.label"
+                type="button"
+                class="stressButton"
+                @click="applyStressCase(testCase)"
+              >
+                {{ testCase.label }}
+              </button>
+            </div>
+          </section>
+
+          <section class="railSection compact">
+            <div class="sectionHeader">
+              <h2>Status</h2>
+              <button type="button" class="ghostButton" @click="resetFilters">
+                Reset
+              </button>
+            </div>
+
+            <div class="statusFilters">
+              <button
+                v-for="option in statusOptions"
+                :key="option.value"
+                type="button"
+                :class="[
+                  'statusFilter',
+                  option.value,
+                  { active: selectedStatus === option.value },
+                ]"
+                @click="selectedStatus = option.value"
+              >
+                <span>{{ option.label }}</span>
+                <small>{{ option.hint }}</small>
+              </button>
+            </div>
+          </section>
+
+          <section class="railSection compact">
+            <h2>Filtr diagnostyczny</h2>
+
+            <div class="controlGroup">
+              <label for="validationField">Pole walidacji</label>
+              <select id="validationField" v-model="selectedValidationField">
+                <option
+                  v-for="option in validationFieldOptions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+
+            <div class="controlGroup">
+              <label for="formatFilter">Format</label>
+              <select id="formatFilter" v-model="selectedFormat">
+                <option
+                  v-for="option in formatFilterOptions"
+                  :key="option.value"
+                  :value="option.value"
+                >
+                  {{ option.label }}
+                </option>
+              </select>
+            </div>
+          </section>
+
+          <section class="railSection compact">
+            <h2>Statystyki</h2>
+
+            <div class="statsGrid">
+              <div class="statCard">
+                <strong>{{ stats.total }}</strong>
+                <span>wszystkie</span>
+              </div>
+
+              <div class="statCard ok">
+                <strong>{{ stats.ok }}</strong>
+                <span>OK</span>
+              </div>
+
+              <div class="statCard warning">
+                <strong>{{ stats.warning }}</strong>
+                <span>warning</span>
+              </div>
+
+              <div class="statCard error">
+                <strong>{{ stats.error }}</strong>
+                <span>error</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="railSection compact">
+            <h2>Diagnostyka</h2>
+
+            <div class="diagnosticsBlock">
+              <div>
+                <h3>Według pola</h3>
+
+                <p v-if="!validationDiagnostics.byField.length" class="emptyHint">
+                  Brak komunikatów walidacji.
+                </p>
+
+                <div
+                  v-for="item in validationDiagnostics.byField"
+                  :key="item.field"
+                  class="diagnosticRow"
+                >
+                  <span>{{ item.field }}</span>
+                  <strong>{{ item.count }}</strong>
+                </div>
+              </div>
+
+              <div>
+                <h3>Według formatu</h3>
+
+                <p v-if="!validationDiagnostics.byFormat.length" class="emptyHint">
+                  Brak komunikatów formatowych.
+                </p>
+
+                <div
+                  v-for="item in validationDiagnostics.byFormat"
+                  :key="item.formatId"
+                  class="diagnosticRow"
+                >
+                  <span>{{ item.formatId }}</span>
+                  <strong>{{ item.count }}</strong>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
-
-        <div class="statusFilters">
-          <button
-            v-for="option in statusOptions"
-            :key="option.value"
-            type="button"
-            :class="[
-              'statusFilter',
-              option.value,
-              { active: selectedStatus === option.value },
-            ]"
-            @click="selectedStatus = option.value"
-          >
-            <span>{{ option.label }}</span>
-            <small>{{ option.hint }}</small>
-          </button>
-        </div>
-      </section>
-<section class="railSection">
-  <h2>Filtr diagnostyczny</h2>
-
-  <div class="controlGroup">
-    <label for="validationField">Pole walidacji</label>
-    <select id="validationField" v-model="selectedValidationField">
-      <option
-        v-for="option in validationFieldOptions"
-        :key="option.value"
-        :value="option.value"
-      >
-        {{ option.label }}
-      </option>
-    </select>
-  </div>
-
-  <div class="controlGroup">
-    <label for="formatFilter">Format</label>
-    <select id="formatFilter" v-model="selectedFormat">
-      <option
-        v-for="option in formatFilterOptions"
-        :key="option.value"
-        :value="option.value"
-      >
-        {{ option.label }}
-      </option>
-    </select>
-  </div>
-</section>
-
-      <section class="railSection">
-        <h2>Statystyki</h2>
-
-        <div class="statsGrid">
-          <div class="statCard">
-            <strong>{{ stats.total }}</strong>
-            <span>wszystkie</span>
-          </div>
-
-          <div class="statCard ok">
-            <strong>{{ stats.ok }}</strong>
-            <span>OK</span>
-          </div>
-
-          <div class="statCard warning">
-            <strong>{{ stats.warning }}</strong>
-            <span>warning</span>
-          </div>
-
-          <div class="statCard error">
-            <strong>{{ stats.error }}</strong>
-            <span>error</span>
-          </div>
-        </div>
-      </section>
-
-      <section class="railSection">
-  <h2>Diagnostyka</h2>
-
-  <div class="diagnosticsBlock">
-    <div>
-      <h3>Według pola</h3>
-
-      <p v-if="!validationDiagnostics.byField.length" class="emptyHint">
-        Brak komunikatów walidacji.
-      </p>
-
-      <div
-        v-for="item in validationDiagnostics.byField"
-        :key="item.field"
-        class="diagnosticRow"
-      >
-        <span>{{ item.field }}</span>
-        <strong>{{ item.count }}</strong>
-      </div>
-    </div>
-
-    <div>
-      <h3>Według formatu</h3>
-
-      <p v-if="!validationDiagnostics.byFormat.length" class="emptyHint">
-        Brak komunikatów formatowych.
-      </p>
-
-      <div
-        v-for="item in validationDiagnostics.byFormat"
-        :key="item.formatId"
-        class="diagnosticRow"
-      >
-        <span>{{ item.formatId }}</span>
-        <strong>{{ item.count }}</strong>
-      </div>
-    </div>
-  </div>
-</section>
-
+      </details>
     </aside>
 
     <aside class="courseRail" aria-label="Lista kierunków">
       <header class="courseRailHeader">
-  <div>
-    <p class="eyebrow">Kierunki</p>
-    <h2>{{ stats.filtered }} w filtrze</h2>
-  </div>
+        <div>
+          <p class="eyebrow">Kierunki</p>
+          <h2>{{ stats.filtered }} w filtrze</h2>
+        </div>
 
-  <button
-    type="button"
-    class="batchExportButton"
-    :disabled="isBatchExporting || !batchExportCreatives.length"
-    @click="handleBatchExport"
-  >
-    {{ isBatchExporting ? 'Eksportuję…' : 'Eksportuj widoczne' }}
-  </button>
-</header>
+        <button
+          type="button"
+          class="batchExportButton"
+          :disabled="isBatchExporting || !batchExportCreatives.length"
+          @click="handleBatchExport"
+        >
+          {{ isBatchExporting ? "Eksportuję…" : "Eksportuj widoczne" }}
+        </button>
+      </header>
 
-<p v-if="batchExportError" class="batchExportError">
-  {{ batchExportError }}
-</p>
+      <p v-if="batchExportError" class="batchExportError">
+        {{ batchExportError }}
+      </p>
 
       <div class="searchBox">
         <label for="search">Szukaj kierunku</label>
@@ -651,69 +674,73 @@ function applyStressCase(testCase: (typeof stressCases)[number]) {
             </div>
           </section>
 
-
-
           <section class="previewCanvas">
             <AdsFormatPreview :creative="selectedRow.creative" />
           </section>
-                    <section
-  v-if="selectedRow.validation?.messages.length"
-  class="validationPanel"
->
-  <header>
-    <div>
-      <h3>Walidacja</h3>
-      <p>
-        {{ selectedValidationSummary.total }} komunikatów dla wybranej kreacji
-      </p>
-    </div>
+          <section
+            v-if="selectedRow.validation?.messages.length"
+            class="validationPanel"
+          >
+            <header>
+              <div>
+                <h3>Walidacja</h3>
+                <p>
+                  {{ selectedValidationSummary.total }} komunikatów dla wybranej
+                  kreacji
+                </p>
+              </div>
 
-    <div class="validationCounters">
-      <span v-if="selectedValidationSummary.errors" class="counter error">
-        {{ selectedValidationSummary.errors }} error
-      </span>
+              <div class="validationCounters">
+                <span
+                  v-if="selectedValidationSummary.errors"
+                  class="counter error"
+                >
+                  {{ selectedValidationSummary.errors }} error
+                </span>
 
-      <span v-if="selectedValidationSummary.warnings" class="counter warning">
-        {{ selectedValidationSummary.warnings }} warning
-      </span>
-    </div>
-  </header>
+                <span
+                  v-if="selectedValidationSummary.warnings"
+                  class="counter warning"
+                >
+                  {{ selectedValidationSummary.warnings }} warning
+                </span>
+              </div>
+            </header>
 
-  <div class="validationGroups">
-    <details
-      v-for="(messages, field) in selectedValidationGroups"
-      :key="field"
-      class="validationGroup"
-      open
-    >
-      <summary>
-        <span>{{ field }}</span>
-        <strong>{{ messages.length }}</strong>
-      </summary>
+            <div class="validationGroups">
+              <details
+                v-for="(messages, field) in selectedValidationGroups"
+                :key="field"
+                class="validationGroup"
+                open
+              >
+                <summary>
+                  <span>{{ field }}</span>
+                  <strong>{{ messages.length }}</strong>
+                </summary>
 
-      <ul>
-        <li
-          v-for="message in messages"
-          :key="`${message.field}-${message.formatId}-${message.message}`"
-          :class="message.level"
-        >
-          <strong>{{ message.level.toUpperCase() }}</strong>
+                <ul>
+                  <li
+                    v-for="message in messages"
+                    :key="`${message.field}-${message.formatId}-${message.message}`"
+                    :class="message.level"
+                  >
+                    <strong>{{ message.level.toUpperCase() }}</strong>
 
-          <span>
-            <template v-if="message.formatId">
-              {{ message.formatId }}:
-            </template>
-            {{ message.message }}
-          </span>
-        </li>
-      </ul>
-    </details>
-  </div>
-</section>
+                    <span>
+                      <template v-if="message.formatId">
+                        {{ message.formatId }}:
+                      </template>
+                      {{ message.message }}
+                    </span>
+                  </li>
+                </ul>
+              </details>
+            </div>
+          </section>
         </template>
       </template>
     </section>
-    
   </main>
 </template>
 
@@ -730,7 +757,7 @@ function applyStressCase(testCase: (typeof stressCases)[number]) {
     system-ui,
     -apple-system,
     BlinkMacSystemFont,
-    'Segoe UI',
+    "Segoe UI",
     sans-serif;
 }
 
