@@ -1,237 +1,306 @@
-export type SocialComponentStyleVariant =
-  | 'default'
-  | 'compact'
-  | 'strong'
-  | 'soft'
-  | 'outline';
+import {
+  createCreativeTheme,
+  type CreativeThemeMode,
+} from '../../creative-stack/design-system/creativeThemes';
+import {
+  createResponsiveScale,
+  type CreativeDensity,
+} from '../../creative-stack/design-system/createResponsiveScale';
 
-export type SocialTextComponentStyle = {
-  fontFamily: string;
-  fontWeight: number;
-  fontSize: number;
-  lineHeight: number;
-  letterSpacing?: number;
-  color: string;
-  maxLines?: number;
+export type SocialComponentStyleInput = {
+  width: number;
+  height: number;
+  brandKey: string;
+  themeMode?: CreativeThemeMode;
+  density?: CreativeDensity;
+  creativeScale?: number;
 };
 
-export type SocialBadgeComponentStyle = {
-  fontFamily: string;
-  fontWeight: number;
-  fontSize: number;
-  lineHeight: number;
-  letterSpacing?: number;
-  backgroundColor: string;
-  color: string;
-  radius: number;
-  paddingX: number;
-  paddingY: number;
-  borderColor?: string;
-  borderWidth?: number;
+export function createSocialComponentStyles({
+  width,
+  height,
+  brandKey,
+  themeMode = 'light',
+  density = 'default',
+  creativeScale = 1,
+}: SocialComponentStyleInput) {
+  const scale = createResponsiveScale(
+    width,
+    height,
+    density,
+    creativeScale,
+  );
+
+  const theme = createCreativeTheme(themeMode, brandKey);
+
+  const baseTextStyle = {
+  fontFamily: 'Roc Grotesk, Arial, sans-serif',
+  letterSpacing: -0.6 * scale.u,
 };
 
-export type SocialLogoCardComponentStyle = {
-  backgroundColor: string;
-  radius: number;
-  paddingX: number;
-  paddingY: number;
-  maxWidth: number;
-  maxHeight: number;
-};
+  const courseNameDefault = {
+    ...baseTextStyle,
+    fontWeight: 800,
+    fontSize: scale.font.titleLg,
+    minFontSize: scale.font.titleSm,
+    lineHeight: scale.lineHeight.title,
+    color: theme.textPrimary,
+    fill: theme.textPrimary,
+    maxLines: 3,
+  };
 
-export type SocialPhotoComponentStyle = {
-  radius: number;
-  overlayColor?: string;
-  overlayOpacity?: number;
-};
+  const courseNameCompact = {
+    ...courseNameDefault,
+    fontSize: scale.font.titleMd,
+    minFontSize: scale.font.titleSm * 0.92,
+    maxLines: 4,
+  };
 
-export const SOCIAL_BASE_FONT_FAMILY =
-  'Roc Grotesk, Inter, Arial, sans-serif';
+  const benefitDefault = {
+    ...baseTextStyle,
+    fontWeight: 600,
+    fontSize: scale.font.benefit,
+    minFontSize: scale.font.body,
+    lineHeight: scale.lineHeight.body,
+    letterSpacing: -0.25 * scale.u,
+    color: theme.textSecondary,
+    fill: theme.textSecondary,
+    maxLines: 2,
+  };
 
-export const SOCIAL_COMPONENT_STYLES = {
-  photo: {
-    default: {
-      radius: 34,
+  const benefitCompact = {
+    ...benefitDefault,
+    fontSize: scale.font.body,
+    minFontSize: scale.font.body * 0.88,
+    maxLines: 2,
+  };
+
+  const badgeDefault = {
+    ...baseTextStyle,
+    fontWeight: 800,
+    fontSize: scale.font.badge,
+    lineHeight: scale.lineHeight.tight,
+    letterSpacing: -0.15 * scale.u,
+
+    paddingX: scale.space.md,
+    paddingY: scale.space.sm,
+    radius: scale.radius.pill,
+
+    background: theme.badgeBackground,
+    backgroundColor: theme.badgeBackground,
+
+    color: theme.badgeText,
+    fill: theme.badgeText,
+
+    border: theme.borderSubtle,
+    borderColor: theme.borderSubtle,
+    borderWidth: scale.stroke.hairline,
+  };
+
+  const badgeCompact = {
+    ...badgeDefault,
+    fontSize: scale.font.badge * 0.88,
+    paddingX: scale.space.sm,
+    paddingY: scale.space.xs,
+  };
+
+  const priceDefault = {
+    ...badgeDefault,
+    fontWeight: 900,
+
+    background: theme.brandPrimary,
+    backgroundColor: theme.brandPrimary,
+
+    color: theme.textOnBrand,
+    fill: theme.textOnBrand,
+
+    border: 'transparent',
+    borderColor: 'transparent',
+    borderWidth: 0,
+  };
+
+  const priceSoft = {
+    ...badgeDefault,
+    fontWeight: 900,
+
+    background: theme.surfaceStrong,
+    backgroundColor: theme.surfaceStrong,
+
+    color: theme.textPrimary,
+    fill: theme.textPrimary,
+
+    border: theme.borderSubtle,
+    borderColor: theme.borderSubtle,
+    borderWidth: scale.stroke.hairline,
+  };
+
+  const metaDefault = {
+    ...badgeDefault,
+    fontWeight: 700,
+    fontSize: scale.font.badge * 0.9,
+
+    background: theme.surface,
+    backgroundColor: theme.surface,
+
+    color: theme.textPrimary,
+    fill: theme.textPrimary,
+
+    border: theme.borderSubtle,
+    borderColor: theme.borderSubtle,
+    borderWidth: scale.stroke.hairline,
+  };
+
+  const metaCompact = {
+    ...metaDefault,
+    fontSize: scale.font.badge * 0.8,
+    paddingX: scale.space.sm,
+    paddingY: scale.space.xs,
+  };
+
+  const offerModeDefault = {
+    ...metaDefault,
+
+    background: theme.brandSecondary,
+    backgroundColor: theme.brandSecondary,
+
+    color: theme.textOnBrand,
+    fill: theme.textOnBrand,
+
+    border: 'transparent',
+    borderColor: 'transparent',
+    borderWidth: 0,
+  };
+
+  const offerModeCompact = {
+    ...metaCompact,
+
+    background: theme.brandSecondary,
+    backgroundColor: theme.brandSecondary,
+
+    color: theme.textOnBrand,
+    fill: theme.textOnBrand,
+
+    border: 'transparent',
+    borderColor: 'transparent',
+    borderWidth: 0,
+  };
+
+  const partnerLogoDefault = {
+    background: '#FFFFFF',
+    backgroundColor: '#FFFFFF',
+
+    radius: scale.radius.md,
+
+    padding: scale.space.sm,
+    paddingX: scale.space.sm,
+    paddingY: scale.space.sm,
+
+    border: 'rgba(16,45,105,0.12)',
+    borderColor: 'rgba(16,45,105,0.12)',
+    borderWidth: scale.stroke.hairline,
+
+    maxWidth: scale.u * 28,
+    maxHeight: scale.u * 10,
+  };
+
+  const partnerLogoCompact = {
+    ...partnerLogoDefault,
+
+    radius: scale.radius.sm,
+
+    padding: scale.space.xs,
+    paddingX: scale.space.xs,
+    paddingY: scale.space.xs,
+
+    maxWidth: scale.u * 22,
+    maxHeight: scale.u * 8,
+  };
+
+  const brandLogoDefault = {
+    ...baseTextStyle,
+    fontWeight: 900,
+    fontSize: scale.font.body,
+    lineHeight: scale.lineHeight.tight,
+
+    color: theme.textPrimary,
+    fill: theme.textPrimary,
+
+    maxWidth: scale.u * 30,
+    maxHeight: scale.u * 8,
+  };
+
+  return {
+    scale,
+    theme,
+
+    canvas: {
+      background: theme.background,
+      backgroundColor: theme.background,
     },
-  },
 
-  courseName: {
-    default: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 800,
-      fontSize: 76,
-      lineHeight: 0.96,
-      letterSpacing: -1.8,
-      color: '#102D69',
-      maxLines: 3,
+    photo: {
+      default: {
+        radius: scale.radius.lg,
+      },
     },
 
-    compact: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 800,
-      fontSize: 62,
-      lineHeight: 0.98,
-      letterSpacing: -1.3,
-      color: '#102D69',
-      maxLines: 4,
-    },
-  },
-
-  benefit: {
-    default: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 600,
-      fontSize: 34,
-      lineHeight: 1.14,
-      letterSpacing: -0.4,
-      color: '#102D69',
-      maxLines: 2,
+    courseName: {
+      default: courseNameDefault,
+      compact: courseNameCompact,
     },
 
-    compact: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 600,
-      fontSize: 28,
-      lineHeight: 1.16,
-      letterSpacing: -0.25,
-      color: '#102D69',
-      maxLines: 2,
-    },
-  },
-
-  offerMode: {
-    default: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 700,
-      fontSize: 26,
-      lineHeight: 1,
-      letterSpacing: -0.15,
-      backgroundColor: '#FFFFFF',
-      color: '#102D69',
-      radius: 999,
-      paddingX: 24,
-      paddingY: 12,
-      borderColor: 'rgba(16, 45, 105, 0.18)',
-      borderWidth: 2,
+    benefit: {
+      default: benefitDefault,
+      compact: benefitCompact,
     },
 
-    strong: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 800,
-      fontSize: 28,
-      lineHeight: 1,
-      letterSpacing: -0.2,
-      backgroundColor: '#102D69',
-      color: '#FFFFFF',
-      radius: 999,
-      paddingX: 26,
-      paddingY: 13,
-    },
-  },
-
-  price: {
-    default: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 800,
-      fontSize: 34,
-      lineHeight: 1,
-      letterSpacing: -0.4,
-      backgroundColor: '#102D69',
-      color: '#FFFFFF',
-      radius: 999,
-      paddingX: 30,
-      paddingY: 16,
+    price: {
+      default: priceDefault,
+      soft: priceSoft,
+      compact: {
+        ...priceDefault,
+        fontSize: badgeCompact.fontSize,
+        paddingX: badgeCompact.paddingX,
+        paddingY: badgeCompact.paddingY,
+      },
     },
 
-    soft: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 800,
-      fontSize: 32,
-      lineHeight: 1,
-      letterSpacing: -0.35,
-      backgroundColor: '#EAF1FF',
-      color: '#102D69',
-      radius: 999,
-      paddingX: 28,
-      paddingY: 15,
-    },
-  },
-
-  startDate: {
-    default: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 700,
-      fontSize: 28,
-      lineHeight: 1,
-      letterSpacing: -0.25,
-      backgroundColor: '#EAF1FF',
-      color: '#102D69',
-      radius: 999,
-      paddingX: 26,
-      paddingY: 14,
-      borderColor: 'rgba(16, 45, 105, 0.12)',
-      borderWidth: 2,
-    },
-  },
-
-  city: {
-    default: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 700,
-      fontSize: 26,
-      lineHeight: 1,
-      letterSpacing: -0.15,
-      backgroundColor: '#FFFFFF',
-      color: '#102D69',
-      radius: 999,
-      paddingX: 24,
-      paddingY: 12,
-      borderColor: 'rgba(16, 45, 105, 0.16)',
-      borderWidth: 2,
+    startDate: {
+      default: metaDefault,
+      compact: metaCompact,
     },
 
-    compact: {
-      fontFamily: SOCIAL_BASE_FONT_FAMILY,
-      fontWeight: 700,
-      fontSize: 22,
-      lineHeight: 1,
-      letterSpacing: -0.1,
-      backgroundColor: '#FFFFFF',
-      color: '#102D69',
-      radius: 999,
-      paddingX: 20,
-      paddingY: 10,
-      borderColor: 'rgba(16, 45, 105, 0.16)',
-      borderWidth: 2,
-    },
-  },
-
-  partnerLogo: {
-    default: {
-      backgroundColor: '#FFFFFF',
-      radius: 22,
-      paddingX: 24,
-      paddingY: 16,
-      maxWidth: 240,
-      maxHeight: 92,
+    city: {
+      default: metaDefault,
+      compact: metaCompact,
     },
 
-    compact: {
-      backgroundColor: '#FFFFFF',
-      radius: 18,
-      paddingX: 20,
-      paddingY: 13,
-      maxWidth: 200,
-      maxHeight: 78,
+    offerMode: {
+      default: offerModeDefault,
+      compact: offerModeCompact,
     },
-  },
 
-  brandLogo: {
-    default: {
-      maxWidth: 178,
-      maxHeight: 62,
+    partnerLogo: {
+      default: partnerLogoDefault,
+      compact: partnerLogoCompact,
     },
-  },
-} as const;
 
-export type SocialComponentStyles = typeof SOCIAL_COMPONENT_STYLES;
+    brandLogo: {
+      default: brandLogoDefault,
+    },
+
+    debug: {
+      slotStroke: 'rgba(15,68,150,0.35)',
+      safeZoneStroke: 'rgba(227,6,19,0.45)',
+      gridStroke: 'rgba(15,68,150,0.12)',
+    },
+  };
+}
+
+export const socialComponentStyles = createSocialComponentStyles({
+  width: 1080,
+  height: 1080,
+  brandKey: 'teb-edukacja',
+});
+
+export const SOCIAL_COMPONENT_STYLES = socialComponentStyles;
