@@ -3,33 +3,40 @@ import type {
   SocialCreativeData,
   SocialLayoutSlot,
 } from '../types/social.types';
+import { getTextFallbackValue } from '../utils/getTextFallbackValue';
 import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
 
-export type RenderSocialCourseNameOptions = {
+export type RenderSocialBenefitOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
   variant?: 'default' | 'compact';
 };
 
-export function renderSocialCourseName({
+export function renderSocialBenefit({
   creative,
   slot,
   variant = 'default',
-}: RenderSocialCourseNameOptions): string {
-  if (!creative.enabledComponents.includes('courseName')) {
+}: RenderSocialBenefitOptions): string {
+  if (!creative.enabledComponents.includes('benefit')) {
+    return '';
+  }
+
+  const text = getTextFallbackValue(creative.benefit, 'short');
+
+  if (!text) {
     return '';
   }
 
   const style =
     variant === 'compact'
-      ? SOCIAL_COMPONENT_STYLES.courseName.compact
-      : SOCIAL_COMPONENT_STYLES.courseName.default;
+      ? SOCIAL_COMPONENT_STYLES.benefit.compact
+      : SOCIAL_COMPONENT_STYLES.benefit.default;
 
   return renderSvgTextBlock({
     x: slot.x,
     y: slot.y + style.fontSize,
     width: slot.width,
-    text: creative.courseName,
+    text,
     fontFamily: style.fontFamily,
     fontSize: style.fontSize,
     fontWeight: style.fontWeight,
@@ -37,6 +44,6 @@ export function renderSocialCourseName({
     letterSpacing: style.letterSpacing,
     fill: style.color,
     maxLines: style.maxLines,
-    dataComponent: 'social-course-name',
+    dataComponent: 'social-benefit',
   }).svg;
 }
