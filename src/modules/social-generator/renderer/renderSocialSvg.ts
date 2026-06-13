@@ -1,6 +1,16 @@
-import type { SocialCreativeData, SocialFormatId } from '../types/social.types';
-import { getSocialFormat } from './socialFormats';
-import { getSocialLayout } from './socialLayouts';
+import type {
+  SocialCreativeData,
+  SocialFormatId,
+  SocialLayoutSlot,
+} from '../types/social.types';
+import type { CreativeThemeMode } from '../../creative-stack/design-system/creativeThemes';
+import type { CreativeDensity } from '../../creative-stack/design-system/createResponsiveScale';
+import {
+  getSocialFormat,
+  type SocialFormatDefinition,
+} from './socialFormats';
+import { createSocialComponentStyles } from './socialComponentStyles';
+import { createSocialResponsiveLayout } from './layout/createSocialResponsiveLayout';
 import { renderSocialBenefit } from './renderSocialBenefit';
 import { renderSocialBrandLogo } from './renderSocialBrandLogo';
 import { renderSocialCity } from './renderSocialCity';
@@ -15,23 +25,32 @@ export type RenderSocialSvgOptions = {
   creative: SocialCreativeData;
   formatId: SocialFormatId;
   showDebugOverlay?: boolean;
+  themeMode?: CreativeThemeMode;
+  density?: CreativeDensity;
+  creativeScale?: number;
 };
 
-function renderCanvasBackground(width: number, height: number): string {
+type SocialRenderSlots = Record<string, SocialLayoutSlot>;
+
+function renderCanvasBackground(
+  width: number,
+  height: number,
+  fill: string,
+): string {
   return `
     <rect
       x="0"
       y="0"
       width="${width}"
       height="${height}"
-      fill="#F6F8FC"
+      fill="${fill}"
     />
   `;
 }
 
 function renderDebugSlot(
   name: string,
-  slot: { x: number; y: number; width: number; height: number },
+  slot: SocialLayoutSlot,
 ): string {
   return `
     <g data-debug-slot="${name}">
@@ -57,27 +76,17 @@ function renderDebugSlot(
   `;
 }
 
-function renderDebugOverlay(
-  slots: ReturnType<typeof getSocialLayout>['slots'],
-): string {
+function renderDebugOverlay(slots: SocialRenderSlots): string {
   return `
     <g data-component="social-debug-overlay">
       ${Object.entries(slots)
-        .map(([name, slot]) => {
-          if (!slot) {
-            return '';
-          }
-
-          return renderDebugSlot(name, slot);
-        })
+        .map(([name, slot]) => renderDebugSlot(name, slot))
         .join('')}
     </g>
   `;
 }
 
-function renderSafeZoneOverlay(formatId: SocialFormatId): string {
-  const format = getSocialFormat(formatId);
-
+function renderSafeZoneOverlay(format: SocialFormatDefinition): string {
   if (!format.safeZone) {
     return '';
   }
@@ -112,10 +121,37 @@ export function renderSocialSvg({
   creative,
   formatId,
   showDebugOverlay = false,
+  themeMode = 'light',
+  density = 'default',
+  creativeScale = 1,
 }: RenderSocialSvgOptions): string {
   const format = getSocialFormat(formatId);
-  const layout = getSocialLayout(formatId);
-  const { slots } = layout;
+
+  const styles = createSocialComponentStyles({
+    width: format.width,
+    height: format.height,
+    brandKey: creative.brandKey,
+    themeMode,
+    density,
+    creativeScale,
+  });
+
+  const layout = createSocialResponsiveLayout({
+    format,
+    scale: styles.scale,
+  });
+
+  const slots: SocialRenderSlots = {
+    photo: layout.photo,
+    partnerLogo: layout.partnerLogo,
+    offerMode: layout.offerMode,
+    courseName: layout.courseName,
+    benefit: layout.benefit,
+    price: layout.price,
+    startDate: layout.startDate,
+    city: layout.city,
+    brandLogo: layout.brandLogo,
+  };
 
   return `
     <svg
@@ -126,78 +162,58 @@ export function renderSocialSvg({
       role="img"
       aria-label="${creative.courseName}"
     >
-      ${renderCanvasBackground(format.width, format.height)}
+      ${renderCanvasBackground(
+        format.width,
+        format.height,
+        styles.canvas.backgroundColor,
+      )}
 
       ${renderSocialPhoto({
         creative,
         slot: slots.photo,
       })}
 
-      ${
-        slots.partnerLogo
-          ? renderSocialPartnerLogo({
-              creative,
-              slot: slots.partnerLogo,
-            })
-          : ''
-      }
+      ${renderSocialPartnerLogo({
+        creative,
+        slot: slots.partnerLogo,
+      })}
 
-      ${
-        slots.offerMode
-          ? renderSocialOfferMode({
-              creative,
-              slot: slots.offerMode,
-            })
-          : ''
-      }
+      ${renderSocialOfferMode({
+        creative,
+        slot: slots.offerMode,
+      })}
 
       ${renderSocialCourseName({
         creative,
         slot: slots.courseName,
       })}
 
-      ${
-        slots.benefit
-          ? renderSocialBenefit({
-              creative,
-              slot: slots.benefit,
-            })
-          : ''
-      }
+      ${renderSocialBenefit({
+        creative,
+        slot: slots.benefit,
+      })}
 
-      ${
-        slots.price
-          ? renderSocialPrice({
-              creative,
-              slot: slots.price,
-            })
-          : ''
-      }
+      ${renderSocialPrice({
+        creative,
+        slot: slots.price,
+      })}
 
-      ${
-        slots.startDate
-          ? renderSocialStartDate({
-              creative,
-              slot: slots.startDate,
-            })
-          : ''
-      }
+      ${renderSocialStartDate({
+        creative,
+        slot: slots.startDate,
+      })}
 
-      ${
-        slots.city
-          ? renderSocialCity({
-              creative,
-              slot: slots.city,
-            })
-          : ''
-      }
+      ${renderSocialCity({
+        creative,
+        slot: slots.city,
+      })}
 
       ${renderSocialBrandLogo({
         creative,
         slot: slots.brandLogo,
       })}
 
-      ${showDebugOverlay ? renderSafeZoneOverlay(formatId) : ''}
+      ${showDebugOverlay ? renderSafeZoneOverlay(format) : ''}
       ${showDebugOverlay ? renderDebugOverlay(slots) : ''}
     </svg>
   `;
