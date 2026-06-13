@@ -30,12 +30,17 @@ export function createSocialComponentStyles({
     density,
     creativeScale,
   );
-
+const tracking = {
+  tight: -0.6 * scale.u,
+  medium: -0.25 * scale.u,
+  subtle: -0.15 * scale.u,
+  none: 0,
+};
   const theme = createCreativeTheme(themeMode, brandKey);
 
   const baseTextStyle = {
   fontFamily: 'Roc Grotesk, Arial, sans-serif',
-  letterSpacing: -0.6 * scale.u,
+  letterSpacing: tracking.medium,
 };
 
   const courseNameDefault = {
@@ -62,7 +67,7 @@ export function createSocialComponentStyles({
     fontSize: scale.font.benefit,
     minFontSize: scale.font.body,
     lineHeight: scale.lineHeight.body,
-    letterSpacing: -0.25 * scale.u,
+    letterSpacing: tracking.subtle,
     color: theme.textSecondary,
     fill: theme.textSecondary,
     maxLines: 2,
@@ -80,7 +85,7 @@ export function createSocialComponentStyles({
     fontWeight: 800,
     fontSize: scale.font.badge,
     lineHeight: scale.lineHeight.tight,
-    letterSpacing: -0.15 * scale.u,
+    letterSpacing: tracking.tight,
 
     paddingX: scale.space.md,
     paddingY: scale.space.sm,
@@ -229,6 +234,8 @@ export function createSocialComponentStyles({
     maxHeight: scale.u * 8,
   };
 
+
+  
   return {
     scale,
     theme,
