@@ -1204,6 +1204,7 @@ SocialCreativeData
 PartnerData
 SocialLayoutSlot
 SocialLayoutDefinition
+Backlog danych i assetów
 ```
 
 #### Etap 2 — Dane robocze
@@ -1387,3 +1388,181 @@ Utworzyć strukturę modułu social-generator i dodać:
 ```
 
 Nie zaczynać od finalnego layoutu. Najpierw zbudować język danych i komponentów. Layout będzie dopracowywany iteracyjnie w trakcie pracy z realnymi przykładami kierunków.
+
+## Model podglądu i responsywnego renderowania
+
+Social Generator powinien działać w modelu jednego aktywnego podglądu roboczego. Użytkownik nie pracuje równocześnie na kilku osobnych podglądach, lecz wybiera aktualny format, np. `1080×1080`, `1080×1350` albo `1080×1920`, a system dynamicznie przelicza kompozycję na podstawie tego formatu.
+
+Oznacza to, że dane kreacji pozostają wspólne, natomiast format jest kontekstem renderowania. Ten sam draft powinien móc zostać wyrenderowany do różnych proporcji bez tworzenia osobnych układów ręcznie dla każdego formatu.
+
+Model działania:
+
+```txt
+draft kreacji
++ aktywny format podglądu
++ theme
++ density
++ creative scale
+→ responsive layout
+→ SVG aktywnego podglądu
+```
+
+Przy eksporcie system powinien użyć tego samego draftu i tej samej logiki renderowania do wygenerowania całej paczki formatów:
+
+```txt
+draft kreacji
+→ render 1080×1080
+→ render 1080×1350
+→ render 1080×1920
+→ eksport paczki
+```
+
+### Założenia UX
+
+W interfejsie użytkownik powinien widzieć jeden główny podgląd kreacji. Nad lub obok podglądu powinien znajdować się przełącznik formatu:
+
+```txt
+Square 1:1
+Feed 4:5
+Story / Reels 9:16
+```
+
+Zmiana formatu powinna płynnie zmieniać proporcje podglądu i przeliczać layout, ale nie powinna tworzyć osobnej kopii danych. Użytkownik nadal edytuje jedną kreację.
+
+W podglądzie należy rozdzielić dwa rodzaje skali:
+
+1. **Skala podglądu UI** — odpowiada tylko za to, jak duży SVG jest widoczny w aplikacji. Nie wpływa na eksport.
+2. **Skala kompozycji** — wpływa na rzeczywiste rozmiary elementów w grafice: fonty, odstępy, wysokości sekcji, marginesy, badge i układ zdjęcia.
+
+Dzięki temu użytkownik może wygodnie oglądać grafikę w aplikacji bez przypadkowego zmieniania finalnego eksportu.
+
+### Responsywny system kompozycji
+
+Nie zakładamy jednego sztywnego SVG skalowanego do wszystkich formatów. Zakładamy jeden responsywny system layoutu, który generuje różne proporcje z tych samych zasad.
+
+System powinien definiować:
+
+* hierarchię wizualną,
+* skalę typografii,
+* odstępy pionowe i poziome,
+* siatkę / jednostkę bazową,
+* wysokości sekcji,
+* zasady łamania tekstu,
+* priorytety widoczności komponentów,
+* tryby gęstości układu,
+* motywy jasny / ciemny,
+* bezpieczne strefy dla formatów story.
+
+Przykładowa hierarchia wizualna:
+
+```txt
+1. Zdjęcie / kontekst wizualny
+2. Nazwa kierunku
+3. Cena lub główna przewaga
+4. Start / tryb nauki / miasto
+5. Partner
+6. Logo TEB
+```
+
+W przypadku braku miejsca system powinien najpierw skracać lub ukrywać elementy opcjonalne, a nie zmniejszać bez końca najważniejszych elementów. Nazwa kierunku, zdjęcie i logo marki powinny pozostać elementami nadrzędnymi.
+
+### Format jako kontekst renderowania
+
+Format powinien być przekazywany do renderera jako kontekst, np.:
+
+```ts
+type SocialRenderContext = {
+  formatId: SocialFormatId;
+  width: number;
+  height: number;
+  ratio: '1:1' | '4:5' | '9:16';
+};
+```
+
+Natomiast dane kreacji powinny pozostać niezależne od formatu:
+
+```ts
+type SocialCreativeDraft = {
+  courseName: string;
+  imagePath: string;
+  offerMode: 'stationary' | 'online';
+  cityName?: string;
+  benefit?: string;
+  priceLabel?: string;
+  startDateLabel?: string;
+  partner?: {
+    name: string;
+    logoPath: string;
+  };
+  themeMode: 'light' | 'dark';
+  layoutPreset: string;
+  density: 'compact' | 'default' | 'comfortable';
+  creativeScale: number;
+};
+```
+
+Docelowy schemat:
+
+```txt
+SocialCreativeDraft
++ SocialRenderContext
++ CreativeTheme
++ ResponsiveScale
+→ SocialResponsiveLayout
+→ SVG
+```
+
+### Tryby gęstości
+
+Zamiast od razu dodawać wiele ręcznych suwaków, warto wprowadzić kontrolę gęstości kompozycji:
+
+```txt
+compact
+default
+comfortable
+```
+
+Znaczenie:
+
+```txt
+compact:
+  mniejsze odstępy,
+  więcej treści,
+  bardziej użytkowy układ.
+
+default:
+  standardowy rytm kompozycji.
+
+comfortable:
+  większe odstępy,
+  bardziej premium,
+  mniej zagęszczona komunikacja.
+```
+
+Dodatkowo można przewidzieć ekspercki parametr `creativeScale`, np. w zakresie `0.9–1.1`, który proporcjonalnie skaluje fonty, odstępy i komponenty bez naruszania proporcji całego formatu.
+
+### Konsekwencje dla implementacji
+
+W praktyce social-generator powinien rozwijać się w kierunku:
+
+```txt
+jeden aktywny podgląd
++ przełącznik formatu
++ responsive layout engine
++ wspólne dane draftu
++ eksport paczki formatów
+```
+
+Proponowane komponenty i pliki:
+
+```txt
+src/modules/social-generator/components/SocialPreviewStage.vue
+src/modules/social-generator/renderer/layout/createSocialResponsiveLayout.ts
+src/modules/creative-stack/design-system/createResponsiveScale.ts
+src/modules/creative-stack/design-system/creativeTokens.ts
+src/modules/creative-stack/design-system/creativeThemes.ts
+```
+
+`SocialPreviewStage.vue` powinien odpowiadać tylko za prezentację jednego aktywnego formatu w UI. Renderer SVG powinien nadal generować grafikę w realnych wymiarach eksportowych, np. `1080×1080`, `1080×1350`, `1080×1920`.
+
+Eksport powinien działać niezależnie od aktywnego podglądu. Aktywny podgląd określa tylko to, co użytkownik aktualnie ogląda i edytuje. Eksport może wygenerować wszystkie zaznaczone formaty na podstawie tego samego draftu.
