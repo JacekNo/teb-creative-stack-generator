@@ -24,21 +24,24 @@ export function createSocialComponentStyles({
   density = 'default',
   creativeScale = 1,
 }: SocialComponentStyleInput) {
-  const scale = createResponsiveScale(
-    width,
-    height,
-    density,
-    creativeScale,
-  );
+  
+const scale = createResponsiveScale(
+  width,
+  height,
+  density,
+  creativeScale,
+);
+
 const tracking = {
   tight: -0.6 * scale.u,
   medium: -0.25 * scale.u,
   subtle: -0.15 * scale.u,
   none: 0,
 };
-  const theme = createCreativeTheme(themeMode, brandKey);
 
-  const baseTextStyle = {
+const theme = createCreativeTheme(themeMode, brandKey);
+
+const baseTextStyle = {
   fontFamily: 'Roc Grotesk, Arial, sans-serif',
   letterSpacing: tracking.medium,
 };
