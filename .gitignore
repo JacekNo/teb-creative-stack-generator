@@ -29,4 +29,5 @@ project-tree.txt
 Add-Content .gitignore "`nproject-files.txt"
 Add-Content .gitignore "exports/"
 Add-Content .gitignore "*.zip"
-Add-Content .gitignore "`nproject-tree.txt"
+
+scripts/
