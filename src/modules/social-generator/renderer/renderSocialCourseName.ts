@@ -3,17 +3,19 @@ import type {
   SocialCreativeData,
   SocialLayoutSlot,
 } from '../types/social.types';
-import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
+import type { SocialComponentStyles } from './socialComponentStyles';
 
 export type RenderSocialCourseNameOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
+  styles: SocialComponentStyles;
   variant?: 'default' | 'compact';
 };
 
 export function renderSocialCourseName({
   creative,
   slot,
+  styles,
   variant = 'default',
 }: RenderSocialCourseNameOptions): string {
   if (!creative.enabledComponents.includes('courseName')) {
@@ -22,8 +24,8 @@ export function renderSocialCourseName({
 
   const style =
     variant === 'compact'
-      ? SOCIAL_COMPONENT_STYLES.courseName.compact
-      : SOCIAL_COMPONENT_STYLES.courseName.default;
+      ? styles.courseName.compact
+      : styles.courseName.default;
 
   return renderSvgTextBlock({
     x: slot.x,

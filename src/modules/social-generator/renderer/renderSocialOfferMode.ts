@@ -3,16 +3,20 @@ import type {
   SocialCreativeData,
   SocialLayoutSlot,
 } from '../types/social.types';
-import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
+import type { SocialComponentStyles } from './socialComponentStyles';
 
 export type RenderSocialOfferModeOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
+  styles: SocialComponentStyles;
+  variant?: 'default' | 'compact';
 };
 
 export function renderSocialOfferMode({
   creative,
   slot,
+  styles,
+  variant = 'default',
 }: RenderSocialOfferModeOptions): string {
   if (creative.offerMode !== 'online') {
     return '';
@@ -23,7 +27,10 @@ export function renderSocialOfferMode({
   }
 
   const text = creative.offerModeLabel ?? 'Nauka online';
-  const style = SOCIAL_COMPONENT_STYLES.offerMode.default;
+  const style =
+    variant === 'compact'
+      ? styles.offerMode.compact
+      : styles.offerMode.default;
 
   return renderSvgBadge({
     x: slot.x,

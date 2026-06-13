@@ -9,8 +9,8 @@ import {
   getSocialFormat,
   type SocialFormatDefinition,
 } from './socialFormats';
-import { createSocialComponentStyles } from './socialComponentStyles';
 import { createSocialResponsiveLayout } from './layout/createSocialResponsiveLayout';
+import { createSocialComponentStyles } from './socialComponentStyles';
 import { renderSocialBenefit } from './renderSocialBenefit';
 import { renderSocialBrandLogo } from './renderSocialBrandLogo';
 import { renderSocialCity } from './renderSocialCity';
@@ -32,6 +32,15 @@ export type RenderSocialSvgOptions = {
 
 type SocialRenderSlots = Record<string, SocialLayoutSlot>;
 
+function escapeXml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&apos;');
+}
+
 function renderCanvasBackground(
   width: number,
   height: number,
@@ -51,16 +60,17 @@ function renderCanvasBackground(
 function renderDebugSlot(
   name: string,
   slot: SocialLayoutSlot,
+  stroke: string,
 ): string {
   return `
-    <g data-debug-slot="${name}">
+    <g data-debug-slot="${escapeXml(name)}">
       <rect
         x="${slot.x}"
         y="${slot.y}"
         width="${slot.width}"
         height="${slot.height}"
         fill="none"
-        stroke="#FF4652"
+        stroke="${stroke}"
         stroke-width="2"
         stroke-dasharray="8 8"
       />
@@ -70,23 +80,29 @@ function renderDebugSlot(
         font-family="Arial, sans-serif"
         font-size="18"
         font-weight="700"
-        fill="#FF4652"
-      >${name}</text>
+        fill="${stroke}"
+      >${escapeXml(name)}</text>
     </g>
   `;
 }
 
-function renderDebugOverlay(slots: SocialRenderSlots): string {
+function renderDebugOverlay(
+  slots: SocialRenderSlots,
+  stroke: string,
+): string {
   return `
     <g data-component="social-debug-overlay">
       ${Object.entries(slots)
-        .map(([name, slot]) => renderDebugSlot(name, slot))
+        .map(([name, slot]) => renderDebugSlot(name, slot, stroke))
         .join('')}
     </g>
   `;
 }
 
-function renderSafeZoneOverlay(format: SocialFormatDefinition): string {
+function renderSafeZoneOverlay(
+  format: SocialFormatDefinition,
+  stroke: string,
+): string {
   if (!format.safeZone) {
     return '';
   }
@@ -101,7 +117,7 @@ function renderSafeZoneOverlay(format: SocialFormatDefinition): string {
         width="${format.width - left - right}"
         height="${format.height - top - bottom}"
         fill="none"
-        stroke="#009BDE"
+        stroke="${stroke}"
         stroke-width="3"
         stroke-dasharray="12 10"
       />
@@ -111,7 +127,7 @@ function renderSafeZoneOverlay(format: SocialFormatDefinition): string {
         font-family="Arial, sans-serif"
         font-size="22"
         font-weight="700"
-        fill="#009BDE"
+        fill="${stroke}"
       >safe zone</text>
     </g>
   `;
@@ -160,7 +176,7 @@ export function renderSocialSvg({
       height="${format.height}"
       viewBox="0 0 ${format.width} ${format.height}"
       role="img"
-      aria-label="${creative.courseName}"
+      aria-label="${escapeXml(creative.courseName)}"
     >
       ${renderCanvasBackground(
         format.width,
@@ -171,50 +187,63 @@ export function renderSocialSvg({
       ${renderSocialPhoto({
         creative,
         slot: slots.photo,
+        styles,
       })}
 
       ${renderSocialPartnerLogo({
         creative,
         slot: slots.partnerLogo,
+        styles,
       })}
 
       ${renderSocialOfferMode({
         creative,
         slot: slots.offerMode,
+        styles,
       })}
 
       ${renderSocialCourseName({
         creative,
         slot: slots.courseName,
+        styles,
       })}
 
       ${renderSocialBenefit({
         creative,
         slot: slots.benefit,
+        styles,
       })}
 
       ${renderSocialPrice({
         creative,
         slot: slots.price,
+        styles,
       })}
 
       ${renderSocialStartDate({
         creative,
         slot: slots.startDate,
+        styles,
       })}
 
       ${renderSocialCity({
         creative,
         slot: slots.city,
+        styles,
       })}
 
       ${renderSocialBrandLogo({
         creative,
         slot: slots.brandLogo,
+        styles,
       })}
 
-      ${showDebugOverlay ? renderSafeZoneOverlay(format) : ''}
-      ${showDebugOverlay ? renderDebugOverlay(slots) : ''}
+      ${showDebugOverlay
+        ? renderSafeZoneOverlay(format, styles.debug.safeZoneStroke)
+        : ''}
+      ${showDebugOverlay
+        ? renderDebugOverlay(slots, styles.debug.slotStroke)
+        : ''}
     </svg>
   `;
 }

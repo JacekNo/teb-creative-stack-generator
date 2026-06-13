@@ -24,27 +24,26 @@ export function createSocialComponentStyles({
   density = 'default',
   creativeScale = 1,
 }: SocialComponentStyleInput) {
-  
-const scale = createResponsiveScale(
-  width,
-  height,
-  density,
-  creativeScale,
-);
+  const scale = createResponsiveScale(
+    width,
+    height,
+    density,
+    creativeScale,
+  );
 
-const tracking = {
-  tight: -0.6 * scale.u,
-  medium: -0.25 * scale.u,
-  subtle: -0.15 * scale.u,
-  none: 0,
-};
+  const tracking = {
+    tight: -0.6 * scale.u,
+    medium: -0.25 * scale.u,
+    subtle: -0.15 * scale.u,
+    none: 0,
+  };
 
-const theme = createCreativeTheme(themeMode, brandKey);
+  const theme = createCreativeTheme(themeMode, brandKey);
 
-const baseTextStyle = {
-  fontFamily: 'Roc Grotesk, Arial, sans-serif',
-  letterSpacing: tracking.medium,
-};
+  const baseTextStyle = {
+    fontFamily: 'Roc Grotesk, Arial, sans-serif',
+    letterSpacing: tracking.medium,
+  };
 
   const courseNameDefault = {
     ...baseTextStyle,
@@ -237,8 +236,6 @@ const baseTextStyle = {
     maxHeight: scale.u * 8,
   };
 
-
-  
   return {
     scale,
     theme,
@@ -251,6 +248,8 @@ const baseTextStyle = {
     photo: {
       default: {
         radius: scale.radius.lg,
+        placeholderBackground: theme.surfaceStrong,
+        placeholderText: theme.textPrimary,
       },
     },
 
@@ -306,6 +305,8 @@ const baseTextStyle = {
     },
   };
 }
+
+export type SocialComponentStyles = ReturnType<typeof createSocialComponentStyles>;
 
 export const socialComponentStyles = createSocialComponentStyles({
   width: 1080,

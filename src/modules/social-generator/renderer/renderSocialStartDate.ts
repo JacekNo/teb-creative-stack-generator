@@ -4,16 +4,20 @@ import type {
   SocialLayoutSlot,
 } from '../types/social.types';
 import { getTextFallbackValue } from '../utils/getTextFallbackValue';
-import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
+import type { SocialComponentStyles } from './socialComponentStyles';
 
 export type RenderSocialStartDateOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
+  styles: SocialComponentStyles;
+  variant?: 'default' | 'compact';
 };
 
 export function renderSocialStartDate({
   creative,
   slot,
+  styles,
+  variant = 'default',
 }: RenderSocialStartDateOptions): string {
   if (!creative.enabledComponents.includes('startDate')) {
     return '';
@@ -25,7 +29,10 @@ export function renderSocialStartDate({
     return '';
   }
 
-  const style = SOCIAL_COMPONENT_STYLES.startDate.default;
+  const style =
+    variant === 'compact'
+      ? styles.startDate.compact
+      : styles.startDate.default;
 
   return renderSvgBadge({
     x: slot.x,

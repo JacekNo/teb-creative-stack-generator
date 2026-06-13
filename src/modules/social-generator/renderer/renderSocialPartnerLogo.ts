@@ -1,12 +1,14 @@
+import { publicAssetPath } from '../../creative-stack/utils/publicAssetPath';
 import type {
   SocialCreativeData,
   SocialLayoutSlot,
 } from '../types/social.types';
-import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
-import { publicAssetPath } from '../../creative-stack/utils/publicAssetPath';
+import type { SocialComponentStyles } from './socialComponentStyles';
+
 export type RenderSocialPartnerLogoOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
+  styles: SocialComponentStyles;
   variant?: 'default' | 'compact';
 };
 
@@ -19,9 +21,21 @@ function escapeXml(value: string): string {
     .replaceAll("'", '&apos;');
 }
 
+function renderStrokeAttributes(
+  borderColor: string | undefined,
+  borderWidth: number | undefined,
+): string {
+  if (!borderColor || !borderWidth || borderWidth <= 0) {
+    return '';
+  }
+
+  return `stroke="${borderColor}" stroke-width="${borderWidth}"`;
+}
+
 export function renderSocialPartnerLogo({
   creative,
   slot,
+  styles,
   variant = 'default',
 }: RenderSocialPartnerLogoOptions): string {
   if (!creative.enabledComponents.includes('partnerLogo')) {
@@ -34,8 +48,8 @@ export function renderSocialPartnerLogo({
 
   const style =
     variant === 'compact'
-      ? SOCIAL_COMPONENT_STYLES.partnerLogo.compact
-      : SOCIAL_COMPONENT_STYLES.partnerLogo.default;
+      ? styles.partnerLogo.compact
+      : styles.partnerLogo.default;
 
   const cardWidth = Math.min(slot.width, style.maxWidth);
   const cardHeight = Math.min(slot.height, style.maxHeight);
@@ -44,6 +58,10 @@ export function renderSocialPartnerLogo({
   const logoY = slot.y + style.paddingY;
   const logoWidth = Math.max(0, cardWidth - style.paddingX * 2);
   const logoHeight = Math.max(0, cardHeight - style.paddingY * 2);
+  const strokeAttributes = renderStrokeAttributes(
+    style.borderColor,
+    style.borderWidth,
+  );
 
   return `
     <g data-component="social-partner-logo">
@@ -54,6 +72,7 @@ export function renderSocialPartnerLogo({
         height="${cardHeight}"
         rx="${style.radius}"
         fill="${style.backgroundColor}"
+        ${strokeAttributes}
       />
       <image
         href="${escapeXml(publicAssetPath(creative.partner.logoPath))}"

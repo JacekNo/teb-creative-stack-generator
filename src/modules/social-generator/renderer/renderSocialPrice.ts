@@ -4,17 +4,19 @@ import type {
   SocialLayoutSlot,
 } from '../types/social.types';
 import { getTextFallbackValue } from '../utils/getTextFallbackValue';
-import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
+import type { SocialComponentStyles } from './socialComponentStyles';
 
 export type RenderSocialPriceOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
-  variant?: 'default' | 'soft';
+  styles: SocialComponentStyles;
+  variant?: 'default' | 'soft' | 'compact';
 };
 
 export function renderSocialPrice({
   creative,
   slot,
+  styles,
   variant = 'default',
 }: RenderSocialPriceOptions): string {
   if (!creative.enabledComponents.includes('price')) {
@@ -27,10 +29,7 @@ export function renderSocialPrice({
     return '';
   }
 
-  const style =
-    variant === 'soft'
-      ? SOCIAL_COMPONENT_STYLES.price.soft
-      : SOCIAL_COMPONENT_STYLES.price.default;
+  const style = styles.price[variant];
 
   return renderSvgBadge({
     x: slot.x,
@@ -45,6 +44,8 @@ export function renderSocialPrice({
     radius: style.radius,
     fill: style.backgroundColor,
     color: style.color,
+    borderColor: style.borderColor,
+    borderWidth: style.borderWidth,
     maxWidth: slot.width,
     dataComponent: 'social-price',
   }).svg;

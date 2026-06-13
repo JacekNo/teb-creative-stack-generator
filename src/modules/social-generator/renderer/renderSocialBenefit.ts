@@ -4,17 +4,19 @@ import type {
   SocialLayoutSlot,
 } from '../types/social.types';
 import { getTextFallbackValue } from '../utils/getTextFallbackValue';
-import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
+import type { SocialComponentStyles } from './socialComponentStyles';
 
 export type RenderSocialBenefitOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
+  styles: SocialComponentStyles;
   variant?: 'default' | 'compact';
 };
 
 export function renderSocialBenefit({
   creative,
   slot,
+  styles,
   variant = 'default',
 }: RenderSocialBenefitOptions): string {
   if (!creative.enabledComponents.includes('benefit')) {
@@ -29,8 +31,8 @@ export function renderSocialBenefit({
 
   const style =
     variant === 'compact'
-      ? SOCIAL_COMPONENT_STYLES.benefit.compact
-      : SOCIAL_COMPONENT_STYLES.benefit.default;
+      ? styles.benefit.compact
+      : styles.benefit.default;
 
   return renderSvgTextBlock({
     x: slot.x,

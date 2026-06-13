@@ -3,17 +3,19 @@ import type {
   SocialCreativeData,
   SocialLayoutSlot,
 } from '../types/social.types';
-import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
+import type { SocialComponentStyles } from './socialComponentStyles';
 
 export type RenderSocialCityOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
+  styles: SocialComponentStyles;
   variant?: 'default' | 'compact';
 };
 
 export function renderSocialCity({
   creative,
   slot,
+  styles,
   variant = 'default',
 }: RenderSocialCityOptions): string {
   if (!creative.enabledComponents.includes('city')) {
@@ -30,8 +32,8 @@ export function renderSocialCity({
 
   const style =
     variant === 'compact'
-      ? SOCIAL_COMPONENT_STYLES.city.compact
-      : SOCIAL_COMPONENT_STYLES.city.default;
+      ? styles.city.compact
+      : styles.city.default;
 
   return renderSvgBadge({
     x: slot.x,

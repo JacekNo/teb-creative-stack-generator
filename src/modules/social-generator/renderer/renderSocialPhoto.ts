@@ -3,11 +3,12 @@ import type {
   SocialCreativeData,
   SocialLayoutSlot,
 } from '../types/social.types';
-import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
+import type { SocialComponentStyles } from './socialComponentStyles';
 
 export type RenderSocialPhotoOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
+  styles: SocialComponentStyles;
 };
 
 function escapeXml(value: string): string {
@@ -26,21 +27,17 @@ function createClipPathId(courseId: string): string {
 export function renderSocialPhoto({
   creative,
   slot,
+  styles,
 }: RenderSocialPhotoOptions): string {
   if (!creative.enabledComponents.includes('photo')) {
     return '';
   }
 
-  const style = SOCIAL_COMPONENT_STYLES.photo.default;
+  const style = styles.photo.default;
   const clipPathId = createClipPathId(creative.courseId);
-
   const imageHref = creative.imagePath
-  ? publicAssetPath(creative.imagePath)
-  : undefined;
-  console.log('Social photo path debug:', {
-  rawImagePath: creative.imagePath,
-  imageHref,
-});
+    ? publicAssetPath(creative.imagePath)
+    : undefined;
 
   if (!imageHref) {
     return `
@@ -51,15 +48,15 @@ export function renderSocialPhoto({
           width="${slot.width}"
           height="${slot.height}"
           rx="${style.radius}"
-          fill="#EAF1FF"
+          fill="${style.placeholderBackground}"
         />
         <text
-          x="${slot.x + 36}"
-          y="${slot.y + 64}"
+          x="${slot.x + styles.scale.space.lg}"
+          y="${slot.y + styles.scale.space.xl}"
           font-family="Roc Grotesk, Inter, Arial, sans-serif"
-          font-size="28"
+          font-size="${styles.scale.font.body}"
           font-weight="700"
-          fill="#102D69"
+          fill="${style.placeholderText}"
         >Brak zdjęcia</text>
       </g>
     `;
@@ -85,7 +82,7 @@ export function renderSocialPhoto({
         width="${slot.width}"
         height="${slot.height}"
         rx="${style.radius}"
-        fill="#EAF1FF"
+        fill="${style.placeholderBackground}"
       />
 
       <image
