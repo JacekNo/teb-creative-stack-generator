@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import AdsQualityOverview from './modules/ads-generator/components/AdsQualityOverview.vue';
+import SocialGeneratorSmokeTest from './modules/social-generator/components/SocialGeneratorSmokeTest.vue';
 </script>
 
 <template>
-  <AdsQualityOverview />
+  <SocialGeneratorSmokeTest />
 </template>
