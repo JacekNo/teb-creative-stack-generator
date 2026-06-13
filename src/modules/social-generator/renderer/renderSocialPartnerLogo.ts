@@ -3,7 +3,7 @@ import type {
   SocialLayoutSlot,
 } from '../types/social.types';
 import { SOCIAL_COMPONENT_STYLES } from './socialComponentStyles';
-
+import { publicAssetPath } from '../../creative-stack/utils/publicAssetPath';
 export type RenderSocialPartnerLogoOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
@@ -56,7 +56,7 @@ export function renderSocialPartnerLogo({
         fill="${style.backgroundColor}"
       />
       <image
-        href="${escapeXml(creative.partner.logoPath)}"
+        href="${escapeXml(publicAssetPath(creative.partner.logoPath))}"
         x="${logoX}"
         y="${logoY}"
         width="${logoWidth}"

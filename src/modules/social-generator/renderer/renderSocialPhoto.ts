@@ -1,3 +1,4 @@
+import { publicAssetPath } from '../../creative-stack/utils/publicAssetPath';
 import type {
   SocialCreativeData,
   SocialLayoutSlot,
@@ -33,7 +34,13 @@ export function renderSocialPhoto({
   const style = SOCIAL_COMPONENT_STYLES.photo.default;
   const clipPathId = createClipPathId(creative.courseId);
 
-  const imageHref = creative.imagePath;
+  const imageHref = creative.imagePath
+  ? publicAssetPath(creative.imagePath)
+  : undefined;
+  console.log('Social photo path debug:', {
+  rawImagePath: creative.imagePath,
+  imageHref,
+});
 
   if (!imageHref) {
     return `
