@@ -61,64 +61,32 @@
   - pełna szerokość netto title card,
   - podział długich nazw na `main`, `subtitle`, `modeLabel`,
   - dynamiczna wysokość title card.
+- Zweryfikowano Stage 3A dla krótkiej i długiej nazwy w trzech formatach.
+- Dodano Stage 3B:
+  - `renderSocialBackground.ts`,
+  - pattern przeniesiony z Google Ads,
+  - realny asset logo TEB jako brand logo,
+  - kontrolowany fallback partner logo bez broken image.
+- Dodano Stage 3C:
+  - tony badge’y,
+  - flow z zawijaniem,
+  - wspólny helper `socialBadgeFlow.ts`,
+  - badge’e oparte o design tokens.
+- Przebudowano layout social zgodnie z kierunkiem wizualnym:
+  - zdjęcie pełną szerokością od góry,
+  - stałe wysokości zdjęcia: `500`, `600`, `850`,
+  - kadrowanie `slice` z obsługą `imageFocalPoint`,
+  - zaokrąglenie tylko lewego dolnego narożnika zdjęcia,
+  - nazwa kierunku bez białej apli,
+  - `subtitle` jako mniejszy dopisek pod nazwą,
+  - `modeLabel` jako badge przy tytule,
+  - partner card na prawym dolnym rogu zdjęcia,
+  - facts w dolnym rzędzie obok brand logo,
+  - miasto jako opcjonalny element pod badge’ami.
 
 ## Now
 
-### 1. Social Generator — Stage 3A: weryfikacja responsywnego title flow
-
-Cel: sprawdzić, czy title card, facts, badges i footer zachowują się poprawnie dla krótkich i długich nazw kierunków.
-
-Zakres:
-
-- sprawdzić `Barber` w formatach:
-  - `1080×1080`,
-  - `1080×1350`,
-  - `1080×1920`,
-- sprawdzić `Programowanie Python z Cisco Networking Academy ONLINE` w tych samych formatach,
-- zweryfikować, czy tytuł nie nachodzi na facts,
-- zweryfikować, czy facts i badges układają się pod dynamicznym title card,
-- sprawdzić, czy footer jest zakotwiczony w dolnej safe area,
-- ocenić, czy max 3 linie jest wystarczające dla długich nazw.
-
-### 2. Social Generator — Stage 3B: tło, brand logo i partner logo
-
-Cel: uzupełnić warstwę wizualną social generatora o elementy brandowe znane z Google Ads.
-
-Zakres:
-
-- dodać tło/pattern wykorzystywane wcześniej w module Google Ads,
-- dodać `renderSocialBackground.ts`, jeśli warstwa tła wymaga osobnego renderera,
-- podpiąć realne logotypy brandów w lewym dolnym rogu:
-  - TEB Edukacja,
-  - TEB Kursy,
-  - TEB Szkoły Medyczne,
-  - TEB Szkoły Policealne,
-- zastąpić tekstowy fallback `TEB Kursy` logotypem lub uporządkowanym fallbackiem,
-- dodać fallback/ukrywanie `partnerLogo`, jeśli asset logo nie istnieje,
-- sprawdzić, czy partner logo nie pokazuje broken image.
-
-### 3. Social Generator — Stage 3C: system badge’y
-
-Cel: poprawić UI badge’y, które obecnie są robocze.
-
-Zakres:
-
-- zdefiniować tony badge’y:
-  - `primary`,
-  - `secondary`,
-  - `light`,
-  - `green`,
-  - `yellow`,
-  - `popular`,
-  - `online`,
-- poprawić paddingi badge’y,
-- poprawić wysokość badge’y,
-- poprawić border radius,
-- dodać flow z zawijaniem badge’y,
-- sprawdzić czytelność przy 2–4 badge’ach,
-- upewnić się, że badge’e korzystają z design tokens, a nie lokalnych magic numbers.
-
-### 4. Social Generator — dane online i partnerzy
+### 1. Social Generator — dane online i partnerzy
 
 Cel: przygotować dane pod pełniejsze generowanie grafik social na podstawie informacji z teb.pl.
 
@@ -132,6 +100,18 @@ Zakres:
 - przygotować pliki logotypów partnerów,
 - osadzić logotypy partnerów w publicznych assetach,
 - zweryfikować, czy każdy `partnerKey` ma istniejący plik logo.
+
+### 2. Social Generator — warianty brandów i badge QA
+
+Cel: sprawdzić aktualny system wizualny na brandach `kursy`, `policealne`, `medyczne`, `edukacja`.
+
+Zakres:
+
+- dodać mockowe kreacje dla SP i SM,
+- sprawdzić kolory tytułu, patternu, badge’y i facts,
+- dopracować warianty `primary`, `popular`, `online`, `green`,
+- przygotować docelowe logo brandów zamiast wspólnego fallbacku `teb-edukacja.svg`,
+- sprawdzić partner card z realnym assetem partnera.
 
 ## Next
 

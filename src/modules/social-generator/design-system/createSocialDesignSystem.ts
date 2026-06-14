@@ -120,10 +120,12 @@ function createTheme(brand: SocialDesignBrand) {
     primary: {
       fill: brandTokens.primary,
       color: brandTokens.onPrimary,
+      borderColor: brandTokens.primary,
     },
     secondary: {
       fill: brandTokens.primary,
       color: brandTokens.onPrimary,
+      borderColor: brandTokens.secondary,
     },
     light: {
       fill: brandTokens.soft,
@@ -133,10 +135,12 @@ function createTheme(brand: SocialDesignBrand) {
     green: {
       fill: '#16863D',
       color: socialDesignTokens.helper.white,
+      borderColor: '#0F6F34',
     },
     yellow: {
       fill: socialDesignTokens.helper.yellow,
       color: brandTokens.text,
+      borderColor: brandTokens.primary,
     },
     popular: {
       fill: 'transparent',
@@ -146,6 +150,7 @@ function createTheme(brand: SocialDesignBrand) {
     online: {
       fill: socialDesignTokens.helper.dark,
       color: socialDesignTokens.helper.white,
+      borderColor: socialDesignTokens.helper.dark,
     },
   };
 

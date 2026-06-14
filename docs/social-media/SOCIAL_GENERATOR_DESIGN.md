@@ -301,13 +301,12 @@ type SocialCourseBadge = {
 
 Badge UI wymaga osobnego dopracowania:
 
-- paddingi,
-- wysokość,
-- radius,
-- flow z zawijaniem,
-- tony kolorystyczne,
-- czytelność przy 2–4 badge’ach,
-- spójność z brandem.
+- paddingi, wysokość i radius wynikają z design tokens,
+- badge’e układają się w flow z zawijaniem,
+- `modeLabel` typu `ONLINE` może być renderowany jako osobny badge przy tytule,
+- course badges nie powinny dublować badge’a trybu,
+- tony kolorystyczne są brand-aware,
+- finalne warianty wizualne wymagają QA na brandach Kursy, SP, SM i Edukacja.
 
 ---
 
@@ -354,10 +353,13 @@ Logo partnera jest nakładką na zdjęciu, na białej apli.
 
 Zasady:
 
-- domyślnie pozycja `photo-top-right`,
+- domyślnie pozycja przy prawej dolnej krawędzi zdjęcia,
+- apla partnera przylega do dolnej krawędzi zdjęcia,
+- apla ma zaokrąglone tylko górne narożniki,
+- w lewym górnym rogu apli znajduje się mały dopisek `partner`,
 - partner logo nie zabiera miejsca w głównej sekcji tekstowej,
 - brak assetu nie powinien pokazywać broken image,
-- jeśli asset nie istnieje, komponent powinien być ukryty albo pokazać kontrolowany fallback.
+- jeśli asset nie istnieje, komponent pokazuje kontrolowany placeholder `logo partnera`.
 
 ---
 
@@ -377,10 +379,11 @@ Kolejność renderowania:
 background
 photo
 partnerLogo
-titleCard
-courseFacts
+courseName
+modeBadge
 courseBadges
-footer / brandLogo / city
+courseFacts
+footer / brandLogo / facts
 debug overlay
 ```
 
@@ -394,9 +397,9 @@ Aktualny kierunek layoutu:
 
 ```txt
 photo
-titleCard
-courseFacts
+courseName
 courseBadges
+city optional
 footer
 ```
 
@@ -410,13 +413,18 @@ a nie przez ręczne współrzędne y dla każdego elementu.
 Docelowo:
 
 ```txt
-titleCard height = zależne od treści
-facts.y = titleCard.y + titleCard.height + gap
-badges.y = facts.y + facts.height + gap
+photo = pełna szerokość, start od y=0
+photo height = 500 / 600 / 850
+photo clip = tylko lewy dolny narożnik
+courseName.y = photo.y + photo.height
+courseName = main title + subtitle + optional mode badge
+badges.y = courseName.y + courseName.height + gap
+city.y = badges.y + badges.height + gap
 footer = kotwiczony do dolnej safe area
+facts = w dolnym rzędzie obok brand logo
 ```
 
-Dzięki temu długie nazwy kierunków nie nachodzą na facts i badges.
+Dzięki temu długie nazwy kierunków nie nachodzą na zdjęcie, facts i badges.
 
 ---
 
@@ -455,7 +463,15 @@ Zrealizowano:
 - `courseNameParts`,
 - `renderSocialCourseFacts.ts`,
 - `renderSocialCourseBadges.ts`,
-- responsywny title flow z auto-fit.
+- responsywny title flow z auto-fit,
+- `renderSocialBackground.ts`,
+- `socialBadgeFlow.ts`,
+- pełnoszerokie zdjęcie z kadrowaniem `slice` i `imageFocalPoint`,
+- nazwa bez białej apli,
+- `subtitle` jako mniejszy dopisek,
+- `modeLabel` jako badge przy tytule,
+- partner card z placeholderem,
+- facts w dolnym rzędzie obok brand logo.
 
 ---
 
@@ -463,26 +479,35 @@ Zrealizowano:
 
 #### Stage 3A — weryfikacja title flow
 
-- sprawdzić krótkie i długie nazwy w 3 formatach,
-- upewnić się, że tytuł nie nachodzi na facts,
-- sprawdzić pozycję footeru,
-- sprawdzić stories safe zone.
+- wykonane: sprawdzono krótkie i długie nazwy w 3 formatach,
+- wykonane: tytuł nie nachodzi na zdjęcie, facts ani badges,
+- wykonane: footer jest zakotwiczony w dolnej safe area.
 
 #### Stage 3B — background i logo
 
 - dodać tło/pattern z banner-ads,
 - dodać `renderSocialBackground.ts`, jeśli będzie potrzebny,
 - podpiąć realne logo brandu w lewym dolnym rogu,
-- dodać fallback/ukrywanie partner logo.
+- dodać fallback/ukrywanie partner logo,
+- wykonane: dodano kontrolowany placeholder partnera.
 
 #### Stage 3C — badge system
 
 - poprawić UI badge’y,
 - dodać tony badge’y,
 - poprawić flow i zawijanie,
-- oprzeć paddingi i rozmiary o design tokens.
+- oprzeć paddingi i rozmiary o design tokens,
+- wykonane: `modeLabel` renderuje się jako osobny badge przy tytule.
 
-#### Stage 3D — cleanup
+#### Stage 3D — dane i warianty brandów
+
+- dodać mocki SP i SM,
+- uzupełnić dane online i partnerów,
+- dodać realne assety partnerów,
+- dopracować warianty badge’y dla brandów,
+- podmienić wspólne brand logo na docelowe assety brandowe.
+
+#### Stage 3E — cleanup
 
 - usunąć stare renderery kampanijne, jeśli nie są już używane,
 - usunąć stare layouty statyczne,

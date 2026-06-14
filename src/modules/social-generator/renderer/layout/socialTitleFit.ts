@@ -167,6 +167,28 @@ function getTitleHeight({
   return fontSize + Math.max(0, linesCount - 1) * lineHeight;
 }
 
+function createSubtitleTypography(
+  titleFontSize: number,
+  system: SocialDesignSystem,
+): {
+  fontSize: number;
+  fontWeight: number;
+  lineHeight: number;
+  letterSpacing: number;
+} {
+  const fontSize = Math.max(
+    system.typography.caption.fontSize,
+    Math.round(titleFontSize * 0.34),
+  );
+
+  return {
+    fontSize,
+    fontWeight: 800,
+    lineHeight: Math.round(fontSize * 1.14),
+    letterSpacing: 0,
+  };
+}
+
 export function fitSocialCourseTitle({
   creative,
   system,
@@ -182,10 +204,15 @@ export function fitSocialCourseTitle({
 }): SocialTitleFit {
   const parts = resolveSocialCourseNameParts(creative);
   let fallbackFit: SocialTitleFit | undefined;
+  const titleSubtitleGap = system.spacing[1];
+  const titleModeGap = system.spacing[3];
 
   for (const typographyKey of TITLE_VARIANTS) {
     const typography = system.typography[typographyKey];
-    const subtitleTypography = system.typography.metaLg;
+    const subtitleTypography = createSubtitleTypography(
+      typography.fontSize,
+      system,
+    );
     const lines = wrapTitleParts({
       parts,
       width,
@@ -211,8 +238,8 @@ export function fitSocialCourseTitle({
     const modeBadgeHeight = modeLabel ? system.components.badge.height : 0;
     const height =
       titleHeight +
-      (subtitleHeight > 0 ? system.spacing[2] + subtitleHeight : 0) +
-      (modeBadgeHeight > 0 ? system.spacing[4] + modeBadgeHeight : 0);
+      (subtitleHeight > 0 ? titleSubtitleGap + subtitleHeight : 0) +
+      (modeBadgeHeight > 0 ? titleModeGap + modeBadgeHeight : 0);
     const didFit =
       lines.length <= maxLines &&
       subtitleLines.length <= 2 &&

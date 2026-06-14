@@ -132,7 +132,9 @@ Rules:
 - title should auto-fit through typography steps,
 - max 3 lines for the main social title area,
 - long names should reduce font size before overflowing,
-- facts and badges must be placed below the dynamic title card.
+- subtitle is rendered as a smaller line below the main title,
+- mode labels such as `ONLINE` render as a separate badge near the title,
+- facts sit in the footer row next to the brand logo.
 
 ## Layout rules
 
@@ -140,11 +142,12 @@ The layout should behave as a flow:
 
 ```txt
 background
-photo
+photo full-width from y=0
 partnerLogo
-titleCard
-courseFacts
+courseName
+modeBadge
 courseBadges
+city optional
 footer
 ```
 
@@ -158,21 +161,29 @@ Left footer:
 brand logo
 ```
 
-Right footer:
+Footer content:
 
 ```txt
-city or secondary label
+course facts next to brand logo
 ```
+
+Photo rules:
+
+- square photo height: `500`,
+- portrait photo height: `600`,
+- stories photo height: `850`,
+- use `preserveAspectRatio` slice with `imageFocalPoint`,
+- only the lower-left photo corner is rounded.
 
 ## Visual requirements
 
 Next visual improvements:
 
-- use the background/pattern from the previous Google Ads module,
-- replace text fallback `TEB Kursy` with real brand logos,
-- add fallback or hiding behavior for missing partner logos,
-- improve badge UI,
-- support online courses properly,
+- add mock creatives for SP and SM,
+- replace the shared TEB logo fallback with real brand logos,
+- add real partner logo assets,
+- refine badge visual variants across brands,
+- support online courses with complete data,
 - keep the design consistent with the TEB brand family.
 
 ## Commands
@@ -210,3 +221,4 @@ A task is done when:
 - Long course names fit responsively.
 - Components use tokens/design system values instead of local magic numbers.
 - Visual changes are checked with debug overlay and then without debug overlay.
+- Partner logo never renders as a broken image; use a controlled placeholder when the asset is missing.

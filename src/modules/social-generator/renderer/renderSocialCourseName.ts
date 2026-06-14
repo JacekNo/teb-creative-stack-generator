@@ -63,8 +63,10 @@ export function renderSocialCourseName({
     fit.lines.length > 0
       ? fit.fontSize + Math.max(0, fit.lines.length - 1) * fit.lineHeight
       : 0;
+  const titleSubtitleGap = system.spacing[1];
+  const titleModeGap = system.spacing[3];
   const subtitleStartY =
-    slot.y + mainTextHeight + (fit.subtitleLines.length > 0 ? system.spacing[2] : 0);
+    slot.y + mainTextHeight + (fit.subtitleLines.length > 0 ? titleSubtitleGap : 0);
   const subtitleBaselineY = subtitleStartY + fit.subtitleFontSize;
   const subtitleSvg = fit.subtitleLines
     .map((line, index) => {
@@ -96,7 +98,7 @@ export function renderSocialCourseName({
         y:
           subtitleStartY +
           subtitleHeight +
-          system.spacing[4],
+          titleModeGap,
         text: fit.modeLabel,
         fontFamily: fit.fontFamily,
         fontSize: modeBadgeFontSize,
@@ -108,6 +110,8 @@ export function renderSocialCourseName({
         height: modeBadgeHeight,
         fill: system.theme.badgeTones.online.fill,
         color: system.theme.badgeTones.online.color,
+        borderColor: system.theme.badgeTones.online.borderColor,
+        borderWidth: badgeStyle.borderWidth,
         maxWidth: slot.width,
         dataComponent: 'social-course-mode-badge',
       }).svg

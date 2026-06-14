@@ -65,7 +65,7 @@ export function renderSocialCourseBadges({
       fill: tone.fill,
       color: tone.color,
       borderColor: tone.borderColor,
-      borderWidth: tone.borderColor ? badgeStyle.borderWidth : undefined,
+      borderWidth: tone.borderColor ? badgeStyle.borderWidth : 0,
       maxWidth: placement.width,
       dataComponent: 'social-course-badge',
     });
