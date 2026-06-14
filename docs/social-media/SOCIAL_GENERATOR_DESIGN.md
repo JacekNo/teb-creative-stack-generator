@@ -1,81 +1,55 @@
 # TEB Creative Stack Generator
 
-## Dokument projektowy modułu Social Media — v0.1
+## Dokument projektowy modułu Social Media — v0.3
 
 ### 1. Kontekst projektu
 
-Projekt **TEB Creative Stack Generator** ma rozwijać się z gotowego generatora grafik Google Ads w szersze narzędzie do tworzenia materiałów marketingowych TEB. Etap Google Ads jest traktowany jako stabilny, działający moduł produkcyjny. Nowy etap dotyczy zaprojektowania osobnego modułu do generowania grafik social media.
+Projekt **TEB Creative Stack Generator** rozwija się z generatora grafik Google Ads w szersze narzędzie do tworzenia materiałów marketingowych TEB.
 
-Moduł social media nie powinien nadpisywać ani rozbudowywać bezpośrednio logiki Google Ads. Powinien powstać jako osobna warstwa, korzystająca ze wspólnych danych, resolverów, assetów, tokenów brandowych i mechanizmu renderowania SVG.
+Moduł Google Ads pozostaje osobnym, działającym modułem. Moduł social media powstaje obok, korzystając ze wspólnych danych, assetów, helperów SVG i zasad brandowych.
 
 Główna zasada architektoniczna:
 
 ```txt
 Google Ads zostaje jako działający moduł.
 Social media budujemy obok.
-Wspólne elementy stopniowo przenosimy do core creative-stack.
+Wspólne elementy stopniowo przenosimy do creative-stack.
 ```
 
 ---
 
 ### 2. Cel modułu social media
 
-Celem modułu social media jest generowanie zestawów grafik dla kierunków edukacyjnych TEB w formatach używanych w komunikacji social media.
+Celem modułu social media jest generowanie zestawów grafik dla kierunków edukacyjnych TEB w formatach używanych w social media.
 
-Na etapie MVP generator działa na sztywnych danych. Nie budujemy jeszcze pełnego kreatora ani panelu edycji danych. Projektujemy jednak strukturę tak, aby w przyszłości można było przejść do trybu ręcznego składania materiałów z komponentów.
+Moduł ma działać jako jeden kreator z jednym aktywnym podglądem. Użytkownik przełącza format, ale dane kreacji pozostają wspólne. Eksport docelowo generuje paczkę formatów z tego samego draftu.
 
-Docelowo moduł powinien obsługiwać:
-
-* wybór kierunku,
-* wybór formatu,
-* dane kierunku,
-* dane oferty,
-* zdjęcie,
-* nazwę kierunku,
-* tryb oferty: online / stacjonarne,
-* przewagę,
-* cenę lub informację promocyjną,
-* termin startu,
-* opcjonalne miasto,
-* logo TEB,
-* logo partnera, jeśli kierunek ma partnera,
-* eksport grafik do PNG / ZIP.
-
----
-
-### 3. Zakres MVP
-
-MVP modułu social media obejmuje:
+Model działania:
 
 ```txt
-1. Sztywne dane social.
-2. Trzy formaty: 1080×1080, 1080×1350, 1080×1920.
-3. Jeden roboczy layout bazowy.
-4. Bazę komponentów SVG.
-5. Resolver danych social.
-6. Walidator jakości.
-7. Render SVG.
-8. Eksport PNG / ZIP.
-9. Debug overlay dla safe zone i slotów.
+jeden draft kreacji
++ aktywny format podglądu
++ brand
++ design system
++ responsive layout flow
+→ SVG aktywnego podglądu
 ```
 
-Poza zakresem MVP:
+Docelowy eksport:
 
 ```txt
-1. Pełny kreator ręczny.
-2. Backend.
-3. Trwały zapis projektów.
-4. Panel administracyjny danych.
-5. Zaawansowana biblioteka layoutów.
-6. Eksport video / reels.
-7. Pełna obsługa wszystkich platform social media.
+jeden draft kreacji
+→ 1080×1080
+→ 1080×1350
+→ 1080×1920
+→ paczka eksportowa
 ```
 
 ---
 
-### 4. Format social media
+### 3. Format social media
 
-Moduł social media obsługuje na start trzy formaty:
+Moduł obsługuje trzy formaty:
 
 ```ts
 export type SocialFormatId =
@@ -84,81 +58,267 @@ export type SocialFormatId =
   | 'story-9x16-1080';
 ```
 
-Definicje:
+Wymiary:
 
-```ts
-export const SOCIAL_FORMATS = {
-  'square-1080': {
-    id: 'square-1080',
-    width: 1080,
-    height: 1080,
-    ratio: '1:1',
-    label: 'Post square 1080×1080',
-  },
-
-  'feed-4x5-1080': {
-    id: 'feed-4x5-1080',
-    width: 1080,
-    height: 1350,
-    ratio: '4:5',
-    label: 'Feed portrait 1080×1350',
-  },
-
-  'story-9x16-1080': {
-    id: 'story-9x16-1080',
-    width: 1080,
-    height: 1920,
-    ratio: '9:16',
-    label: 'Story / Reels 1080×1920',
-  },
-} as const;
+```txt
+1080×1080 — post square / 1:1
+1080×1350 — feed portrait / 4:5
+1080×1920 — story / reels / 9:16
 ```
 
-Dla formatu story należy uwzględnić marginesy ochronne, aby kluczowe elementy nie kolidowały z interfejsem platformy.
-
-W MVP nie musimy jeszcze ustalać finalnych wartości safe zone, ale renderer powinien mieć możliwość pokazania pomocniczej warstwy diagnostycznej.
+Dla formatu story należy uwzględniać safe zone, aby kluczowe elementy nie kolidowały z interfejsem platformy.
 
 ---
 
-### 5. Różnica względem Google Ads
+### 4. Główna decyzja architektoniczna
 
-Generator Google Ads opierał się na strukturze:
-
-```txt
-zdjęcie
-nazwa kierunku
-subtitle
-CTA
-miasto
-logo
-```
-
-W module social media CTA nie jest komponentem obowiązkowym.
-
-Social media opiera się raczej na strukturze:
+Social Generator nie powinien być zestawem ręcznie ustawianych layoutów dla każdego formatu. Projekt przyjmuje model:
 
 ```txt
-zdjęcie
-nazwa kierunku
-tryb nauki / dopisek online
-przewaga
-cena / promocja
-start / termin
-logo TEB
-logo partnera
-opcjonalnie miasto
+format → brand → design system → layout flow → SVG renderer
 ```
 
-CTA może pojawić się później jako opcjonalny komponent, ale nie jest częścią podstawowego MVP. W social media CTA często może być obsługiwane przez opis posta, przycisk reklamowy platformy, link w stories, ostatni slajd karuzeli albo mechanikę kampanii.
+Wartości liczbowe mogą istnieć w tokenach, ale nie powinny być powielane bezpośrednio w rendererach.
+
+Zasada:
+
+```txt
+renderer nie wymyśla layoutu,
+renderer tylko rysuje komponenty według layoutu i stylów.
+```
 
 ---
 
-### 6. Tryb oferty: online / stacjonarne
+### 5. Design system social
 
-W module social media rozróżniamy dwa tryby oferty:
+Social Generator ma osobny design system:
+
+```txt
+src/modules/social-generator/design-system/socialDesignTokens.ts
+src/modules/social-generator/design-system/createSocialDesignSystem.ts
+```
+
+Design system definiuje:
+
+- brandy,
+- kolory,
+- typografię,
+- line height,
+- spacing,
+- radius,
+- formaty,
+- safe zones,
+- komponenty:
+  - title card,
+  - badge,
+  - logo box,
+  - partner box,
+  - info grid.
+
+Skala spacingu oparta jest o 4 px:
+
+```txt
+4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64, 72, 80, 96, 112, 128
+```
+
+Przykład zasady:
+
+```txt
+fontSize, padding, gap, radius i lineHeight powinny wynikać z tokenów,
+a nie z lokalnych wartości wpisanych w rendererze.
+```
+
+---
+
+### 6. Brandy
+
+Social Generator obsługuje cztery brandy:
 
 ```ts
-export type OfferMode = 'stationary' | 'online';
+export type SocialBrand =
+  | 'edukacja'
+  | 'kursy'
+  | 'medyczne'
+  | 'policealne';
+```
+
+Kolory bazowe:
+
+```txt
+TEB Edukacja
+#102D69
+#0F4496
+
+TEB Kursy
+#994365
+#C7839F
+
+TEB Szkoły Medyczne
+#009489
+#B8DDD5
+
+TEB Szkoły Policealne
+#E27D00
+#F5B062
+
+Pomocniczy
+#FFC965
+```
+
+Docelowo logo brandu powinno być realnym assetem w lewym dolnym rogu, a nie tekstowym placeholderem.
+
+---
+
+### 7. Model danych kierunku
+
+Moduł social przechodzi z modelu kampanijnego:
+
+```txt
+benefit / price / startDate / offerMode
+```
+
+na model informacji kierunku zgodny z logiką nagłówków kierunków na teb.pl:
+
+```txt
+courseNameParts
+courseFacts
+courseBadges
+deliveryMode / offerMode
+brandLogo
+partnerLogo
+city
+```
+
+Ceny i raty są na obecnym etapie pomijane.
+
+---
+
+### 8. Nazwa kierunku
+
+Długie nazwy powinny być dzielone strukturalnie:
+
+```ts
+type CourseNameParts = {
+  main: string;
+  subtitle?: string;
+  modeLabel?: string;
+};
+```
+
+Przykład:
+
+```ts
+courseNameParts: {
+  main: 'Programowanie Python',
+  subtitle: 'z Cisco Networking Academy',
+  modeLabel: 'ONLINE',
+}
+```
+
+Zasady:
+
+- title card korzysta z pełnej szerokości netto formatu,
+- nazwa ma auto-fit po skali typografii,
+- maksymalnie 3 linie dla głównego obszaru tytułu,
+- długi tekst schodzi stopień niżej z wielkością fontu,
+- facts i badges układają się pod dynamiczną title card,
+- title card nie może nachodzić na facts.
+
+Mechanika inspirowana jest rozwiązaniami z modułu Google Ads, ale w social media może być mniej restrykcyjna.
+
+---
+
+### 9. Course facts
+
+`courseFacts` opisują merytoryczne informacje o kierunku.
+
+Przykłady:
+
+```txt
+2 semestry
+Czas trwania
+
+188 godzin
+10 miesięcy kształcenia
+
+Tryb weekendowy
+Zajęcia online na żywo
+```
+
+Model:
+
+```ts
+type SocialCourseFact = {
+  id: string;
+  icon?: 'clock' | 'calendar' | 'online' | 'info';
+  value: string;
+  label?: string;
+};
+```
+
+Zasady renderowania:
+
+- 1 fakt: jeden element informacyjny,
+- 2 fakty: układ w dwóch kolumnach, jeśli jest miejsce,
+- 3–4 fakty: układ flow / grid,
+- facts nie powinny być ręcznie pozycjonowane względem title card,
+- facts powinny podążać za dynamiczną wysokością title card.
+
+---
+
+### 10. Course badges
+
+`courseBadges` opisują krótkie wyróżniki i etykiety sprzedażowe.
+
+Przykłady:
+
+```txt
+Nie wymagamy matury!
+Popularne
+Szybki START
+W SIERPNIU
+ONLINE
+```
+
+Model:
+
+```ts
+type SocialBadgeTone =
+  | 'primary'
+  | 'secondary'
+  | 'light'
+  | 'green'
+  | 'yellow'
+  | 'popular'
+  | 'online';
+
+type SocialCourseBadge = {
+  id: string;
+  label: string;
+  tone: SocialBadgeTone;
+};
+```
+
+Badge UI wymaga osobnego dopracowania:
+
+- paddingi,
+- wysokość,
+- radius,
+- flow z zawijaniem,
+- tony kolorystyczne,
+- czytelność przy 2–4 badge’ach,
+- spójność z brandem.
+
+---
+
+### 11. Tryb online / stacjonarny
+
+W module social należy obsługiwać kierunki online jako pełnoprawny wariant danych.
+
+Aktualnie można korzystać z `offerMode`, ale docelowo warto rozważyć nazwę `deliveryMode`:
+
+```ts
+type DeliveryMode = 'stationary' | 'online' | 'hybrid';
 ```
 
 Zasady:
@@ -166,72 +326,22 @@ Zasady:
 ```txt
 stationary:
 - może mieć miasto,
-- miasto może być domyślnie widoczne,
-- nie pokazuje dopisku „Nauka online”.
+- miasto może być widoczne.
 
 online:
 - domyślnie ukrywa miasto,
-- pokazuje dopisek „Nauka online”,
-- może korzystać z tych samych zdjęć lub mapowania fallbackowego.
+- może pokazywać ONLINE w tytule,
+- może mieć badge ONLINE,
+- może mieć fact „Zajęcia online na żywo”.
 ```
 
-Przykład domyślnych ustawień:
-
-```ts
-export const offerModeDefaults = {
-  stationary: {
-    label: undefined,
-    showCity: true,
-    showOfferModeLabel: false,
-  },
-
-  online: {
-    label: 'Nauka online',
-    showCity: false,
-    showOfferModeLabel: true,
-  },
-} as const;
-```
-
-W przyszłości użytkownik w kreatorze może ręcznie zmienić widoczność miasta lub dopisku online, ale w MVP logika wynika z danych.
+Kierunki online muszą zostać uzupełnione w danych, ponieważ wcześniejszy moduł banner-ads nie uwzględniał ich w pełni.
 
 ---
 
-### 7. Kierunki online
-
-Do oferty kursów mają dojść kierunki online. Należy sprawdzić, czy istniejące dane kierunków obejmują te pozycje.
-
-Zadanie danych:
-
-```txt
-1. Sprawdzić courses.normalized.json.
-2. Dodać brakujące kierunki online.
-3. Dodać offerMode: "online".
-4. Dodać domyślny label: "Nauka online".
-5. Sprawdzić mapowanie zdjęć w image-map.final.json.
-6. W razie braku zdjęcia użyć fallbacku z kierunku bazowego.
-```
-
-Przykład:
-
-```ts
-{
-  courseId: 'pku-programowanie-python-online',
-  courseName: 'Programowanie Python',
-  brandKey: 'kursy',
-  offerMode: 'online',
-  offerModeLabel: 'Nauka online',
-  imageKey: 'pku-programowanie-python'
-}
-```
-
----
-
-### 8. Partnerzy
+### 12. Partnerzy
 
 Partner jest przypisany do konkretnego kierunku.
-
-W MVP partner nie jest globalnym elementem kampanii i nie jest ręcznie wybierany dla wszystkich kierunków.
 
 Zasada MVP:
 
@@ -240,904 +350,171 @@ Jeżeli kierunek ma partnerKey, logo partnera występuje automatycznie.
 Jeżeli kierunek nie ma partnerKey, komponent partnera nie jest renderowany.
 ```
 
-Model danych kierunku:
+Logo partnera jest nakładką na zdjęciu, na białej apli.
 
-```ts
-export type SocialCourseData = {
-  courseId: string;
-  courseName: string;
-  brandKey: string;
-  offerMode: 'stationary' | 'online';
+Zasady:
 
-  partnerKey?: string;
-
-  benefit?: string;
-  priceLabel?: string;
-  startDateLabel?: string;
-};
-```
-
-Baza partnerów:
-
-```ts
-export type PartnerData = {
-  partnerKey: string;
-  name: string;
-  logoPath: string;
-  badgeStyle?: 'white-card';
-};
-```
-
-Przykład:
-
-```ts
-export const partners = {
-  cisco: {
-    partnerKey: 'cisco',
-    name: 'Cisco Networking Academy',
-    logoPath: '/creative-stack/logos/partners/cisco.svg',
-    badgeStyle: 'white-card',
-  },
-} as const;
-```
-
-Resolver:
-
-```ts
-const partner = course.partnerKey
-  ? partners[course.partnerKey]
-  : undefined;
-```
-
-Renderer:
-
-```ts
-if (!creative.partner) {
-  return '';
-}
-
-return renderSocialPartnerLogoBadge({
-  partner: creative.partner,
-  slot: layout.slots.partnerLogo,
-});
-```
+- domyślnie pozycja `photo-top-right`,
+- partner logo nie zabiera miejsca w głównej sekcji tekstowej,
+- brak assetu nie powinien pokazywać broken image,
+- jeśli asset nie istnieje, komponent powinien być ukryty albo pokazać kontrolowany fallback.
 
 ---
 
-### 9. Logo partnera
+### 13. Tło / pattern
 
-Logo partnera powinno być renderowane jako badge na zdjęciu, na białej apli. Dzięki temu dolna część layoutu pozostaje dostępna dla ważniejszych treści sprzedażowych.
+Social Generator powinien wykorzystywać tło lub pattern znane z modułu Google Ads.
+
+Planowany komponent:
+
+```txt
+renderSocialBackground.ts
+```
+
+Kolejność renderowania:
+
+```txt
+background
+photo
+partnerLogo
+titleCard
+courseFacts
+courseBadges
+footer / brandLogo / city
+debug overlay
+```
+
+Tło powinno korzystać z brandu i tokenów, a nie być lokalnym, przypadkowym kolorem.
+
+---
+
+### 14. Layout flow
+
+Aktualny kierunek layoutu:
+
+```txt
+photo
+titleCard
+courseFacts
+courseBadges
+footer
+```
 
 Zasada:
 
 ```txt
-PartnerLogoBadge jest nakładką na PhotoFrame.
-Nie zabiera miejsca w głównej sekcji tekstowej.
-Zawsze ma białą aplę dla kontroli kontrastu.
+sekcje układają się jedna po drugiej,
+a nie przez ręczne współrzędne y dla każdego elementu.
 ```
 
-Domyślne umieszczenie:
-
-```ts
-export type PartnerBadgePlacement =
-  | 'photo-top-right'
-  | 'photo-top-left'
-  | 'photo-bottom-right';
-```
-
-Domyślnie:
-
-```ts
-partnerBadgePlacement: 'photo-top-right'
-```
-
-Styl:
-
-```ts
-export type PartnerBadgeStyle = {
-  backgroundColor: '#FFFFFF';
-  radius: number;
-  paddingX: number;
-  paddingY: number;
-  maxWidth: number;
-  maxHeight: number;
-};
-```
-
----
-
-### 10. Partner w przyszłym kreatorze
-
-W późniejszym trybie kreatora użytkownik powinien mieć możliwość ręcznego włączenia miejsca na partnera oraz wyboru lub wprowadzenia logotypu.
-
-To działa na poziomie draftu kreacji, a nie na poziomie bazowych danych kierunku.
-
-Typ:
-
-```ts
-export type PartnerSource =
-  | 'from-course'
-  | 'selected'
-  | 'custom'
-  | 'hidden';
-```
-
-Draft partnera:
-
-```ts
-export type SocialDraftPartner = {
-  enabled: boolean;
-
-  source: PartnerSource;
-
-  partnerKey?: string;
-
-  customPartner?: {
-    name: string;
-    logoPath: string;
-    fileName?: string;
-  };
-};
-```
-
-Interpretacja:
+Docelowo:
 
 ```txt
-from-course:
-- partner przypisany do kierunku,
-- domyślne zachowanie produkcyjne.
-
-selected:
-- użytkownik wybiera partnera z biblioteki.
-
-custom:
-- użytkownik wprowadza lub wgrywa własny logotyp.
-
-hidden:
-- partner ukryty w trybie ręcznym.
+titleCard height = zależne od treści
+facts.y = titleCard.y + titleCard.height + gap
+badges.y = facts.y + facts.height + gap
+footer = kotwiczony do dolnej safe area
 ```
 
-W MVP nie budujemy tej funkcjonalności, ale model powinien ją przewidywać.
+Dzięki temu długie nazwy kierunków nie nachodzą na facts i badges.
 
 ---
 
-### 11. Baza komponentów social
-
-Moduł social powinien mieć bazę komponentów SVG. Każdy komponent ma własną funkcję renderującą oraz własny preset stylu.
-
-Podstawowe komponenty:
-
-```txt
-PhotoFrame
-CourseNameBlock
-OfferModeBadge
-BenefitBlock
-PriceBadge
-StartDateBadge
-CityBadge
-PartnerLogoBadge
-BrandLogoAnchor
-SafeZoneOverlay
-DebugOverlay
-```
-
-Opis:
-
-| Komponent        | Rola                                    |
-| ---------------- | --------------------------------------- |
-| PhotoFrame       | zdjęcie kierunku / tło                  |
-| CourseNameBlock  | nazwa kierunku                          |
-| OfferModeBadge   | dopisek „Nauka online”                  |
-| BenefitBlock     | przewaga / wyróżnik                     |
-| PriceBadge       | cena / promocja                         |
-| StartDateBadge   | start / termin                          |
-| CityBadge        | opcjonalne miasto                       |
-| PartnerLogoBadge | logo partnera na białej apli            |
-| BrandLogoAnchor  | logo TEB                                |
-| SafeZoneOverlay  | warstwa pomocnicza dla stories          |
-| DebugOverlay     | sloty, bounding boxy, nazwy komponentów |
-
----
-
-### 12. Typy komponentów
-
-```ts
-export type SocialComponentId =
-  | 'photo'
-  | 'courseName'
-  | 'offerMode'
-  | 'benefit'
-  | 'price'
-  | 'startDate'
-  | 'city'
-  | 'partnerLogo'
-  | 'brandLogo'
-  | 'safeZone'
-  | 'debug';
-```
-
-Dane kreacji:
-
-```ts
-export type SocialCreativeData = {
-  courseId: string;
-  courseName: string;
-  brandKey: string;
-
-  offerMode: OfferMode;
-  offerModeLabel?: string;
-
-  imageKey?: string;
-  imagePath?: string;
-
-  benefit?: string;
-  priceLabel?: string;
-  startDateLabel?: string;
-
-  cityId?: string;
-  cityName?: string;
-
-  partner?: {
-    key: string;
-    name: string;
-    logoPath: string;
-  };
-
-  enabledComponents: SocialComponentId[];
-};
-```
-
----
-
-### 13. Dane sztywne MVP
-
-Na start tworzymy dane mockowe / robocze:
-
-```txt
-src/modules/social-generator/data/social-creatives.mock.ts
-```
-
-Przykład:
-
-```ts
-import type { SocialCreativeData } from '../types/social.types';
-
-export const socialCreativesMock: SocialCreativeData[] = [
-  {
-    courseId: 'pku-barber',
-    courseName: 'Barber',
-    brandKey: 'kursy',
-    offerMode: 'stationary',
-    imageKey: 'pku-barber',
-    benefit: 'Nauka praktyczna od pierwszych zajęć',
-    priceLabel: 'od 0 zł',
-    startDateLabel: 'Start: wrzesień',
-    cityId: 'poznan',
-    cityName: 'Poznań',
-    enabledComponents: [
-      'photo',
-      'courseName',
-      'benefit',
-      'price',
-      'startDate',
-      'city',
-      'brandLogo',
-    ],
-  },
-
-  {
-    courseId: 'pku-programowanie-python-z-cisco-networking-academy',
-    courseName: 'Programowanie Python',
-    brandKey: 'kursy',
-    offerMode: 'online',
-    offerModeLabel: 'Nauka online',
-    imageKey: 'pku-programowanie-python',
-    benefit: 'Praktyczna nauka programowania',
-    priceLabel: 'od 0 zł',
-    startDateLabel: 'Start: wrzesień',
-    partner: {
-      key: 'cisco',
-      name: 'Cisco Networking Academy',
-      logoPath: '/creative-stack/logos/partners/cisco.svg',
-    },
-    enabledComponents: [
-      'photo',
-      'courseName',
-      'offerMode',
-      'benefit',
-      'price',
-      'startDate',
-      'partnerLogo',
-      'brandLogo',
-    ],
-  },
-];
-```
-
----
-
-### 14. Style komponentów
-
-Tworzymy bazowy plik stylów komponentów:
-
-```txt
-src/modules/social-generator/renderer/socialComponentStyles.ts
-```
-
-Przykład:
-
-```ts
-export type SocialComponentStyleVariant =
-  | 'default'
-  | 'compact'
-  | 'strong'
-  | 'soft'
-  | 'outline';
-
-export type SocialTextComponentStyle = {
-  fontFamily: string;
-  fontWeight: number;
-  fontSize: number;
-  lineHeight: number;
-  letterSpacing?: number;
-  color: string;
-};
-
-export type SocialBadgeStyle = {
-  backgroundColor: string;
-  color: string;
-  radius: number;
-  paddingX: number;
-  paddingY: number;
-  borderColor?: string;
-};
-
-export const socialComponentStyles = {
-  courseName: {
-    default: {
-      fontFamily: 'TEBFont',
-      fontWeight: 800,
-      fontSize: 72,
-      lineHeight: 0.95,
-      color: 'var(--brand-primary)',
-    },
-  },
-
-  benefit: {
-    default: {
-      fontFamily: 'TEBFont',
-      fontWeight: 600,
-      fontSize: 34,
-      lineHeight: 1.15,
-      color: 'var(--brand-primary)',
-    },
-  },
-
-  price: {
-    default: {
-      backgroundColor: 'var(--brand-primary)',
-      color: '#FFFFFF',
-      radius: 999,
-      paddingX: 28,
-      paddingY: 14,
-    },
-  },
-
-  startDate: {
-    default: {
-      backgroundColor: '#EAF1FF',
-      color: 'var(--brand-primary)',
-      radius: 999,
-      paddingX: 24,
-      paddingY: 12,
-    },
-  },
-
-  offerMode: {
-    default: {
-      backgroundColor: '#FFFFFF',
-      color: 'var(--brand-primary)',
-      radius: 999,
-      paddingX: 22,
-      paddingY: 10,
-      borderColor: 'rgba(16, 45, 105, 0.18)',
-    },
-  },
-
-  partnerLogo: {
-    default: {
-      backgroundColor: '#FFFFFF',
-      radius: 18,
-      paddingX: 22,
-      paddingY: 14,
-      maxWidth: 220,
-      maxHeight: 84,
-    },
-  },
-} as const;
-```
-
----
-
-### 15. Layout jako sloty
-
-Na tym etapie nie projektujemy finalnego wyglądu layoutów. Definiujemy layout jako mapę slotów.
-
-```ts
-export type SocialLayoutSlot = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-export type SocialLayoutDefinition = {
-  id: string;
-  formatId: SocialFormatId;
-
-  slots: {
-    photo: SocialLayoutSlot;
-    courseName: SocialLayoutSlot;
-    offerMode?: SocialLayoutSlot;
-    benefit?: SocialLayoutSlot;
-    price?: SocialLayoutSlot;
-    startDate?: SocialLayoutSlot;
-    city?: SocialLayoutSlot;
-    partnerLogo?: SocialLayoutSlot;
-    brandLogo: SocialLayoutSlot;
-  };
-};
-```
-
-Dzięki temu można dopracowywać wygląd później, bez przepisywania modelu danych i rendererów.
-
----
-
-### 16. Presety layoutowe
-
-W MVP wdrażamy jeden layout roboczy, ale model powinien przewidywać kilka presetów.
-
-```ts
-export type SocialLayoutPreset =
-  | 'photo-top-content-bottom'
-  | 'photo-background-card'
-  | 'split-photo-content'
-  | 'story-editorial'
-  | 'minimal-course-card';
-```
-
-Na start:
-
-```txt
-photo-top-content-bottom
-```
-
-Założenie:
-
-```txt
-zdjęcie u góry,
-logo partnera na zdjęciu,
-treść na dole,
-logo TEB w lewym dolnym obszarze,
-opcjonalne miasto w dolnym lub bocznym tagu.
-```
-
----
-
-### 17. Priorytety komponentów
-
-Renderer powinien wiedzieć, które komponenty są obowiązkowe, a które mogą zostać ukryte lub skrócone przy braku miejsca.
-
-```ts
-export type SocialComponentPriority =
-  | 'required'
-  | 'recommended'
-  | 'optional';
-```
-
-Proponowana hierarchia:
-
-```txt
-required:
-- photo
-- courseName
-- brandLogo
-
-recommended:
-- offerMode
-- price
-- startDate
-- partnerLogo, jeśli kierunek ma partnera
-
-optional:
-- city
-- benefit
-```
-
-W przypadku konfliktów layoutu renderer lub walidator może zasugerować:
-
-```txt
-Miasto ukryte, bo oferta online.
-Przewaga skrócona, bo nazwa kierunku jest długa.
-Cena zachowana, bo ma wyższy priorytet.
-```
-
----
-
-### 18. Fallbacki tekstowe
-
-Teksty powinny mieć warianty pełne i skrócone.
-
-```ts
-export type TextFallbackValue = {
-  full: string;
-  short?: string;
-  compact?: string;
-};
-```
-
-Przykład ceny:
-
-```ts
-priceLabel: {
-  full: 'od 0 zł miesięcznie',
-  short: 'od 0 zł',
-}
-```
-
-Przykład startu:
-
-```ts
-startDateLabel: {
-  full: 'Start zajęć: wrzesień 2026',
-  short: 'Start: wrzesień',
-  compact: 'wrzesień',
-}
-```
-
-W MVP można zacząć od prostych stringów, ale docelowo fallbacki powinny zostać dodane do danych lub resolvera.
-
----
-
-### 19. Focal point zdjęcia
-
-To samo zdjęcie będzie kadrowane do trzech różnych proporcji. Dlatego każde zdjęcie powinno docelowo mieć punkt kadrowania.
-
-```ts
-export type ImageFocalPoint = {
-  x: number; // 0–1
-  y: number; // 0–1
-};
-```
-
-Przykład:
-
-```ts
-imageFocalPoint: {
-  x: 0.52,
-  y: 0.38,
-}
-```
-
-Zastosowanie:
-
-```txt
-1080×1080:
-- kadr wokół centralnego obiektu.
-
-1080×1350:
-- więcej pionu, ale nadal ochrona twarzy / dłoni / stanowiska.
-
-1080×1920:
-- kadr story z ochroną safe zone i kluczowego obiektu.
-```
-
----
-
-### 20. Debug overlay
-
-Moduł social powinien mieć tryb diagnostyczny.
+### 15. Debug overlay
 
 Debug overlay pokazuje:
 
-```txt
-safe zone,
-sloty layoutu,
-bounding boxy tekstów,
-nazwy komponentów,
-elementy ukryte,
-fallbacki,
-kolizje komponentów.
-```
+- safe zone,
+- sloty layoutu,
+- bounding boxy tekstów,
+- nazwy komponentów,
+- elementy ukryte,
+- fallbacki,
+- potencjalne kolizje.
 
-Funkcja:
-
-```ts
-renderSocialDebugOverlay({
-  format,
-  layout,
-  validation,
-});
-```
-
-W MVP debug overlay będzie bardzo przydatny przy dopracowywaniu layoutów.
+Tryb debug jest kluczowy przy kalibracji sociali dla trzech formatów.
 
 ---
 
-### 21. Brand tokens
+### 16. Aktualnie zrealizowane
 
-Kolory, logo i typografia nie powinny być wpisywane na sztywno w komponentach. Powinny pochodzić z brand tokens.
+Zrealizowano:
 
-```ts
-export type SocialBrandTokens = {
-  brandKey: string;
-  primaryColor: string;
-  secondaryColor: string;
-  backgroundColor: string;
-  textColor: string;
-  logoPath: string;
-  fontFamily: string;
-};
-```
-
-Komponenty takie jak:
-
-```txt
-PriceBadge
-OfferModeBadge
-BenefitBlock
-CourseNameBlock
-```
-
-powinny korzystać z tokenów brandu.
+- strukturę `social-generator`,
+- formaty social,
+- mockowe dane,
+- helper `publicAssetPath.ts`,
+- podgląd jednego aktywnego formatu,
+- renderery SVG,
+- `socialDesignTokens.ts`,
+- `createSocialDesignSystem.ts`,
+- `createSocialResponsiveLayout.ts`,
+- przekazywanie styles do rendererów,
+- `courseFacts`,
+- `courseBadges`,
+- `courseNameParts`,
+- `renderSocialCourseFacts.ts`,
+- `renderSocialCourseBadges.ts`,
+- responsywny title flow z auto-fit.
 
 ---
 
-### 22. Walidacja social
+### 17. Najbliższe etapy
 
-Walidator social powinien być osobnym plikiem:
+#### Stage 3A — weryfikacja title flow
+
+- sprawdzić krótkie i długie nazwy w 3 formatach,
+- upewnić się, że tytuł nie nachodzi na facts,
+- sprawdzić pozycję footeru,
+- sprawdzić stories safe zone.
+
+#### Stage 3B — background i logo
+
+- dodać tło/pattern z banner-ads,
+- dodać `renderSocialBackground.ts`, jeśli będzie potrzebny,
+- podpiąć realne logo brandu w lewym dolnym rogu,
+- dodać fallback/ukrywanie partner logo.
+
+#### Stage 3C — badge system
+
+- poprawić UI badge’y,
+- dodać tony badge’y,
+- poprawić flow i zawijanie,
+- oprzeć paddingi i rozmiary o design tokens.
+
+#### Stage 3D — cleanup
+
+- usunąć stare renderery kampanijne, jeśli nie są już używane,
+- usunąć stare layouty statyczne,
+- uporządkować typy.
+
+---
+
+### 18. Walidacja social
+
+Walidator social powinien być osobnym modułem:
 
 ```txt
 src/modules/social-generator/validators/validateSocialCreative.ts
 ```
 
-Typy pól walidacji:
+Zakres walidacji:
 
-```ts
-export type SocialValidationField =
-  | 'courseName'
-  | 'offerMode'
-  | 'benefit'
-  | 'price'
-  | 'startDate'
-  | 'city'
-  | 'brandLogo'
-  | 'partnerLogo'
-  | 'safeZone'
-  | 'image'
-  | 'textOverflow'
-  | 'contrast';
-```
-
-Reguły:
-
-```txt
-courseName:
-- nie może wychodzić poza slot,
-- może mieć zmniejszany font,
-- może przechodzić do kilku linii.
-
-offerMode:
-- dla online pokazuje „Nauka online”,
-- dla stacjonarne domyślnie niewidoczne.
-
-city:
-- dla online domyślnie ukryte,
-- dla długich nazw może przejść w mniejszy tag,
-- może zostać ukryte, jeśli jest opcjonalne.
-
-partnerLogo:
-- jeśli course.partnerKey istnieje, logo musi zostać wyrenderowane,
-- jeśli brakuje pliku logo, walidator zgłasza warning/error,
-- logo powinno mieć białą aplę,
-- nie powinno wychodzić poza slot,
-- w story nie może kolidować z safe zone.
-
-safeZone:
-- dotyczy szczególnie story,
-- kluczowe teksty i logo nie powinny wchodzić w obszary ryzyka.
-
-image:
-- musi istnieć,
-- powinno mieć fallback,
-- docelowo powinno mieć focal point.
-
-textOverflow:
-- wykrywa przepełnienia tekstu.
-
-contrast:
-- sprawdza ryzyko nieczytelności tekstu na tle.
-```
+- overflow tytułu,
+- minimalna wielkość fontu,
+- przekroczenie max lines,
+- kolizja title card z facts,
+- kolizja badges z footerem,
+- brak zdjęcia,
+- brak logo partnera,
+- broken partner logo,
+- safe zone dla stories,
+- zbyt mały tekst po skalowaniu,
+- ryzyko kontrastu.
 
 ---
 
-### 23. Architektura plików
-
-Proponowana struktura:
-
-```txt
-src/modules/creative-stack/
-  core/
-    data/
-    resolver/
-    naming/
-    brand/
-    image/
-    export/
-    svg/
-
-src/modules/ads-generator/
-  components/
-  data/
-  export/
-  renderer/
-  types/
-  utils/
-  validators/
-
-src/modules/social-generator/
-  components/
-    SocialWorkspace.vue
-    SocialControlsPanel.vue
-    SocialPreviewPanel.vue
-    SocialFormatPreview.vue
-    SocialDataSmokeTest.vue
-
-  data/
-    social-creatives.mock.ts
-    partners.ts
-
-  renderer/
-    renderSocialSvg.ts
-    renderSocialPhoto.ts
-    renderSocialCourseName.ts
-    renderSocialOfferMode.ts
-    renderSocialBenefit.ts
-    renderSocialPrice.ts
-    renderSocialStartDate.ts
-    renderSocialCity.ts
-    renderSocialPartnerLogo.ts
-    renderSocialBrandLogo.ts
-    renderSocialDebugOverlay.ts
-    socialFormats.ts
-    socialLayouts.ts
-    socialComponentStyles.ts
-
-  stores/
-    socialDraftStore.ts
-
-  types/
-    social.types.ts
-
-  utils/
-    resolveSocialCreative.ts
-
-  validators/
-    validateSocialCreative.ts
-```
-
----
-
-### 24. Resolver social
-
-Resolver social przygotowuje dane dla renderera. Renderer nie powinien samodzielnie zgadywać, czy kierunek jest online, czy ma partnera, albo czy miasto ma być pokazane.
-
-Funkcja:
-
-```ts
-resolveSocialCreative(input: ResolveSocialCreativeInput): SocialCreativeData
-```
-
-Przykład wejścia:
-
-```ts
-export type ResolveSocialCreativeInput = {
-  courseId: string;
-  cityId?: string;
-  formatId: SocialFormatId;
-};
-```
-
-Logika:
-
-```txt
-1. Pobierz kierunek.
-2. Pobierz brand.
-3. Pobierz zdjęcie.
-4. Sprawdź offerMode.
-5. Jeśli offerMode = online, dodaj label „Nauka online”.
-6. Jeśli kierunek ma partnerKey, pobierz partnera.
-7. Jeśli kierunek jest stacjonarny i ma cityId, dodaj miasto.
-8. Zbuduj enabledComponents.
-9. Zwróć SocialCreativeData.
-```
-
----
-
-### 25. Przyszły tryb kreatora
-
-W przyszłości powstanie tryb ręcznego składania materiału z komponentów.
-
-Użytkownik będzie mógł:
-
-```txt
-wybrać set / layout,
-wybrać formaty,
-wybrać zdjęcie,
-wpisać nazwę kierunku,
-wybrać online / stacjonarne,
-włączyć lub ukryć miasto,
-włączyć cenę,
-wpisać cenę,
-włączyć start,
-wpisać termin,
-włączyć przewagę,
-wpisać przewagę,
-włączyć partnera,
-wybrać partnera z biblioteki,
-wgrać lub wskazać własny logotyp.
-```
-
-Model draftu:
-
-```ts
-export type SocialCreativeDraft = {
-  id: string;
-
-  courseId?: string;
-  formatIds: SocialFormatId[];
-
-  courseName: string;
-  imageKey?: string;
-
-  offerMode: 'stationary' | 'online';
-  showOfferModeLabel: boolean;
-
-  cityId?: string;
-  showCity: boolean;
-
-  benefit?: string;
-  showBenefit: boolean;
-
-  priceLabel?: string;
-  showPrice: boolean;
-
-  startLabel?: string;
-  showStart: boolean;
-
-  partner: SocialDraftPartner;
-
-  layoutId: SocialLayoutPreset;
-};
-```
-
-Ważne rozdzielenie:
-
-```txt
-SocialCreativeData:
-- dane produkcyjne,
-- automatyczne,
-- oparte o kierunek.
-
-SocialCreativeDraft:
-- dane ręcznie składanej kreacji,
-- może nadpisywać wartości,
-- nie zmienia bazowych danych kierunku.
-```
-
----
-
-### 26. Eksport i nazewnictwo
+### 19. Eksport i nazewnictwo
 
 Jednostka eksportu:
 
@@ -1145,17 +522,10 @@ Jednostka eksportu:
 1 kierunek + 1 tryb oferty + opcjonalnie miasto = social set
 ```
 
-Format ZIP:
-
-```txt
-brand_context_courseId_social-set.zip
-```
-
 Dla stacjonarnych:
 
 ```txt
 kursy_poz_pku-barber_social-set.zip
-
 kursy_poz_pku-barber_1080x1080.png
 kursy_poz_pku-barber_1080x1350.png
 kursy_poz_pku-barber_1080x1920.png
@@ -1165,7 +535,6 @@ Dla online:
 
 ```txt
 kursy_online_pku-python_social-set.zip
-
 kursy_online_pku-python_1080x1080.png
 kursy_online_pku-python_1080x1350.png
 kursy_online_pku-python_1080x1920.png
@@ -1183,386 +552,49 @@ brand_online_courseId_format
 
 ---
 
-### 27. Roadmapa wdrożenia
-
-#### Etap 1 — Typy i formaty
-
-Pliki:
-
-```txt
-social.types.ts
-socialFormats.ts
-```
-
-Zakres:
-
-```txt
-SocialFormatId
-OfferMode
-SocialComponentId
-SocialCreativeData
-PartnerData
-SocialLayoutSlot
-SocialLayoutDefinition
-Backlog danych i assetów
-```
-
-#### Etap 2 — Dane robocze
-
-Pliki:
-
-```txt
-social-creatives.mock.ts
-partners.ts
-```
-
-Zakres:
-
-```txt
-kilka kierunków testowych,
-jeden kierunek stacjonarny,
-jeden kierunek online,
-jeden kierunek z partnerem.
-```
-
-#### Etap 3 — Style komponentów
-
-Plik:
-
-```txt
-socialComponentStyles.ts
-```
-
-Zakres:
-
-```txt
-CourseNameBlock
-OfferModeBadge
-BenefitBlock
-PriceBadge
-StartDateBadge
-CityBadge
-PartnerLogoBadge
-BrandLogoAnchor
-```
-
-#### Etap 4 — Pierwszy layout slotowy
-
-Plik:
-
-```txt
-socialLayouts.ts
-```
-
-Zakres:
-
-```txt
-photo-top-content-bottom dla 1080×1080.
-```
-
-#### Etap 5 — Renderer SVG
-
-Pliki:
-
-```txt
-renderSocialSvg.ts
-renderSocialPhoto.ts
-renderSocialCourseName.ts
-renderSocialOfferMode.ts
-renderSocialBenefit.ts
-renderSocialPrice.ts
-renderSocialStartDate.ts
-renderSocialCity.ts
-renderSocialPartnerLogo.ts
-renderSocialBrandLogo.ts
-```
-
-Zakres:
-
-```txt
-render pierwszego formatu 1080×1080.
-```
-
-#### Etap 6 — Pozostałe formaty
-
-Zakres:
-
-```txt
-1080×1350,
-1080×1920,
-safe zone dla story,
-debug overlay.
-```
-
-#### Etap 7 — Walidacja
-
-Plik:
-
-```txt
-validateSocialCreative.ts
-```
-
-Zakres:
-
-```txt
-braki danych,
-overflow tekstu,
-safe zone,
-partner logo,
-brak zdjęcia,
-ryzyko kontrastu.
-```
-
-#### Etap 8 — UI robocze
-
-Komponenty:
-
-```txt
-SocialWorkspace.vue
-SocialControlsPanel.vue
-SocialPreviewPanel.vue
-SocialFormatPreview.vue
-```
-
-Zakres:
-
-```txt
-wybór kierunku,
-podgląd 3 formatów,
-debug overlay,
-walidacja.
-```
-
-#### Etap 9 — Eksport
-
-Zakres:
-
-```txt
-SVG → PNG,
-ZIP setu,
-nazewnictwo dla online i stacjonarnych.
-```
-
----
-
-### 28. Decyzje projektowe
+### 20. Decyzje projektowe
 
 1. Moduł social media powstaje jako osobny moduł `social-generator`.
 2. Nie rozbudowujemy bezpośrednio `ads-generator`.
-3. Wspólne elementy stopniowo przenosimy do `creative-stack/core`.
+3. Wspólne elementy stopniowo przenosimy do `creative-stack`.
 4. MVP działa na sztywnych danych.
 5. Nie budujemy jeszcze pełnego kreatora.
 6. CTA nie jest obowiązkowym komponentem social media.
 7. Podstawowe formaty to 1080×1080, 1080×1350 i 1080×1920.
 8. Dla story stosujemy safe zone i debug overlay.
-9. Tryb oferty ma dwie wartości: online albo stacjonarne.
-10. Dla online pokazujemy dopisek „Nauka online”.
-11. Dla online miasto jest domyślnie ukryte.
-12. Dla stacjonarnych miasto może być widoczne.
-13. Partner jest przypisany do konkretnego kierunku.
-14. Jeśli kierunek ma partnera, logo partnera renderuje się automatycznie.
-15. Logo partnera występuje jako badge na zdjęciu, na białej apli.
-16. W przyszłym kreatorze partner będzie możliwy do ręcznego włączenia, wybrania lub wgrania.
-17. Każdy element social jest komponentem renderera SVG.
-18. Layout opisujemy jako sloty, nie jako finalny projekt graficzny.
-19. Komponenty mają własne style bazowe.
-20. Renderer powinien obsługiwać priorytety komponentów i fallbacki.
-21. Zdjęcia powinny docelowo mieć focal point.
-22. Walidator social jest osobny względem walidatora Google Ads.
-23. Eksport rozróżnia online i stacjonarne w nazwach plików.
-24. Model danych powinien przewidywać przyszły tryb kompozytora.
+9. Social Generator działa jako jeden draft z aktywnym podglądem formatu.
+10. Eksport docelowo generuje paczkę formatów z tego samego draftu.
+11. Layout social ma działać jako flow, nie jako ręczna mapa y dla każdego elementu.
+12. Nazwa kierunku korzysta z `courseNameParts`.
+13. Długie nazwy mają schodzić po skali fontu, aż zmieszczą się w limicie.
+14. Ceny i raty pomijamy na obecnym etapie social.
+15. Informacje kierunku modelujemy jako `courseFacts`.
+16. Wyróżniki modelujemy jako `courseBadges`.
+17. Kierunki online muszą zostać uzupełnione w danych.
+18. Partner jest przypisany do konkretnego kierunku.
+19. Jeśli kierunek ma partnera, logo partnera renderuje się automatycznie.
+20. Brak assetu partnera nie może pokazywać broken image.
+21. Logo brandu powinno być realnym assetem w lewym dolnym rogu.
+22. Tło/pattern powinno zostać przeniesione z modułu Google Ads.
+23. Badge UI wymaga osobnego systemu i kalibracji.
+24. Walidator social jest osobny względem walidatora Google Ads.
+25. Eksport rozróżnia online i stacjonarne w nazwach plików.
 
 ---
 
-### 29. Najbliższy krok techniczny
-
-Pierwszy krok wdrożeniowy:
+### 21. Ważne pliki
 
 ```txt
-Utworzyć strukturę modułu social-generator i dodać:
-- social.types.ts
-- socialFormats.ts
-- socialComponentStyles.ts
-- partners.ts
-- social-creatives.mock.ts
-```
-
-Nie zaczynać od finalnego layoutu. Najpierw zbudować język danych i komponentów. Layout będzie dopracowywany iteracyjnie w trakcie pracy z realnymi przykładami kierunków.
-
-## Model podglądu i responsywnego renderowania
-
-Social Generator powinien działać w modelu jednego aktywnego podglądu roboczego. Użytkownik nie pracuje równocześnie na kilku osobnych podglądach, lecz wybiera aktualny format, np. `1080×1080`, `1080×1350` albo `1080×1920`, a system dynamicznie przelicza kompozycję na podstawie tego formatu.
-
-Oznacza to, że dane kreacji pozostają wspólne, natomiast format jest kontekstem renderowania. Ten sam draft powinien móc zostać wyrenderowany do różnych proporcji bez tworzenia osobnych układów ręcznie dla każdego formatu.
-
-Model działania:
-
-```txt
-draft kreacji
-+ aktywny format podglądu
-+ theme
-+ density
-+ creative scale
-→ responsive layout
-→ SVG aktywnego podglądu
-```
-
-Przy eksporcie system powinien użyć tego samego draftu i tej samej logiki renderowania do wygenerowania całej paczki formatów:
-
-```txt
-draft kreacji
-→ render 1080×1080
-→ render 1080×1350
-→ render 1080×1920
-→ eksport paczki
-```
-
-### Założenia UX
-
-W interfejsie użytkownik powinien widzieć jeden główny podgląd kreacji. Nad lub obok podglądu powinien znajdować się przełącznik formatu:
-
-```txt
-Square 1:1
-Feed 4:5
-Story / Reels 9:16
-```
-
-Zmiana formatu powinna płynnie zmieniać proporcje podglądu i przeliczać layout, ale nie powinna tworzyć osobnej kopii danych. Użytkownik nadal edytuje jedną kreację.
-
-W podglądzie należy rozdzielić dwa rodzaje skali:
-
-1. **Skala podglądu UI** — odpowiada tylko za to, jak duży SVG jest widoczny w aplikacji. Nie wpływa na eksport.
-2. **Skala kompozycji** — wpływa na rzeczywiste rozmiary elementów w grafice: fonty, odstępy, wysokości sekcji, marginesy, badge i układ zdjęcia.
-
-Dzięki temu użytkownik może wygodnie oglądać grafikę w aplikacji bez przypadkowego zmieniania finalnego eksportu.
-
-### Responsywny system kompozycji
-
-Nie zakładamy jednego sztywnego SVG skalowanego do wszystkich formatów. Zakładamy jeden responsywny system layoutu, który generuje różne proporcje z tych samych zasad.
-
-System powinien definiować:
-
-* hierarchię wizualną,
-* skalę typografii,
-* odstępy pionowe i poziome,
-* siatkę / jednostkę bazową,
-* wysokości sekcji,
-* zasady łamania tekstu,
-* priorytety widoczności komponentów,
-* tryby gęstości układu,
-* motywy jasny / ciemny,
-* bezpieczne strefy dla formatów story.
-
-Przykładowa hierarchia wizualna:
-
-```txt
-1. Zdjęcie / kontekst wizualny
-2. Nazwa kierunku
-3. Cena lub główna przewaga
-4. Start / tryb nauki / miasto
-5. Partner
-6. Logo TEB
-```
-
-W przypadku braku miejsca system powinien najpierw skracać lub ukrywać elementy opcjonalne, a nie zmniejszać bez końca najważniejszych elementów. Nazwa kierunku, zdjęcie i logo marki powinny pozostać elementami nadrzędnymi.
-
-### Format jako kontekst renderowania
-
-Format powinien być przekazywany do renderera jako kontekst, np.:
-
-```ts
-type SocialRenderContext = {
-  formatId: SocialFormatId;
-  width: number;
-  height: number;
-  ratio: '1:1' | '4:5' | '9:16';
-};
-```
-
-Natomiast dane kreacji powinny pozostać niezależne od formatu:
-
-```ts
-type SocialCreativeDraft = {
-  courseName: string;
-  imagePath: string;
-  offerMode: 'stationary' | 'online';
-  cityName?: string;
-  benefit?: string;
-  priceLabel?: string;
-  startDateLabel?: string;
-  partner?: {
-    name: string;
-    logoPath: string;
-  };
-  themeMode: 'light' | 'dark';
-  layoutPreset: string;
-  density: 'compact' | 'default' | 'comfortable';
-  creativeScale: number;
-};
-```
-
-Docelowy schemat:
-
-```txt
-SocialCreativeDraft
-+ SocialRenderContext
-+ CreativeTheme
-+ ResponsiveScale
-→ SocialResponsiveLayout
-→ SVG
-```
-
-### Tryby gęstości
-
-Zamiast od razu dodawać wiele ręcznych suwaków, warto wprowadzić kontrolę gęstości kompozycji:
-
-```txt
-compact
-default
-comfortable
-```
-
-Znaczenie:
-
-```txt
-compact:
-  mniejsze odstępy,
-  więcej treści,
-  bardziej użytkowy układ.
-
-default:
-  standardowy rytm kompozycji.
-
-comfortable:
-  większe odstępy,
-  bardziej premium,
-  mniej zagęszczona komunikacja.
-```
-
-Dodatkowo można przewidzieć ekspercki parametr `creativeScale`, np. w zakresie `0.9–1.1`, który proporcjonalnie skaluje fonty, odstępy i komponenty bez naruszania proporcji całego formatu.
-
-### Konsekwencje dla implementacji
-
-W praktyce social-generator powinien rozwijać się w kierunku:
-
-```txt
-jeden aktywny podgląd
-+ przełącznik formatu
-+ responsive layout engine
-+ wspólne dane draftu
-+ eksport paczki formatów
-```
-
-Proponowane komponenty i pliki:
-
-```txt
-src/modules/social-generator/components/SocialPreviewStage.vue
+src/modules/social-generator/design-system/socialDesignTokens.ts
+src/modules/social-generator/design-system/createSocialDesignSystem.ts
 src/modules/social-generator/renderer/layout/createSocialResponsiveLayout.ts
-src/modules/creative-stack/design-system/createResponsiveScale.ts
-src/modules/creative-stack/design-system/creativeTokens.ts
-src/modules/creative-stack/design-system/creativeThemes.ts
+src/modules/social-generator/renderer/layout/socialTitleFit.ts
+src/modules/social-generator/renderer/renderSocialSvg.ts
+src/modules/social-generator/renderer/renderSocialCourseName.ts
+src/modules/social-generator/renderer/renderSocialCourseFacts.ts
+src/modules/social-generator/renderer/renderSocialCourseBadges.ts
+src/modules/social-generator/renderer/renderSocialPartnerLogo.ts
+src/modules/social-generator/renderer/renderSocialBrandLogo.ts
+src/modules/social-generator/data/social-creatives.mock.ts
+src/modules/social-generator/types/social.types.ts
 ```
-
-`SocialPreviewStage.vue` powinien odpowiadać tylko za prezentację jednego aktywnego formatu w UI. Renderer SVG powinien nadal generować grafikę w realnych wymiarach eksportowych, np. `1080×1080`, `1080×1350`, `1080×1920`.
-
-Eksport powinien działać niezależnie od aktywnego podglądu. Aktywny podgląd określa tylko to, co użytkownik aktualnie ogląda i edytuje. Eksport może wygenerować wszystkie zaznaczone formaty na podstawie tego samego draftu.
