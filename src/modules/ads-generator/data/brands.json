@@ -6,7 +6,7 @@
     "primary": "#994365",
     "soft": "#F5EDF0",
     "text": "#0941A1",
-    "logo": "teb-edukacja.svg",
+    "logo": "teb-kursy.svg",
     "notes": "PKU i KKZ korzystają z tego samego zestawu kolorystycznego."
   },
   {
@@ -16,7 +16,7 @@
     "primary": "#009489",
     "soft": "#E6F5F4",
     "text": "#0941A1",
-    "logo": "teb-edukacja.svg",
+    "logo": "teb-medyczne.svg",
     "notes": ""
   },
   {
@@ -26,7 +26,7 @@
     "primary": "#E27D00",
     "soft": "#FDF2E6",
     "text": "#0941A1",
-    "logo": "teb-edukacja.svg",
+    "logo": "teb-policealne.svg",
     "notes": ""
   }
 ]

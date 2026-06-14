@@ -10,21 +10,22 @@ Primary source data still lives in the Google Ads module:
 
 Current social MVP data lives here:
 
-- `src/modules/social-generator/data/social-creatives.mock.ts`
+- `src/modules/social-generator/data/socialCreativeCatalog.ts`
 - `src/modules/social-generator/data/partners.ts`
 
 ## Course coverage
 
 Source course catalog:
 
-- total: 94 courses
+- total: 139 courses
 - SP: 25
 - PKU: 52
 - KKZ: 17
-- image mappings: 94 / 94
-- social-ready mock records: 2 / 94
+- PKU_ONLINE: 45
+- image mappings: 139 / 139
+- social catalog records: 139 / 139
 
-The next data task is not image mapping. The missing layer is social-ready creative data:
+The next data task is QA and overrides for social-ready creative data:
 
 - `courseNameParts.main`
 - `courseNameParts.subtitle`
@@ -75,12 +76,15 @@ Expected files:
 Currently present:
 
 - `teb-edukacja.svg`
+- `teb-kursy.svg`
+- `teb-medyczne.svg`
+- `teb-policealne.svg`
 
 Important implementation note:
 
 - `src/modules/creative-stack/utils/publicAssetExists.ts` uses a known-public-assets list.
-- After adding a real asset file, add its path to `KNOWN_PUBLIC_ASSET_PATHS`.
-- Otherwise the renderer will keep using the fallback text logo.
+- The known-public-assets list was refreshed after adding brand, partner and PKU online image assets.
+- After adding more real asset files, refresh `KNOWN_PUBLIC_ASSET_PATHS`.
 
 ## Partner logo assets
 
@@ -93,6 +97,7 @@ public/creative-stack/logos/partners/
 Expected partner logo files from the current source catalog:
 
 - `3shape.svg`
+- `altkom-akademia.svg`
 - `bielenda-professional.svg`
 - `canon.svg`
 - `cisco.svg`
@@ -115,16 +120,21 @@ Expected partner logo files from the current source catalog:
 - `schwarzkopf-professional.svg`
 - `semilac-professional.svg`
 - `vita.svg`
+- `webmetric.svg`
+- `zabka.svg`
 
 Current state:
 
-- partner registry has expected keys and paths in `src/modules/social-generator/data/partners.ts`
-- physical SVG assets are not present yet
-- `publicAssetExists` must be updated after files are added
+- partner registry has expected keys, paths and name aliases in `src/modules/social-generator/data/partners.ts`
+- most physical SVG assets are present in `public/creative-stack/logos/partners/`
+- missing physical SVG files as of this audit:
+  - `altkom-akademia.svg`
+  - `felg.svg`
+- missing partner assets render as controlled placeholders, not broken images
 
 ## Course list to convert
 
-All 94 source courses should be converted to social-ready records. Prioritize in this order:
+All 139 source courses are available through the social catalog. Prioritize manual QA in this order:
 
 1. Current visual QA examples:
    - `pku-barber`
@@ -140,21 +150,21 @@ All 94 source courses should be converted to social-ready records. Prioritize in
    - SP remaining
    - PKU remaining
    - KKZ remaining
+   - PKU_ONLINE remaining
 
-## Recommended next data module
+## Current data module
 
-Create a resolver instead of hand-writing all social records:
+A resolver creates social records instead of hand-writing every course:
 
 ```txt
-src/modules/social-generator/data/createSocialCreativeFromCourse.ts
+src/modules/social-generator/data/socialCreativeCatalog.ts
 ```
 
 Inputs:
 
 - normalized course row
 - image map row
-- optional city
-- optional manual overrides
+- partner registry aliases
 
 Output:
 

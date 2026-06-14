@@ -470,6 +470,10 @@ Zrealizowano:
 - `modeLabel` jako badge przy tytule,
 - partner card z placeholderem,
 - facts w dolnym rzędzie obok brand logo.
+- pełny katalog 139 kierunków z danych ads-generatora,
+- PKU online jako 45 osobnych kierunków,
+- realne brand logo dla TEB Kursy, Szkół Medycznych i Policealnych,
+- registry partnerów z aliasami nazw i kontrolowanym fallbackiem logo.
 
 ---
 
@@ -499,11 +503,13 @@ Zrealizowano:
 
 #### Stage 3D — dane i warianty brandów
 
-- dodać mocki SP i SM,
-- uzupełnić dane online i partnerów,
-- dodać realne assety partnerów,
+- wykonane: podpięto pełny katalog 139 kierunków,
+- wykonane: dodano 45 kierunków PKU online,
+- wykonane: podpięto realne assety brandów,
+- wykonane: dodano registry partnerów z aliasami i fallbackiem,
+- uzupełnić brakujące assety partnerów `altkom-akademia.svg` i `felg.svg`,
 - dopracować warianty badge’y dla brandów,
-- podmienić wspólne brand logo na docelowe assety brandowe.
+- przeprowadzić QA wariantów SP, SM, PKU, KKZ i PKU online.
 
 #### Stage 3E — cleanup
 
@@ -618,6 +624,8 @@ src/modules/social-generator/renderer/renderSocialCourseFacts.ts
 src/modules/social-generator/renderer/renderSocialCourseBadges.ts
 src/modules/social-generator/renderer/renderSocialPartnerLogo.ts
 src/modules/social-generator/renderer/renderSocialBrandLogo.ts
+src/modules/social-generator/data/socialCreativeCatalog.ts
 src/modules/social-generator/data/social-creatives.mock.ts
+src/modules/social-generator/data/partners.ts
 src/modules/social-generator/types/social.types.ts
 ```

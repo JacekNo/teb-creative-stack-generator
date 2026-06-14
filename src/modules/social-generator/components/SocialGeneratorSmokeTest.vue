@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref, watch } from 'vue';
 import SocialPreviewStage from './SocialPreviewStage.vue';
-import { socialCreativesMock } from '../data/social-creatives.mock';
+import { socialCreativeCatalog } from '../data/socialCreativeCatalog';
 import {
   SOCIAL_FORMAT_ORDER,
   getSocialFormat,
@@ -17,7 +17,12 @@ import type {
 } from '../types/social.types';
 import { renderSocialSvg } from '../renderer/renderSocialSvg';
 
-const selectedCreativeIndex = ref(0);
+const defaultCreativeIndex = socialCreativeCatalog.findIndex(
+  (creative) =>
+    creative.courseId === 'pku-online-programowanie-python-z-cisco-networking-academy' ||
+    creative.courseId === 'pku-programowanie-python-z-cisco-networking-academy',
+);
+const selectedCreativeIndex = ref(Math.max(0, defaultCreativeIndex));
 const selectedFormatId = ref<SocialFormatId>('square-1080');
 const previewZoom = ref(1);
 const showDebug = ref(true);
@@ -153,7 +158,7 @@ function resetFormFromCreative(creative: SocialCreativeData): void {
 }
 
 const baseCreative = computed(() => {
-  return socialCreativesMock [selectedCreativeIndex.value];
+  return socialCreativeCatalog[selectedCreativeIndex.value] ?? socialCreativeCatalog[0];
 });
 
 const selectedFormat = computed(() => {
@@ -249,7 +254,7 @@ const activeSvg = computed(() => {
           <span>Kierunek</span>
           <select v-model.number="selectedCreativeIndex">
             <option
-              v-for="(creative, index) in socialCreativesMock"
+              v-for="(creative, index) in socialCreativeCatalog"
               :key="creative.courseId"
               :value="index"
             >
