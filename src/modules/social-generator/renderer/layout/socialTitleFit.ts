@@ -66,7 +66,7 @@ function estimateTextWidth(text: string, fontSize: number): number {
       ? text.replace(/[^A-ZĄĆĘŁŃÓŚŹŻ]/g, '').length / text.length
       : 0;
 
-  const averageGlyphWidth = upperCaseRatio > 0.45 ? 0.58 : 0.53;
+  const averageGlyphWidth = upperCaseRatio > 0.45 ? 0.66 : 0.6;
 
   return text.length * fontSize * averageGlyphWidth;
 }

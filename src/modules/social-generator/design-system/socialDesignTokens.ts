@@ -113,25 +113,25 @@ export const socialDesignTokens = {
     square: {
       width: 1080,
       height: 1080,
-      safe: { top: 64, right: 64, bottom: 64, left: 64 },
-      photoHeight: 560,
-      contentOverlap: 28,
+      safe: { top: 56, right: 48, bottom: 56, left: 48 },
+      photoHeight: 500,
+      contentOverlap: 0,
     },
 
     portrait: {
       width: 1080,
       height: 1350,
-      safe: { top: 72, right: 64, bottom: 72, left: 64 },
-      photoHeight: 660,
-      contentOverlap: 32,
+      safe: { top: 64, right: 48, bottom: 64, left: 48 },
+      photoHeight: 600,
+      contentOverlap: 0,
     },
 
     stories: {
       width: 1080,
       height: 1920,
-      safe: { top: 180, right: 72, bottom: 240, left: 72 },
-      photoHeight: 900,
-      contentOverlap: 36,
+      safe: { top: 180, right: 56, bottom: 232, left: 56 },
+      photoHeight: 850,
+      contentOverlap: 0,
     },
   },
 
@@ -150,7 +150,7 @@ export const socialDesignTokens = {
   components: {
     background: {
       patternColor: '#FFFFFF',
-      patternOpacity: 0.18,
+      patternOpacity: 0.28,
       patternSize: 72,
       patternStrokeWidth: 2,
       patternDotSize: 6,
@@ -167,7 +167,7 @@ export const socialDesignTokens = {
     titleCard: {
       radius: 40,
       paddingX: 44,
-      paddingY: 36,
+      paddingY: 24,
       minFontSize: 44,
       maxFontSize: 88,
       maxLines: 5,
@@ -177,8 +177,8 @@ export const socialDesignTokens = {
     titleStack: {
       titleSubtitleGap: 8,
       subtitleModeGap: 12,
-      subtitleFontRatio: 0.42,
-      subtitleMinFontSize: 24,
+      subtitleFontRatio: 0.48,
+      subtitleMinFontSize: 28,
       subtitleFontWeight: 800,
       subtitleLineHeightRatio: 1.16,
       modeBadge: {
@@ -197,7 +197,7 @@ export const socialDesignTokens = {
     badge: {
       height: 52,
       radius: 14,
-      paddingX: 24,
+      paddingX: 28,
       paddingY: 10,
       fontSize: 22,
       lineHeight: 28,
@@ -207,7 +207,7 @@ export const socialDesignTokens = {
       columnGap: 12,
       borderWidth: 2,
       maxItems: 5,
-      textWidthRatio: 0.55,
+      textWidthRatio: 0.64,
       letterSpacing: 0.1,
     },
 
@@ -230,16 +230,16 @@ export const socialDesignTokens = {
 
     factStack: {
       maxItems: 4,
-      gap: 8,
-      itemHeight: 66,
-      iconSize: 44,
-      iconRadius: 14,
-      iconTextGap: 16,
-      valueFontSize: 28,
-      valueLineHeight: 34,
+      gap: 6,
+      itemHeight: 54,
+      iconSize: 36,
+      iconRadius: 12,
+      iconTextGap: 14,
+      valueFontSize: 24,
+      valueLineHeight: 30,
       valueFontWeight: 800,
-      labelFontSize: 18,
-      labelLineHeight: 22,
+      labelFontSize: 15,
+      labelLineHeight: 19,
       labelFontWeight: 700,
       valueLabelGap: 2,
     },
@@ -267,7 +267,7 @@ export const socialDesignTokens = {
     },
 
     contentFlow: {
-      insetX: 40,
+      insetX: 0,
       titleToFactsGap: 16,
       factsToBadgesGap: 18,
       badgesToFooterGap: 44,

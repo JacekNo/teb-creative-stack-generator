@@ -157,15 +157,15 @@ function createTheme(brand: SocialDesignBrand) {
         borderWidth: 0,
       },
       light: {
-        fill: helper.white,
+        fill: brandTokens.light,
         color: brandTokens.text,
-        borderColor: brandTokens.primary,
+        borderColor: brandTokens.secondary,
         borderWidth: 2,
       },
       popular: {
-        fill: helper.white,
-        color: brandTokens.text,
-        borderColor: brandTokens.primary,
+        fill: helper.yellow,
+        color: helper.dark,
+        borderColor: helper.yellow,
         borderWidth: 2,
       },
       green: {

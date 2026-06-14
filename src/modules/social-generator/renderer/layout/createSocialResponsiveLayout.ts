@@ -146,7 +146,7 @@ export function createSocialResponsiveLayout({
     ? rect(
         safeArea.x + spacing[2],
         safeArea.y + spacing[2],
-        Math.min(safeArea.width * 0.42, spacing[32] * 1.32),
+        Math.min(safeArea.width - spacing[4], spacing[32] * 4.5),
         components.cityBadge.height,
       )
     : rect(safeArea.x, safeArea.y, 0, 0);
@@ -157,7 +157,7 @@ export function createSocialResponsiveLayout({
   );
 
   const partnerLogo = rect(
-    photo.x + photo.width - partnerLogoWidth - spacing[6],
+    photo.x + photo.width - partnerLogoWidth,
     photo.y + photo.height - components.partnerBox.height,
     partnerLogoWidth,
     components.partnerBox.height,
@@ -171,7 +171,7 @@ export function createSocialResponsiveLayout({
   const badgesHeight = getBadgesHeight({
     creative,
     system,
-    width: safeArea.width,
+    width: contentWidth,
   });
   const factsHeight = getFactsHeight({
     creative,
@@ -185,8 +185,7 @@ export function createSocialResponsiveLayout({
     (badgesHeight > 0
       ? components.contentFlow.factsToBadgesGap + badgesHeight
       : 0) +
-    components.contentFlow.badgesToFooterGap +
-    footerHeight;
+    components.contentFlow.badgesToFooterGap;
 
   const maxTitleCardHeight = Math.max(
     system.typography.heroXs.fontSize,
@@ -233,10 +232,17 @@ export function createSocialResponsiveLayout({
       )
     : rect(contentX, titleCard.y + titleCard.height, 0, 0);
 
-  const courseBadgesY =
+  const courseBadgesNaturalY =
     courseFacts.height > 0
       ? courseFacts.y + courseFacts.height + components.contentFlow.factsToBadgesGap
       : titleCard.y + titleCard.height + components.contentFlow.titleToFactsGap;
+
+  const courseBadgesBottomY =
+    footer.y - components.contentFlow.badgesToFooterGap - badgesHeight;
+  const courseBadgesY =
+    badgesHeight > 0
+      ? Math.max(courseBadgesNaturalY, courseBadgesBottomY)
+      : courseBadgesNaturalY;
 
   const badgesAvailableHeight = Math.max(
     0,

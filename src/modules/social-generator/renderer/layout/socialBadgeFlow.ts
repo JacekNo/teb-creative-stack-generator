@@ -5,6 +5,7 @@ import type {
   SocialLayoutSlot,
   TextFallbackValue,
 } from '../../types/social.types';
+import { estimateSocialTextWidth } from './socialTextMetrics';
 
 export type ResolvedSocialCourseBadge = SocialCourseBadge & {
   resolvedLabel: string;
@@ -65,10 +66,10 @@ export function measureSocialBadgeWidth({
 }): number {
   const badgeStyle = system.components.badge;
   const naturalWidth =
-    label.length * badgeStyle.fontSize * badgeStyle.textWidthRatio +
+    estimateSocialTextWidth(label, badgeStyle.fontSize) +
     badgeStyle.paddingX * 2;
 
-  return Math.min(naturalWidth, maxWidth);
+  return Math.ceil(Math.min(naturalWidth, maxWidth));
 }
 
 export function getSocialBadgeFlowHeight({
@@ -120,12 +121,18 @@ export function createSocialBadgePlacements({
   }
 
   const badgeStyle = system.components.badge;
-  const maxX = slot.x + slot.width;
   const maxY = slot.y + slot.height;
-  let cursorX = slot.x;
+  let cursorX = 0;
   let cursorY = slot.y;
 
-  const placements: SocialBadgePlacement[] = [];
+  const rows: Array<{
+    y: number;
+    width: number;
+    badges: Array<{
+      badge: ResolvedSocialCourseBadge;
+      width: number;
+    }>;
+  }> = [{ y: cursorY, width: 0, badges: [] }];
 
   for (const badge of badges) {
     const width = measureSocialBadgeWidth({
@@ -133,26 +140,41 @@ export function createSocialBadgePlacements({
       system,
       maxWidth: slot.width,
     });
+    let row = rows[rows.length - 1];
 
-    if (cursorX > slot.x && cursorX + width > maxX) {
-      cursorX = slot.x;
+    if (cursorX > 0 && cursorX + width > slot.width) {
+      cursorX = 0;
       cursorY += badgeStyle.height + badgeStyle.rowGap;
+      row = { y: cursorY, width: 0, badges: [] };
+      rows.push(row);
     }
 
     if (cursorY + badgeStyle.height > maxY) {
       continue;
     }
 
-    placements.push({
-      badge,
-      x: cursorX,
-      y: cursorY,
-      width,
-      height: badgeStyle.height,
-    });
+    row.badges.push({ badge, width });
+    row.width =
+      row.badges.reduce((sum, item) => sum + item.width, 0) +
+      Math.max(0, row.badges.length - 1) * badgeStyle.gap;
 
     cursorX += width + badgeStyle.gap;
   }
 
-  return placements;
+  return rows.flatMap((row) => {
+    let x = slot.x + Math.max(0, (slot.width - row.width) / 2);
+
+    return row.badges.map((item) => {
+      const placement = {
+        badge: item.badge,
+        x,
+        y: row.y,
+        width: item.width,
+        height: badgeStyle.height,
+      };
+
+      x += item.width + badgeStyle.gap;
+      return placement;
+    });
+  });
 }

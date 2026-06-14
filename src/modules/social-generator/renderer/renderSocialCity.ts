@@ -3,6 +3,7 @@ import type {
   SocialCreativeData,
   SocialLayoutSlot,
 } from '../types/social.types';
+import { estimateSocialTextWidth } from './layout/socialTextMetrics';
 
 export type RenderSocialCityOptions = {
   creative: SocialCreativeData;
@@ -17,14 +18,6 @@ function escapeXml(value: string): string {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&apos;');
-}
-
-function estimateTextWidth(
-  text: string,
-  fontSize: number,
-  textWidthRatio: number,
-): number {
-  return text.length * fontSize * textWidthRatio;
 }
 
 function renderCityShadowFilter({
@@ -87,10 +80,9 @@ export function renderSocialCity({
 
   const style = system.components.cityBadge;
   const tone = system.theme.cityBadge;
-  const textWidth = estimateTextWidth(
+  const textWidth = estimateSocialTextWidth(
     creative.cityName,
     style.fontSize,
-    style.textWidthRatio,
   );
   const iconWidth = style.showIcon ? style.iconSize + style.iconGap : 0;
   const badgeWidth = Math.min(

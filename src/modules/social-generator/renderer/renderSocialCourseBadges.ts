@@ -1,11 +1,13 @@
 import type { SocialDesignSystem } from '../design-system/createSocialDesignSystem';
 import type {
-  SocialCourseBadge,
   SocialCourseBadgeTone,
   SocialCreativeData,
   SocialLayoutSlot,
-  TextFallbackValue,
 } from '../types/social.types';
+import {
+  createSocialBadgePlacements,
+  getVisibleSocialCourseBadges,
+} from './layout/socialBadgeFlow';
 
 export type RenderSocialCourseBadgesOptions = {
   creative: SocialCreativeData;
@@ -24,29 +26,13 @@ function escapeXml(value: string): string {
     .replace(/'/g, '&apos;');
 }
 
-function isTextFallbackValue(value: unknown): value is TextFallbackValue {
-  return typeof value === 'object' && value !== null && 'full' in value;
-}
-
-function getTextValue(value: string | TextFallbackValue | undefined): string {
-  if (!value) {
-    return '';
-  }
-
-  if (isTextFallbackValue(value)) {
-    return value.short ?? value.compact ?? value.full;
-  }
-
-  return value;
-}
-
 function resolveToneKey(
   tone: SocialCourseBadgeTone | undefined,
   system: SocialDesignSystem,
 ): BadgeToneKey {
   if (tone === 'online') {
-  return 'online';
-}
+    return 'online';
+  }
 
   const candidate = (tone ?? 'primary') as BadgeToneKey;
 
@@ -55,15 +41,6 @@ function resolveToneKey(
   }
 
   return 'primary';
-}
-
-function estimateBadgeWidth(
-  label: string,
-  fontSize: number,
-  paddingX: number,
-  textWidthRatio: number,
-): number {
-  return Math.ceil(label.length * fontSize * textWidthRatio + paddingX * 2);
 }
 
 function renderBadge({
@@ -125,57 +102,21 @@ export function renderSocialCourseBadges({
     return '';
   }
 
-  const { components } = system;
-  const badgeStyle = components.badge;
-
-  const badges = (creative.courseBadges ?? [])
-    .map((badge): SocialCourseBadge & { resolvedLabel: string } => ({
-      ...badge,
-      resolvedLabel: getTextValue(badge.label),
-    }))
-    .filter((badge) => badge.resolvedLabel)
-    .slice(0, badgeStyle.maxItems);
+  const badges = getVisibleSocialCourseBadges({ creative, system });
 
   if (badges.length === 0) {
     return '';
   }
 
-  const maxX = slot.x + slot.width;
-  const maxY = slot.y + slot.height;
-  let cursorX = slot.x;
-  let cursorY = slot.y;
-
-  const rendered = badges.map((badge) => {
-    const toneKey = resolveToneKey(badge.tone, system);
-    const naturalWidth = estimateBadgeWidth(
-      badge.resolvedLabel,
-      badgeStyle.fontSize,
-      badgeStyle.paddingX,
-      badgeStyle.textWidthRatio,
-    );
-    const width = Math.min(naturalWidth, slot.width);
-
-    if (cursorX > slot.x && cursorX + width > maxX) {
-      cursorX = slot.x;
-      cursorY += badgeStyle.height + badgeStyle.rowGap;
-    }
-
-    if (cursorY + badgeStyle.height > maxY) {
-      return '';
-    }
-
-    const svg = renderBadge({
-      label: badge.resolvedLabel,
-      x: cursorX,
-      y: cursorY,
-      width,
+  const rendered = createSocialBadgePlacements({ badges, slot, system })
+    .map((placement) => renderBadge({
+      label: placement.badge.resolvedLabel,
+      x: placement.x,
+      y: placement.y,
+      width: placement.width,
       system,
-      toneKey,
-    });
-
-    cursorX += width + badgeStyle.columnGap;
-    return svg;
-  });
+      toneKey: resolveToneKey(placement.badge.tone, system),
+    }));
 
   return `
     <g data-component="social-course-badges">
