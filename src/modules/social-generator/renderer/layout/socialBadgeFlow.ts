@@ -65,7 +65,7 @@ export function measureSocialBadgeWidth({
   maxWidth: number;
 }): number {
   const badgeStyle = system.components.badge;
-  const badgeTextWidthAdjustment = 0.92;
+  const badgeTextWidthAdjustment = 0.98;
   const naturalWidth =
     estimateSocialTextWidth(label, badgeStyle.fontSize) *
       badgeTextWidthAdjustment +

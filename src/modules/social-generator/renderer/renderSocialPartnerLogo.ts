@@ -83,14 +83,13 @@ export function renderSocialPartnerLogo({
 
   const cardWidth = Math.min(slot.width, style.maxWidth);
   const cardHeight = Math.min(slot.height, style.maxHeight);
-  const labelFontSize = Math.max(10, Math.round(style.maxHeight * 0.14));
   const labelFontFamily = styles.brandLogo.default.fontFamily;
-  const labelY = slot.y + style.paddingY + labelFontSize;
 
-  const logoX = slot.x + style.paddingX;
-  const logoY = labelY + style.paddingY * 0.55;
-  const logoWidth = Math.max(0, cardWidth - style.paddingX * 2);
-  const logoHeight = Math.max(0, slot.y + cardHeight - logoY - style.paddingY);
+  const logoX = slot.x;
+  const logoY = slot.y;
+  const logoWidth = cardWidth;
+  const logoHeight = cardHeight;
+  const placeholderFontSize = Math.max(18, Math.round(cardHeight * 0.1));
   const strokeAttributes = renderStrokeAttributes(
     style.borderColor,
     style.borderWidth,
@@ -113,15 +112,6 @@ export function renderSocialPartnerLogo({
         fill="${style.backgroundColor}"
         ${strokeAttributes}
       />
-      <text
-        x="${slot.x + style.paddingX}"
-        y="${labelY}"
-        font-family="${escapeXml(labelFontFamily)}"
-        font-size="${labelFontSize}"
-        font-weight="800"
-        letter-spacing="0.8"
-        fill="rgba(16, 45, 105, 0.52)"
-      >partner</text>
       ${hasLogoAsset
         ? `
           <image
@@ -139,7 +129,7 @@ export function renderSocialPartnerLogo({
             x="${logoX + logoWidth / 2}"
             y="${logoY + logoHeight * 0.58}"
             font-family="${escapeXml(labelFontFamily)}"
-            font-size="${Math.max(12, Math.round(labelFontSize * 1.12))}"
+            font-size="${placeholderFontSize}"
             font-weight="800"
             fill="rgba(16, 45, 105, 0.42)"
             text-anchor="middle"

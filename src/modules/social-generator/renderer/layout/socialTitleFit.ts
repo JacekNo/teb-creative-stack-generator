@@ -4,6 +4,7 @@ import type {
   SocialCourseNameParts,
   TextFallbackValue,
 } from '../../types/social.types';
+import { estimateSocialTextWidth } from './socialTextMetrics';
 
 export type SocialTitleTypographyKey =
   | 'heroXl'
@@ -60,15 +61,10 @@ function getTextValue(value: string | TextFallbackValue | undefined): string {
   return value;
 }
 
-function estimateTextWidth(text: string, fontSize: number): number {
-  const upperCaseRatio =
-    text.length > 0
-      ? text.replace(/[^A-ZĄĆĘŁŃÓŚŹŻ]/g, '').length / text.length
-      : 0;
+function estimateTitleTextWidth(text: string, fontSize: number): number {
+  const displayFontWidthAdjustment = 0.84;
 
-  const averageGlyphWidth = upperCaseRatio > 0.45 ? 0.66 : 0.6;
-
-  return text.length * fontSize * averageGlyphWidth;
+  return estimateSocialTextWidth(text, fontSize) * displayFontWidthAdjustment;
 }
 
 function normalizeWhitespace(value: string | undefined): string {
@@ -110,7 +106,7 @@ function wrapWords(
   for (const word of words) {
     const nextLine = currentLine ? `${currentLine} ${word}` : word;
 
-    if (estimateTextWidth(nextLine, fontSize) <= width) {
+    if (estimateTitleTextWidth(nextLine, fontSize) <= width) {
       currentLine = nextLine;
       continue;
     }

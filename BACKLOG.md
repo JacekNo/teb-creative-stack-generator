@@ -95,39 +95,17 @@
 - Rozszerzono registry partnerów i aliasów nazw w `partners.ts`.
 - Dodano `socialCreativeCatalog.ts`, który buduje katalog social z danych ads-generatora.
 - Panel testowy social korzysta z pełnej listy 139 kierunków.
+- Zrealizowano Stage 3E — kalibracja wizualna elementów social:
+  - powiększono `courseBadges`,
+  - poprawiono estymację szerokości nazw kierunków, aby nie łamały się za wcześnie,
+  - powiększono logo brandu w footerze,
+  - powiększono partner card,
+  - dodano skalowanie samego logo partnera,
+  - dodano mocniejszą kompensację skali dla logo Cisco.
 
 ## Now
 
-### 1. Stage 3E — kalibracja wizualna elementów social
-
-Cel: poprawić rytm i skalę kluczowych elementów po podpięciu pełnego katalogu kierunków.
-
-Zakres:
-
-- powiększyć `courseBadges`:
-  - wysokość,
-  - font,
-  - padding,
-  - border / outline dla wariantów jasnych,
-  - odstępy między badge’ami.
-- sprawdzić łamanie nazw kierunków:
-  - czy maksymalna szerokość tekstu pokrywa się z szerokością slotu,
-  - czy estymacja szerokości tekstu nie wymusza zbyt szybkiego przejścia do nowej linii,
-  - czy auto-fit zaczyna od największego sensownego rozmiaru.
-- powiększyć logo brandu w footerze.
-- znacząco powiększyć logo partnera na zdjęciu:
-  - większy slot partner card,
-  - większy obszar samego logo,
-  - mniejsza dominacja etykiety `partner`,
-  - sprawdzenie safe zone i przylegania do zdjęcia.
-- sprawdzić warianty:
-  - square `1080×1080`,
-  - portrait `1080×1350`,
-  - stories `1080×1920`,
-  - krótkie i długie nazwy,
-  - SP, SM, PKU, KKZ, PKU online.
-
-### 2. Stage 3F — ręczne kadrowanie zdjęcia
+### 1. Stage 3F — ręczne kadrowanie zdjęcia
 
 Cel: pozwolić ręcznie dopasować kompozycję zdjęcia tam, gdzie automatyczny focal point nie wystarcza.
 
@@ -142,7 +120,7 @@ Zakres:
 - pokazać w debug overlay punkt focal point i obszar kadrowania,
 - zapisywać ustawienia jako override draftu, bez modyfikowania danych źródłowych.
 
-### 3. Stage 3G — eksport aktualnych ustawień bez backendu
+### 2. Stage 3G — eksport aktualnych ustawień bez backendu
 
 Cel: umożliwić zapis i odtworzenie ręcznych zmian przed wdrożeniem backendu.
 

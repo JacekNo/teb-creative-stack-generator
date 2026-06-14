@@ -329,9 +329,12 @@ export function createSocialDesignSystem({
       radius: scaleNumber(socialDesignTokens.components.partnerBox.radius, supportScaleFactor, grid),
       paddingX: scaleNumber(socialDesignTokens.components.partnerBox.paddingX, supportScaleFactor, grid),
       paddingY: scaleNumber(socialDesignTokens.components.partnerBox.paddingY, supportScaleFactor, grid),
+      sourceWidth: scaleNumber(socialDesignTokens.components.partnerBox.sourceWidth, supportScaleFactor, grid),
+      sourceHeight: scaleNumber(socialDesignTokens.components.partnerBox.sourceHeight, supportScaleFactor, grid),
+      scale: socialDesignTokens.components.partnerBox.scale,
       minWidth: scaleNumber(socialDesignTokens.components.partnerBox.minWidth, supportScaleFactor, grid),
       maxWidth: scaleNumber(socialDesignTokens.components.partnerBox.maxWidth, supportScaleFactor, grid),
-      height: scaleNumber(socialDesignTokens.components.partnerBox.height, supportScaleFactor, grid),
+      aspectRatio: socialDesignTokens.components.partnerBox.aspectRatio,
     },
 
     factStack: {

@@ -151,16 +151,22 @@ export function createSocialResponsiveLayout({
       )
     : rect(safeArea.x, safeArea.y, 0, 0);
 
+  const partnerSourceAspectRatio =
+    components.partnerBox.sourceHeight / components.partnerBox.sourceWidth;
+  const partnerLogoTargetWidth =
+    components.partnerBox.sourceWidth * components.partnerBox.scale;
   const partnerLogoWidth = Math.min(
     components.partnerBox.maxWidth,
-    Math.max(components.partnerBox.minWidth, spacing[28]),
+    safeArea.width,
+    Math.max(components.partnerBox.minWidth, partnerLogoTargetWidth),
   );
+  const partnerLogoHeight = partnerLogoWidth * partnerSourceAspectRatio;
 
   const partnerLogo = rect(
     safeArea.x + safeArea.width - partnerLogoWidth,
-    photo.y + photo.height - components.partnerBox.height,
+    photo.y + photo.height - partnerLogoHeight,
     partnerLogoWidth,
-    components.partnerBox.height,
+    partnerLogoHeight,
   );
 
   const contentStartY = Math.max(

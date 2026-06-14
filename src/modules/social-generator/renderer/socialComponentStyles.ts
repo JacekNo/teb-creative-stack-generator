@@ -198,16 +198,16 @@ export function createSocialComponentStyles({
 
     radius: scale.radius.md,
 
-    padding: scale.space.sm,
-    paddingX: scale.space.sm,
-    paddingY: scale.space.sm,
+    padding: 0,
+    paddingX: 0,
+    paddingY: 0,
 
     border: 'rgba(16,45,105,0.12)',
     borderColor: 'rgba(16,45,105,0.12)',
     borderWidth: scale.stroke.hairline,
 
-    maxWidth: scale.u * 28,
-    maxHeight: scale.u * 10,
+    maxWidth: scale.u * 50,
+    maxHeight: scale.u * 30,
   };
 
   const partnerLogoCompact = {
@@ -215,12 +215,12 @@ export function createSocialComponentStyles({
 
     radius: scale.radius.sm,
 
-    padding: scale.space.xs,
-    paddingX: scale.space.xs,
-    paddingY: scale.space.xs,
+    padding: 0,
+    paddingX: 0,
+    paddingY: 0,
 
-    maxWidth: scale.u * 22,
-    maxHeight: scale.u * 8,
+    maxWidth: scale.u * 42,
+    maxHeight: scale.u * 25.2,
   };
 
   const brandLogoDefault = {
@@ -232,8 +232,8 @@ export function createSocialComponentStyles({
     color: theme.textPrimary,
     fill: theme.textPrimary,
 
-    maxWidth: scale.u * 30,
-    maxHeight: scale.u * 8,
+    maxWidth: scale.u * 38,
+    maxHeight: scale.u * 12,
   };
 
   return {
