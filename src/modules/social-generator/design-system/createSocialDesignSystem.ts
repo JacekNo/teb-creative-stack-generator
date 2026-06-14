@@ -1,5 +1,4 @@
 import type { SocialFormatId } from '../types/social.types';
-import type { SocialCourseBadgeTone } from '../types/social.types';
 import {
   socialDesignTokens,
   type SocialDesignBrand,
@@ -113,53 +112,14 @@ function resolveSocialFormat(
 
 function createTheme(brand: SocialDesignBrand) {
   const brandTokens = socialDesignTokens.brands[brand];
-  const badgeTones: Record<
-    SocialCourseBadgeTone,
-    { fill: string; color: string; borderColor?: string }
-  > = {
-    primary: {
-      fill: brandTokens.primary,
-      color: brandTokens.onPrimary,
-      borderColor: brandTokens.primary,
-    },
-    secondary: {
-      fill: brandTokens.primary,
-      color: brandTokens.onPrimary,
-      borderColor: brandTokens.secondary,
-    },
-    light: {
-      fill: brandTokens.soft,
-      color: brandTokens.text,
-      borderColor: brandTokens.primary,
-    },
-    green: {
-      fill: '#16863D',
-      color: socialDesignTokens.helper.white,
-      borderColor: '#0F6F34',
-    },
-    yellow: {
-      fill: socialDesignTokens.helper.yellow,
-      color: brandTokens.text,
-      borderColor: brandTokens.primary,
-    },
-    popular: {
-      fill: 'transparent',
-      color: brandTokens.text,
-      borderColor: brandTokens.primary,
-    },
-    online: {
-      fill: socialDesignTokens.helper.dark,
-      color: socialDesignTokens.helper.white,
-      borderColor: socialDesignTokens.helper.dark,
-    },
-  };
+  const yellow = socialDesignTokens.helper.yellow;
+  const white = socialDesignTokens.helper.white;
 
   return {
     brand: brandTokens,
 
     background: brandTokens.soft,
-    backgroundPatternColor: brandTokens.primary,
-    surface: socialDesignTokens.helper.white,
+    surface: white,
     surfaceSoft: brandTokens.light,
     surfaceTint: brandTokens.soft,
 
@@ -168,6 +128,8 @@ function createTheme(brand: SocialDesignBrand) {
     textOnPrimary: brandTokens.onPrimary,
 
     borderSubtle: socialDesignTokens.helper.border,
+    backgroundPatternColor: brandTokens.secondary,
+
 
     badgePrimaryBackground: brandTokens.primary,
     badgePrimaryText: brandTokens.onPrimary,
@@ -175,22 +137,92 @@ function createTheme(brand: SocialDesignBrand) {
     badgeSoftBackground: brandTokens.light,
     badgeSoftText: brandTokens.text,
 
-    badgeLightBackground: socialDesignTokens.helper.white,
+    badgeLightBackground: white,
     badgeLightText: brandTokens.text,
 
     badgeGreenBackground: '#1F7A2E',
-    badgeGreenText: socialDesignTokens.helper.white,
-
-    badgeYellowBackground: socialDesignTokens.helper.yellow,
-    badgeYellowText: brandTokens.text,
-
-    badgeOnlineBackground: brandTokens.secondary,
-    badgeOnlineText: brandTokens.onPrimary,
+    badgeGreenText: white,
 
     badgePopularBackground: '#FFF0DE',
     badgePopularText: '#7A4100',
 
-    badgeTones,
+    badgeTones: {
+      // Filled brand CTA: promo #1 style.
+      primary: {
+        fill: brandTokens.primary,
+        color: brandTokens.onPrimary,
+        borderColor: brandTokens.primary,
+        borderWidth: 0,
+        markerColor: 'transparent',
+        shadowColor: 'transparent',
+      },
+
+      // Outline brand CTA: promo #2 style.
+      outline: {
+        fill: 'transparent',
+        color: brandTokens.primary,
+        borderColor: brandTokens.primary,
+        borderWidth: 2,
+        markerColor: 'transparent',
+        shadowColor: 'transparent',
+      },
+
+      light: {
+        fill: 'transparent',
+        color: brandTokens.primary,
+        borderColor: brandTokens.primary,
+        borderWidth: 2,
+        markerColor: 'transparent',
+        shadowColor: 'transparent',
+      },
+
+      soft: {
+        fill: brandTokens.light,
+        color: brandTokens.text,
+        borderColor: brandTokens.light,
+        borderWidth: 0,
+        markerColor: 'transparent',
+        shadowColor: 'transparent',
+      },
+
+      // Keep popular as an outline/light promo label instead of an egg-shaped chip.
+      popular: {
+        fill: 'transparent',
+        color: brandTokens.primary,
+        borderColor: brandTokens.primary,
+        borderWidth: 2,
+        markerColor: 'transparent',
+        shadowColor: 'transparent',
+      },
+
+      // Dedicated online badge follows master-brand blue.
+      online: {
+        fill: '#0F4496',
+        color: white,
+        borderColor: '#0F4496',
+        borderWidth: 0,
+        markerColor: 'transparent',
+        shadowColor: 'transparent',
+      },
+
+      green: {
+        fill: '#16863D',
+        color: white,
+        borderColor: '#16863D',
+        borderWidth: 0,
+        markerColor: 'transparent',
+        shadowColor: 'transparent',
+      },
+
+      yellow: {
+        fill: yellow,
+        color: brandTokens.text,
+        borderColor: yellow,
+        borderWidth: 0,
+        markerColor: 'transparent',
+        shadowColor: 'transparent',
+      },
+    },
   };
 }
 
@@ -274,30 +306,6 @@ export function createSocialDesignSystem({
   };
 
   const components = {
-    background: {
-      ...socialDesignTokens.components.background,
-      patternGap: scaleNumber(
-        socialDesignTokens.components.background.patternGap,
-        scaleFactor,
-        grid,
-      ),
-      patternRowGap: scaleNumber(
-        socialDesignTokens.components.background.patternRowGap,
-        scaleFactor,
-        grid,
-      ),
-      patternInsetX: scaleNumber(
-        socialDesignTokens.components.background.patternInsetX,
-        scaleFactor,
-        grid,
-      ),
-      patternInsetY: scaleNumber(
-        socialDesignTokens.components.background.patternInsetY,
-        scaleFactor,
-        grid,
-      ),
-    },
-
     titleCard: {
       ...socialDesignTokens.components.titleCard,
       radius: scaleNumber(
@@ -327,6 +335,45 @@ export function createSocialDesignSystem({
       ),
     },
 
+    background: {
+      ...socialDesignTokens.components.background,
+      patternSize: scaleNumber(
+        socialDesignTokens.components.background.patternSize,
+        scaleFactor,
+        grid,
+      ),
+      patternStrokeWidth: scaleNumber(
+        socialDesignTokens.components.background.patternStrokeWidth,
+        scaleFactor,
+        grid,
+      ),
+      patternDotSize: scaleNumber(
+        socialDesignTokens.components.background.patternDotSize,
+        scaleFactor,
+        grid,
+      ),
+      patternInsetX: scaleNumber(
+        socialDesignTokens.components.background.patternInsetX,
+        scaleFactor,
+        grid,
+      ),
+      patternInsetY: scaleNumber(
+        socialDesignTokens.components.background.patternInsetY,
+        scaleFactor,
+        grid,
+      ),
+      patternGap: scaleNumber(
+        socialDesignTokens.components.background.patternGap,
+        scaleFactor,
+        grid,
+      ),
+      patternRowGap: scaleNumber(
+        socialDesignTokens.components.background.patternRowGap,
+        scaleFactor,
+        grid,
+      ),
+    },
+
     badge: {
       ...socialDesignTokens.components.badge,
       height: scaleNumber(
@@ -334,7 +381,11 @@ export function createSocialDesignSystem({
         scaleFactor,
         grid,
       ),
-      radius: socialDesignTokens.components.badge.radius,
+      radius: scaleNumber(
+        socialDesignTokens.components.badge.radius,
+        scaleFactor,
+        grid,
+      ),
       paddingX: scaleNumber(
         socialDesignTokens.components.badge.paddingX,
         scaleFactor,
@@ -376,12 +427,42 @@ export function createSocialDesignSystem({
         scaleFactor,
         grid,
       ),
-      borderWidth: Math.max(
-        1,
-        Math.round(
-          socialDesignTokens.components.badge.borderWidth * scaleFactor,
-        ),
+      columnGap: scaleNumber(
+        socialDesignTokens.components.badge.columnGap,
+        scaleFactor,
+        grid,
       ),
+      borderWidth: scaleNumber(
+        socialDesignTokens.components.badge.borderWidth,
+        scaleFactor,
+        grid,
+      ),
+      markerSize: scaleNumber(
+        socialDesignTokens.components.badge.markerSize,
+        scaleFactor,
+        grid,
+      ),
+      markerInset: scaleNumber(
+        socialDesignTokens.components.badge.markerInset,
+        scaleFactor,
+        grid,
+      ),
+      shadowDx: scaleNumber(
+        socialDesignTokens.components.badge.shadowDx,
+        scaleFactor,
+        grid,
+      ),
+      shadowDy: scaleNumber(
+        socialDesignTokens.components.badge.shadowDy,
+        scaleFactor,
+        grid,
+      ),
+      shadowBlur: scaleNumber(
+        socialDesignTokens.components.badge.shadowBlur,
+        scaleFactor,
+        grid,
+      ),
+      shadowOpacity: socialDesignTokens.components.badge.shadowOpacity,
     },
 
     logoBox: {
