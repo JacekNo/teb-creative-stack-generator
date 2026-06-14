@@ -55,61 +55,61 @@ const SOCIAL_LAYOUT_TEMPLATES: Record<
   SocialLayoutTemplate
 > = {
   square: {
-    photo: {
-      x: 5.6,
-      y: 5.6,
-      width: 96.8,
-      height: 54.8,
-    },
-    partnerLogo: {
-      x: 76,
-      y: 8.8,
-      width: 22,
-      height: 9.2,
-    },
-    courseName: {
-      x: 7.2,
-      y: 64.8,
-      width: 78,
-      height: 21,
-    },
-    offerMode: {
-      x: 7.2,
-      y: 59,
-      width: 26,
-      height: 6.4,
-    },
-    benefit: {
-      x: 7.2,
-      y: 84,
-      width: 72,
-      height: 8.8,
-    },
-    price: {
-      x: 7.2,
-      y: 94,
-      width: 19,
-      height: 7.2,
-    },
-    startDate: {
-      x: 28,
-      y: 94,
-      width: 25,
-      height: 7.2,
-    },
-    city: {
-      x: 72,
-      y: 94,
-      width: 26,
-      height: 7.2,
-    },
-    brandLogo: {
-      x: 7.2,
-      y: 99.4,
-      width: 17.8,
-      height: 6.2,
-    },
+  photo: {
+    x: 0,
+    y: 0,
+    width: 1080,
+    height: 54.8,
   },
+  partnerLogo: {
+    x: 76,
+    y: 8.8,
+    width: 22,
+    height: 9.2,
+  },
+  offerMode: {
+    x: 7.2,
+    y: 60.4,
+    width: 26,
+    height: 6.4,
+  },
+  courseName: {
+    x: 7.2,
+    y: 66.4,
+    width: 78,
+    height: 14.8,
+  },
+  benefit: {
+    x: 7.2,
+    y: 82.8,
+    width: 78,
+    height: 9.2,
+  },
+  price: {
+    x: 7.2,
+    y: 94.6,
+    width: 21,
+    height: 7.2,
+  },
+  startDate: {
+    x: 29.2,
+    y: 94.6,
+    width: 25,
+    height: 7.2,
+  },
+  city: {
+    x: 72,
+    y: 94.6,
+    width: 26,
+    height: 7.2,
+  },
+  brandLogo: {
+    x: 7.2,
+    y: 101.8,
+    width: 20,
+    height: 4.8,
+  },
+},
 
   portrait: {
     photo: {
