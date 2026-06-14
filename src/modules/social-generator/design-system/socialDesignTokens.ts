@@ -155,32 +155,32 @@ export const socialDesignTokens = {
     square: {
       width: 1080,
       height: 1080,
-      safe: { top: 64, right: 64, bottom: 64, left: 64 },
-      photoHeight: 560,
-      contentOverlap: 48,
+      safe: { top: 0, right: 40, bottom: 48, left: 40 },
+      photoHeight: 420,
+      contentOverlap: 0,
     },
 
     portrait: {
       width: 1080,
       height: 1350,
-      safe: { top: 72, right: 64, bottom: 72, left: 64 },
-      photoHeight: 620,
-      contentOverlap: 56,
+      safe: { top: 0, right: 40, bottom: 48, left: 40 },
+      photoHeight: 600,
+      contentOverlap: 0,
     },
 
     stories: {
       width: 1080,
       height: 1920,
       safe: { top: 180, right: 72, bottom: 240, left: 72 },
-      photoHeight: 900,
-      contentOverlap: 64,
+      photoHeight: 860,
+      contentOverlap: 0,
     },
   },
 
   components: {
     background: {
       patternColor: '#FFFFFF',
-      patternOpacity: 0.32,
+      patternOpacity: 0.12,
       patternColumns: 12,
       patternGap: 10,
       patternRowGap: 10,
@@ -192,8 +192,8 @@ export const socialDesignTokens = {
 
     titleCard: {
       radius: 40,
-      paddingX: 44,
-      paddingY: 36,
+      paddingX: 0,
+      paddingY: 32,
       minFontSize: 44,
       maxFontSize: 88,
       maxLines: 3,
@@ -201,15 +201,15 @@ export const socialDesignTokens = {
     },
 
     badge: {
-      height: 56,
+      height: 68,
       radius: 999,
-      paddingX: 28,
-      paddingY: 12,
-      fontSize: 22,
-      lineHeight: 28,
+      paddingX: 32,
+      paddingY: 14,
+      fontSize: 28,
+      lineHeight: 34,
       fontWeight: 800,
-      gap: 12,
-      rowGap: 12,
+      gap: 16,
+      rowGap: 16,
       borderWidth: 2,
       maxItems: 5,
       textWidthRatio: 0.56,

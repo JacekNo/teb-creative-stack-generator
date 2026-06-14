@@ -207,6 +207,10 @@ export function renderSocialCourseFacts({
     return '';
   }
 
+  if (slot.height <= 0 || slot.width <= 0) {
+    return '';
+  }
+
   const facts = (creative.courseFacts ?? []).slice(0, 4);
 
   if (facts.length === 0) {

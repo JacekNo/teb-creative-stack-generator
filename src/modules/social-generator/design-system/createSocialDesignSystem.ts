@@ -122,13 +122,13 @@ function createTheme(brand: SocialDesignBrand) {
       color: brandTokens.onPrimary,
     },
     secondary: {
-      fill: brandTokens.secondary,
-      color: brandTokens.text,
+      fill: brandTokens.primary,
+      color: brandTokens.onPrimary,
     },
     light: {
-      fill: socialDesignTokens.helper.white,
+      fill: brandTokens.soft,
       color: brandTokens.text,
-      borderColor: socialDesignTokens.helper.border,
+      borderColor: brandTokens.primary,
     },
     green: {
       fill: '#1F7A2E',
@@ -139,12 +139,13 @@ function createTheme(brand: SocialDesignBrand) {
       color: brandTokens.text,
     },
     popular: {
-      fill: '#FFF0DE',
-      color: '#7A4100',
+      fill: brandTokens.soft,
+      color: brandTokens.text,
+      borderColor: brandTokens.primary,
     },
     online: {
-      fill: brandTokens.secondary,
-      color: brandTokens.text,
+      fill: socialDesignTokens.helper.dark,
+      color: socialDesignTokens.helper.white,
     },
   };
 
@@ -152,6 +153,7 @@ function createTheme(brand: SocialDesignBrand) {
     brand: brandTokens,
 
     background: brandTokens.soft,
+    backgroundPatternColor: brandTokens.primary,
     surface: socialDesignTokens.helper.white,
     surfaceSoft: brandTokens.light,
     surfaceTint: brandTokens.soft,

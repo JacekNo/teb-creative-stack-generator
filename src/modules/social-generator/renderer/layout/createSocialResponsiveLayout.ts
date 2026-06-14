@@ -117,6 +117,7 @@ export function createSocialResponsiveLayout({
   const { spacing, components } = system;
   const safeArea = createSafeArea(system);
   const canvas = rect(0, 0, format.width, format.height);
+  const hasCity = creative.enabledComponents.includes('city') && Boolean(creative.cityName);
 
   const footerHeight = Math.max(components.logoBox.height, components.badge.height);
   const footer = rect(
@@ -127,9 +128,9 @@ export function createSocialResponsiveLayout({
   );
 
   const photo = rect(
-    safeArea.x,
-    safeArea.y,
-    safeArea.width,
+    0,
+    0,
+    format.width,
     system.format.photoHeight,
   );
 
@@ -140,31 +141,13 @@ export function createSocialResponsiveLayout({
 
   const partnerLogo = rect(
     photo.x + photo.width - partnerLogoWidth - spacing[4],
-    photo.y + spacing[4],
+    photo.y + photo.height - components.partnerBox.height - spacing[6],
     partnerLogoWidth,
     components.partnerBox.height,
   );
 
-  const sectionGap = spacing[5];
+  const sectionGap = spacing[4];
   const footerGap = spacing[6];
-
-  const titleInnerWidth = safeArea.width - components.titleCard.paddingX * 2;
-  const titleFit = fitSocialCourseTitle({
-    creative,
-    system,
-    width: titleInnerWidth,
-    maxLines: 3,
-  });
-
-  const titleCardHeight = Math.max(
-    components.titleCard.paddingY * 2 + titleFit.height,
-    components.titleCard.paddingY * 2 + system.typography.heroXs.fontSize,
-  );
-
-  const factsHeight = getFactsHeight({
-    creative,
-    system,
-  });
 
   const badgesHeight = getBadgesHeight({
     creative,
@@ -172,15 +155,31 @@ export function createSocialResponsiveLayout({
     width: safeArea.width,
   });
 
-  const stackHeight =
-    titleCardHeight +
-    (factsHeight > 0 ? sectionGap + factsHeight : 0) +
-    (badgesHeight > 0 ? sectionGap + badgesHeight : 0);
+  const contentY = photo.y + photo.height;
+  const maxTitleCardHeight = Math.max(
+    system.typography.heroXs.fontSize,
+    footer.y -
+      footerGap -
+      (badgesHeight > 0 ? badgesHeight + sectionGap : 0) -
+      contentY,
+  );
 
-  const baseContentY = photo.y + photo.height - system.format.contentOverlap;
-  const maxContentY = footer.y - footerGap - stackHeight;
-  const minContentY = photo.y + photo.height * 0.52;
-  const contentY = Math.max(minContentY, Math.min(baseContentY, maxContentY));
+  const titleInnerWidth = safeArea.width - components.titleCard.paddingX * 2;
+  const titleFit = fitSocialCourseTitle({
+    creative,
+    system,
+    width: titleInnerWidth,
+    maxHeight: Math.max(
+      system.typography.heroXs.fontSize,
+      maxTitleCardHeight - components.titleCard.paddingY * 2,
+    ),
+    maxLines: 3,
+  });
+
+  const titleCardHeight = Math.max(
+    components.titleCard.paddingY * 2 + titleFit.height,
+    components.titleCard.paddingY * 2 + system.typography.heroXs.fontSize,
+  );
 
   const titleCard = rect(
     safeArea.x,
@@ -196,20 +195,6 @@ export function createSocialResponsiveLayout({
     Math.max(0, titleCard.height - components.titleCard.paddingY * 2),
   );
 
-  const courseFacts = rect(
-    safeArea.x,
-    titleCard.y + titleCard.height + (factsHeight > 0 ? sectionGap : 0),
-    safeArea.width,
-    factsHeight,
-  );
-
-  const courseBadges = rect(
-    safeArea.x,
-    courseFacts.y + courseFacts.height + (badgesHeight > 0 ? sectionGap : 0),
-    safeArea.width,
-    badgesHeight,
-  );
-
   const brandLogo = rect(
     footer.x,
     footer.y,
@@ -222,6 +207,26 @@ export function createSocialResponsiveLayout({
     footer.y + Math.max(0, (footer.height - components.badge.height) / 2),
     spacing[28],
     components.badge.height,
+  );
+
+  const factsHeight = getFactsHeight({
+    creative,
+    system,
+  });
+  const factsX = footer.x + components.logoBox.width + spacing[8];
+  const factsRight = hasCity ? city.x - spacing[8] : footer.x + footer.width;
+  const courseFacts = rect(
+    factsX,
+    footer.y,
+    factsHeight > 0 ? Math.max(0, factsRight - factsX) : 0,
+    factsHeight > 0 ? footer.height : 0,
+  );
+
+  const courseBadges = rect(
+    safeArea.x,
+    titleCard.y + titleCard.height + (badgesHeight > 0 ? sectionGap : 0),
+    safeArea.width,
+    badgesHeight,
   );
 
   const contentBottom = Math.max(

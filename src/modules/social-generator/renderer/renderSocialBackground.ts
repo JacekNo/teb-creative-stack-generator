@@ -62,7 +62,7 @@ function renderPattern(system: SocialDesignSystem): string {
   return `
     <g
       data-component="social-background-pattern"
-      color="${pattern.patternColor}"
+      color="${system.theme.backgroundPatternColor ?? pattern.patternColor}"
       aria-hidden="true"
     >
       ${items.join('')}

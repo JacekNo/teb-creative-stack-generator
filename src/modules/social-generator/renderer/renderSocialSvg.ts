@@ -41,28 +41,6 @@ function escapeXml(value: string): string {
     .replaceAll("'", '&apos;');
 }
 
-function renderSurfaceCard({
-  slot,
-  radius,
-  fill,
-}: {
-  slot: SocialLayoutSlot;
-  radius: number;
-  fill: string;
-}): string {
-  return `
-    <rect
-      data-component="social-title-card-surface"
-      x="${slot.x}"
-      y="${slot.y}"
-      width="${slot.width}"
-      height="${slot.height}"
-      rx="${radius}"
-      fill="${fill}"
-    />
-  `;
-}
-
 function renderDebugSlot(
   name: string,
   slot: SocialLayoutSlot,
@@ -197,12 +175,6 @@ export function renderSocialSvg({
         creative,
         slot: slots.partnerLogo,
         styles,
-      })}
-
-      ${renderSurfaceCard({
-        slot: layout.titleCard,
-        radius: system.components.titleCard.radius,
-        fill: system.theme.surface,
       })}
 
       ${renderSocialCourseName({

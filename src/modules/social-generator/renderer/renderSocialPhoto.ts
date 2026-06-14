@@ -24,6 +24,35 @@ function createClipPathId(courseId: string): string {
   return `social-photo-clip-${courseId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 }
 
+function createBottomRoundedPath({
+  x,
+  y,
+  width,
+  height,
+  radius,
+}: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  radius: number;
+}): string {
+  const cornerRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
+  const right = x + width;
+  const bottom = y + height;
+
+  return [
+    `M ${x} ${y}`,
+    `H ${right}`,
+    `V ${bottom - cornerRadius}`,
+    `Q ${right} ${bottom} ${right - cornerRadius} ${bottom}`,
+    `H ${x + cornerRadius}`,
+    `Q ${x} ${bottom} ${x} ${bottom - cornerRadius}`,
+    `V ${y}`,
+    'Z',
+  ].join(' ');
+}
+
 export function renderSocialPhoto({
   creative,
   slot,
@@ -38,16 +67,19 @@ export function renderSocialPhoto({
   const imageHref = creative.imagePath
     ? publicAssetPath(creative.imagePath)
     : undefined;
+  const photoPath = createBottomRoundedPath({
+    x: slot.x,
+    y: slot.y,
+    width: slot.width,
+    height: slot.height,
+    radius: style.radius,
+  });
 
   if (!imageHref) {
     return `
       <g data-component="social-photo-placeholder">
-        <rect
-          x="${slot.x}"
-          y="${slot.y}"
-          width="${slot.width}"
-          height="${slot.height}"
-          rx="${style.radius}"
+        <path
+          d="${photoPath}"
           fill="${style.placeholderBackground}"
         />
         <text
@@ -66,22 +98,12 @@ export function renderSocialPhoto({
     <g data-component="social-photo">
       <defs>
         <clipPath id="${clipPathId}">
-          <rect
-            x="${slot.x}"
-            y="${slot.y}"
-            width="${slot.width}"
-            height="${slot.height}"
-            rx="${style.radius}"
-          />
+          <path d="${photoPath}" />
         </clipPath>
       </defs>
 
-      <rect
-        x="${slot.x}"
-        y="${slot.y}"
-        width="${slot.width}"
-        height="${slot.height}"
-        rx="${style.radius}"
+      <path
+        d="${photoPath}"
         fill="${style.placeholderBackground}"
       />
 
