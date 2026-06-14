@@ -148,21 +148,6 @@ function renderSafeZoneOverlay(
   `;
 }
 
-function getCourseNameVariant(
-  creative: SocialCreativeData,
-  formatId: SocialFormatId,
-): 'default' | 'compact' {
-  if (formatId === 'story-9x16-1080') {
-    return 'compact';
-  }
-
-  if (creative.courseName.length > 34) {
-    return 'compact';
-  }
-
-  return 'default';
-}
-
 export function renderSocialSvg({
   creative,
   formatId,
@@ -192,6 +177,7 @@ export function renderSocialSvg({
   const layout = createSocialResponsiveLayout({
     format,
     system,
+    creative,
   });
 
   const slots: SocialRenderSlots = {
@@ -241,8 +227,8 @@ export function renderSocialSvg({
       ${renderSocialCourseName({
         creative,
         slot: slots.courseName,
-        styles,
-        variant: getCourseNameVariant(creative, formatId),
+        system,
+        maxLines: 3,
       })}
 
       ${renderSocialCourseFacts({

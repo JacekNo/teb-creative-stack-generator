@@ -1,6 +1,10 @@
 import type { SocialDesignSystem } from '../../design-system/createSocialDesignSystem';
-import type { SocialLayoutSlot } from '../../types/social.types';
+import type {
+  SocialCreativeData,
+  SocialLayoutSlot,
+} from '../../types/social.types';
 import type { SocialFormatDefinition } from '../socialFormats';
+import { fitSocialCourseTitle } from './socialTitleFit';
 
 export type SocialRect = SocialLayoutSlot;
 
@@ -25,6 +29,7 @@ export type SocialResponsiveLayout = {
 export type CreateSocialResponsiveLayoutOptions = {
   format: SocialFormatDefinition;
   system: SocialDesignSystem;
+  creative: SocialCreativeData;
 };
 
 function rect(
@@ -52,51 +57,142 @@ function createSafeArea(system: SocialDesignSystem): SocialRect {
   );
 }
 
-function getTitleCardHeight(system: SocialDesignSystem): number {
-  const { spacing } = system;
-
-  if (system.formatKey === 'stories') {
-    return spacing[32] + spacing[24];
+function countVisibleFacts(creative: SocialCreativeData): number {
+  if (!creative.enabledComponents.includes('courseFacts')) {
+    return 0;
   }
 
-  if (system.formatKey === 'portrait') {
-    return spacing[32] + spacing[16];
-  }
-
-  return spacing[32] + spacing[12];
+  return (creative.courseFacts ?? []).filter((fact) => fact.value).slice(0, 4).length;
 }
 
-function getFactsHeight(system: SocialDesignSystem): number {
-  const { spacing } = system;
-
-  if (system.formatKey === 'stories') {
-    return spacing[32] + spacing[12];
+function countVisibleBadges(creative: SocialCreativeData): number {
+  if (!creative.enabledComponents.includes('courseBadges')) {
+    return 0;
   }
 
-  if (system.formatKey === 'portrait') {
-    return spacing[32];
-  }
-
-  return spacing[24] + spacing[4];
+  return (creative.courseBadges ?? []).filter((badge) => badge.label).slice(0, 5).length;
 }
 
-function getBadgesHeight(system: SocialDesignSystem): number {
-  const { spacing } = system;
+function estimateBadgeWidth(
+  label: string,
+  fontSize: number,
+  paddingX: number,
+): number {
+  return label.length * fontSize * 0.56 + paddingX * 2;
+}
 
-  if (system.formatKey === 'stories') {
-    return spacing[24];
+function getTextValue(value: unknown): string {
+  if (!value) {
+    return '';
   }
 
-  return spacing[16];
+  if (typeof value === 'string') {
+    return value;
+  }
+
+  if (typeof value === 'object' && value !== null && 'full' in value) {
+    const textValue = value as {
+      full: string;
+      short?: string;
+      compact?: string;
+    };
+
+    return textValue.short ?? textValue.compact ?? textValue.full;
+  }
+
+  return '';
+}
+
+function getFactsHeight({
+  creative,
+  system,
+}: {
+  creative: SocialCreativeData;
+  system: SocialDesignSystem;
+}): number {
+  const factsCount = countVisibleFacts(creative);
+
+  if (factsCount === 0) {
+    return 0;
+  }
+
+  const { components, spacing } = system;
+  const columns = factsCount === 1 ? 1 : 2;
+  const rows = Math.ceil(factsCount / columns);
+  const itemHeight = Math.max(
+    spacing[18],
+    components.infoGrid.valueFontSize +
+      components.infoGrid.labelFontSize +
+      spacing[6],
+  );
+
+  return rows * itemHeight + Math.max(0, rows - 1) * components.infoGrid.gap;
+}
+
+function getBadgesHeight({
+  creative,
+  system,
+  width,
+}: {
+  creative: SocialCreativeData;
+  system: SocialDesignSystem;
+  width: number;
+}): number {
+  const badgesCount = countVisibleBadges(creative);
+
+  if (badgesCount === 0) {
+    return 0;
+  }
+
+  const { components, spacing } = system;
+  const badgeStyle = components.badge;
+  const badgeHeight = Math.max(
+    badgeStyle.height,
+    badgeStyle.fontSize + badgeStyle.paddingY * 2,
+  );
+
+  let rows = 1;
+  let cursorX = 0;
+
+  for (const badge of (creative.courseBadges ?? []).slice(0, 5)) {
+    const label = getTextValue(badge.label);
+
+    if (!label) {
+      continue;
+    }
+
+    const badgeWidth = Math.min(
+      estimateBadgeWidth(label, badgeStyle.fontSize, badgeStyle.paddingX),
+      width,
+    );
+
+    if (cursorX > 0 && cursorX + badgeWidth > width) {
+      rows += 1;
+      cursorX = 0;
+    }
+
+    cursorX += badgeWidth + badgeStyle.gap;
+  }
+
+  return rows * badgeHeight + Math.max(0, rows - 1) * spacing[2];
 }
 
 export function createSocialResponsiveLayout({
   format,
   system,
+  creative,
 }: CreateSocialResponsiveLayoutOptions): SocialResponsiveLayout {
   const { spacing, components } = system;
   const safeArea = createSafeArea(system);
   const canvas = rect(0, 0, format.width, format.height);
+
+  const footerHeight = Math.max(components.logoBox.height, components.badge.height);
+  const footer = rect(
+    safeArea.x,
+    safeArea.y + safeArea.height - footerHeight,
+    safeArea.width,
+    footerHeight,
+  );
 
   const photo = rect(
     safeArea.x,
@@ -117,50 +213,76 @@ export function createSocialResponsiveLayout({
     components.partnerBox.height,
   );
 
-  const contentY = photo.y + photo.height - system.format.contentOverlap;
-  const footerHeight = components.logoBox.height;
   const sectionGap = spacing[5];
+  const footerGap = spacing[6];
+
+  const titleInnerWidth = safeArea.width - components.titleCard.paddingX * 2;
+  const titleFit = fitSocialCourseTitle({
+    creative,
+    system,
+    width: titleInnerWidth,
+    maxLines: 3,
+  });
+
+  const titleCardHeight = Math.max(
+    components.titleCard.paddingY * 2 + titleFit.height,
+    components.titleCard.paddingY * 2 + system.typography.heroXs.fontSize,
+  );
+
+  const factsHeight = getFactsHeight({
+    creative,
+    system,
+  });
+
+  const badgesHeight = getBadgesHeight({
+    creative,
+    system,
+    width: safeArea.width,
+  });
+
+  const stackHeight =
+    titleCardHeight +
+    (factsHeight > 0 ? sectionGap + factsHeight : 0) +
+    (badgesHeight > 0 ? sectionGap + badgesHeight : 0);
+
+  const baseContentY = photo.y + photo.height - system.format.contentOverlap;
+  const maxContentY = footer.y - footerGap - stackHeight;
+  const minContentY = photo.y + photo.height * 0.52;
+  const contentY = Math.max(minContentY, Math.min(baseContentY, maxContentY));
 
   const titleCard = rect(
     safeArea.x,
     contentY,
     safeArea.width,
-    getTitleCardHeight(system),
+    titleCardHeight,
   );
 
   const courseName = rect(
     titleCard.x + components.titleCard.paddingX,
     titleCard.y + components.titleCard.paddingY,
     titleCard.width - components.titleCard.paddingX * 2,
-    titleCard.height - components.titleCard.paddingY * 2,
+    Math.max(0, titleCard.height - components.titleCard.paddingY * 2),
   );
 
   const courseFacts = rect(
     safeArea.x,
-    titleCard.y + titleCard.height + sectionGap,
+    titleCard.y + titleCard.height + (factsHeight > 0 ? sectionGap : 0),
     safeArea.width,
-    getFactsHeight(system),
+    factsHeight,
   );
 
   const courseBadges = rect(
     safeArea.x,
-    courseFacts.y + courseFacts.height + sectionGap,
+    courseFacts.y + courseFacts.height + (badgesHeight > 0 ? sectionGap : 0),
     safeArea.width,
-    getBadgesHeight(system),
-  );
-
-  const footer = rect(
-    safeArea.x,
-    safeArea.y + safeArea.height - footerHeight,
-    safeArea.width,
-    footerHeight,
+    badgesHeight,
   );
 
   const brandLogo = rect(
     footer.x,
     footer.y,
     components.logoBox.width,
-    components.logoBox.height,
+    footer.height,
   );
 
   const city = rect(

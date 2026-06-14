@@ -139,6 +139,12 @@ function createTheme(brand: SocialDesignBrand) {
     badgeGreenBackground: '#1F7A2E',
     badgeGreenText: socialDesignTokens.helper.white,
 
+    badgeYellowBackground: socialDesignTokens.helper.yellow,
+    badgeYellowText: brandTokens.text,
+
+    badgeOnlineBackground: brandTokens.secondary,
+    badgeOnlineText: brandTokens.onPrimary,
+
     badgePopularBackground: '#FFF0DE',
     badgePopularText: '#7A4100',
   };

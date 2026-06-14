@@ -54,6 +54,13 @@ export type TextFallbackValue = {
   compact?: string;
 };
 
+
+export type SocialCourseNameParts = {
+  main: string | TextFallbackValue;
+  subtitle?: string | TextFallbackValue;
+  modeLabel?: string | TextFallbackValue;
+};
+
 export type PartnerData = {
   partnerKey: string;
   name: string;
@@ -98,7 +105,9 @@ export type SocialCourseBadgeTone =
   | 'light'
   | 'green'
   | 'blue'
-  | 'popular';
+  | 'popular'
+  | 'yellow'
+  | 'online';
 
 export type SocialCourseBadge = {
   id: string;
@@ -109,6 +118,7 @@ export type SocialCourseBadge = {
 export type SocialCreativeData = {
   courseId: string;
   courseName: string;
+  courseNameParts?: SocialCourseNameParts;
   brandKey: string;
 
   offerMode: OfferMode;
@@ -185,6 +195,7 @@ export type SocialCreativeDraft = {
   formatIds: SocialFormatId[];
 
   courseName: string;
+  courseNameParts?: SocialCourseNameParts;
   imageKey?: string;
 
   offerMode: OfferMode;

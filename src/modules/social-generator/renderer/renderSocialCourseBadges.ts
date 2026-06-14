@@ -43,6 +43,20 @@ function getBadgeColors(
     };
   }
 
+  if (tone === 'yellow') {
+    return {
+      fill: theme.badgeYellowBackground,
+      color: theme.badgeYellowText,
+    };
+  }
+
+  if (tone === 'online') {
+    return {
+      fill: theme.badgeOnlineBackground,
+      color: theme.badgeOnlineText,
+    };
+  }
+
   if (tone === 'popular') {
     return {
       fill: theme.badgePopularBackground,
@@ -92,6 +106,10 @@ export function renderSocialCourseBadges({
     return '';
   }
 
+  if (slot.height <= 0 || slot.width <= 0) {
+    return '';
+  }
+
   const badges = (creative.courseBadges ?? [])
     .map((badge): SocialCourseBadge & { resolvedLabel: string } => ({
       ...badge,
@@ -109,6 +127,7 @@ export function renderSocialCourseBadges({
   const gap = badgeStyle.gap;
   const lineGap = Math.max(0, system.spacing[2]);
   const maxX = slot.x + slot.width;
+  const maxY = slot.y + slot.height;
   let cursorX = slot.x;
   let cursorY = slot.y;
 
@@ -125,12 +144,13 @@ export function renderSocialCourseBadges({
       cursorY += badgeStyle.height + lineGap;
     }
 
-    if (cursorY + badgeStyle.height > slot.y + slot.height) {
+    if (cursorY + badgeStyle.height > maxY) {
       return '';
     }
 
     const colors = getBadgeColors(badge.tone, system);
-    const svg = renderSvgBadge({
+    const remainingWidth = Math.max(0, maxX - cursorX);
+    const result = renderSvgBadge({
       x: cursorX,
       y: cursorY,
       text: badge.resolvedLabel,
@@ -145,12 +165,12 @@ export function renderSocialCourseBadges({
       color: colors.color,
       borderColor: colors.borderColor,
       borderWidth: colors.borderWidth,
-      maxWidth: slot.width,
+      maxWidth: remainingWidth,
       dataComponent: 'social-course-badge',
-    }).svg;
+    });
 
-    cursorX += width + gap;
-    return svg;
+    cursorX += result.width + gap;
+    return result.svg;
   });
 
   return `

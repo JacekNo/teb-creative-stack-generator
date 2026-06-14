@@ -4,6 +4,9 @@ export const socialCreativesMock: SocialCreativeData[] = [
   {
     courseId: 'pku-barber',
     courseName: 'Barber',
+    courseNameParts: {
+      main: 'Barber',
+    },
     brandKey: 'kursy',
     offerMode: 'stationary',
     imageKey: 'pku-barber',
@@ -55,6 +58,11 @@ export const socialCreativesMock: SocialCreativeData[] = [
   {
     courseId: 'pku-programowanie-python-z-cisco-networking-academy',
     courseName: 'Programowanie Python z Cisco Networking Academy ONLINE',
+    courseNameParts: {
+      main: 'Programowanie Python',
+      subtitle: 'z Cisco Networking Academy',
+      modeLabel: 'ONLINE',
+    },
     brandKey: 'kursy',
     offerMode: 'online',
     offerModeLabel: 'Nauka online',
@@ -90,6 +98,11 @@ export const socialCreativesMock: SocialCreativeData[] = [
         id: 'no-matura',
         label: 'Nie wymagamy matury!',
         tone: 'primary',
+      },
+      {
+        id: 'online',
+        label: 'ONLINE',
+        tone: 'online',
       },
       {
         id: 'fast-start',
