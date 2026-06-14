@@ -131,7 +131,7 @@ function createTheme(brand: SocialDesignBrand) {
       borderColor: brandTokens.primary,
     },
     green: {
-      fill: '#1F7A2E',
+      fill: '#16863D',
       color: socialDesignTokens.helper.white,
     },
     yellow: {
@@ -139,7 +139,7 @@ function createTheme(brand: SocialDesignBrand) {
       color: brandTokens.text,
     },
     popular: {
-      fill: brandTokens.soft,
+      fill: 'transparent',
       color: brandTokens.text,
       borderColor: brandTokens.primary,
     },

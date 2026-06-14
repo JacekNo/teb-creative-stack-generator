@@ -14,7 +14,6 @@ export type SocialTitleTypographyKey =
 
 export type SocialTitleFitLine = {
   text: string;
-  isModeLabel?: boolean;
 };
 
 export type SocialTitleFit = {
@@ -26,6 +25,13 @@ export type SocialTitleFit = {
   lineHeightRatio: number;
   letterSpacing: number;
   lines: SocialTitleFitLine[];
+  subtitleLines: SocialTitleFitLine[];
+  subtitleFontSize: number;
+  subtitleFontWeight: number;
+  subtitleLineHeight: number;
+  subtitleLetterSpacing: number;
+  modeLabel: string;
+  modeBadgeHeight: number;
   height: number;
   didFit: boolean;
 };
@@ -142,38 +148,7 @@ function wrapTitleParts({
   width: number;
   fontSize: number;
 }): SocialTitleFitLine[] {
-  const mainLines = wrapWords(getTextValue(parts.main), width, fontSize);
-  const subtitleLines = wrapWords(getTextValue(parts.subtitle), width, fontSize);
-  const modeLabel = getTextValue(parts.modeLabel);
-
-  if (!modeLabel) {
-    return [...mainLines, ...subtitleLines];
-  }
-
-  const lines = [...mainLines, ...subtitleLines];
-  const lastLine = lines.at(-1);
-
-  if (lastLine) {
-    const merged = `${lastLine.text} ${modeLabel}`;
-
-    if (estimateTextWidth(merged, fontSize) <= width) {
-      return [
-        ...lines.slice(0, -1),
-        {
-          text: merged,
-          isModeLabel: true,
-        },
-      ];
-    }
-  }
-
-  return [
-    ...lines,
-    {
-      text: modeLabel,
-      isModeLabel: true,
-    },
-  ];
+  return wrapWords(getTextValue(parts.main), width, fontSize);
 }
 
 function getTitleHeight({
@@ -210,18 +185,38 @@ export function fitSocialCourseTitle({
 
   for (const typographyKey of TITLE_VARIANTS) {
     const typography = system.typography[typographyKey];
+    const subtitleTypography = system.typography.metaLg;
     const lines = wrapTitleParts({
       parts,
       width,
       fontSize: typography.fontSize,
     });
+    const subtitleLines = wrapWords(
+      getTextValue(parts.subtitle),
+      width,
+      subtitleTypography.fontSize,
+    ).slice(0, 2);
+    const modeLabel = getTextValue(parts.modeLabel);
     const visibleLines = lines.slice(0, maxLines);
-    const height = getTitleHeight({
+    const titleHeight = getTitleHeight({
       linesCount: visibleLines.length,
       fontSize: typography.fontSize,
       lineHeight: typography.lineHeight,
     });
-    const didFit = lines.length <= maxLines && height <= maxHeight;
+    const subtitleHeight = getTitleHeight({
+      linesCount: subtitleLines.length,
+      fontSize: subtitleTypography.fontSize,
+      lineHeight: subtitleTypography.lineHeight,
+    });
+    const modeBadgeHeight = modeLabel ? system.components.badge.height : 0;
+    const height =
+      titleHeight +
+      (subtitleHeight > 0 ? system.spacing[2] + subtitleHeight : 0) +
+      (modeBadgeHeight > 0 ? system.spacing[4] + modeBadgeHeight : 0);
+    const didFit =
+      lines.length <= maxLines &&
+      subtitleLines.length <= 2 &&
+      height <= maxHeight;
 
     const fit: SocialTitleFit = {
       typographyKey,
@@ -232,6 +227,13 @@ export function fitSocialCourseTitle({
       lineHeightRatio: typography.lineHeightRatio,
       letterSpacing: typography.letterSpacing,
       lines: visibleLines,
+      subtitleLines,
+      subtitleFontSize: subtitleTypography.fontSize,
+      subtitleFontWeight: subtitleTypography.fontWeight,
+      subtitleLineHeight: subtitleTypography.lineHeight,
+      subtitleLetterSpacing: subtitleTypography.letterSpacing,
+      modeLabel,
+      modeBadgeHeight,
       height,
       didFit,
     };

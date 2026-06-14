@@ -100,11 +100,6 @@ export const socialCreativesMock: SocialCreativeData[] = [
         tone: 'primary',
       },
       {
-        id: 'online',
-        label: 'ONLINE',
-        tone: 'online',
-      },
-      {
         id: 'fast-start',
         label: 'Szybki START',
         tone: 'green',

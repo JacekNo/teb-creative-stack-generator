@@ -1,3 +1,4 @@
+import { renderSvgBadge } from '../../creative-stack/svg-components/renderSvgBadge';
 import type { SocialDesignSystem } from '../design-system/createSocialDesignSystem';
 import type {
   SocialCreativeData,
@@ -40,10 +41,10 @@ export function renderSocialCourseName({
   });
 
   const baselineY = slot.y + fit.fontSize;
+  const badgeStyle = system.components.badge;
   const linesSvg = fit.lines
     .map((line, index) => {
       const y = baselineY + index * fit.lineHeight;
-      const textTransform = line.isModeLabel ? 'uppercase' : 'none';
 
       return `
         <text
@@ -54,11 +55,63 @@ export function renderSocialCourseName({
           font-weight="${fit.fontWeight}"
           fill="${system.theme.textPrimary}"
           letter-spacing="${fit.letterSpacing}"
-          style="text-transform: ${textTransform};"
         >${escapeXml(line.text)}</text>
       `;
     })
     .join('');
+  const mainTextHeight =
+    fit.lines.length > 0
+      ? fit.fontSize + Math.max(0, fit.lines.length - 1) * fit.lineHeight
+      : 0;
+  const subtitleStartY =
+    slot.y + mainTextHeight + (fit.subtitleLines.length > 0 ? system.spacing[2] : 0);
+  const subtitleBaselineY = subtitleStartY + fit.subtitleFontSize;
+  const subtitleSvg = fit.subtitleLines
+    .map((line, index) => {
+      const y = subtitleBaselineY + index * fit.subtitleLineHeight;
+
+      return `
+        <text
+          x="${slot.x}"
+          y="${y}"
+          font-family="${escapeXml(fit.fontFamily)}"
+          font-size="${fit.subtitleFontSize}"
+          font-weight="${fit.subtitleFontWeight}"
+          fill="${system.theme.textPrimary}"
+          letter-spacing="${fit.subtitleLetterSpacing}"
+        >${escapeXml(line.text)}</text>
+      `;
+    })
+    .join('');
+  const subtitleHeight =
+    fit.subtitleLines.length > 0
+      ? fit.subtitleFontSize +
+        Math.max(0, fit.subtitleLines.length - 1) * fit.subtitleLineHeight
+      : 0;
+  const modeBadgeHeight = Math.round(badgeStyle.height * 0.78);
+  const modeBadgeFontSize = Math.round(badgeStyle.fontSize * 0.84);
+  const modeBadgeSvg = fit.modeLabel
+    ? renderSvgBadge({
+        x: slot.x,
+        y:
+          subtitleStartY +
+          subtitleHeight +
+          system.spacing[4],
+        text: fit.modeLabel,
+        fontFamily: fit.fontFamily,
+        fontSize: modeBadgeFontSize,
+        fontWeight: badgeStyle.fontWeight,
+        letterSpacing: system.typography.caption.letterSpacing,
+        paddingX: Math.round(badgeStyle.paddingX * 0.76),
+        paddingY: Math.round(badgeStyle.paddingY * 0.72),
+        radius: badgeStyle.radius,
+        height: modeBadgeHeight,
+        fill: system.theme.badgeTones.online.fill,
+        color: system.theme.badgeTones.online.color,
+        maxWidth: slot.width,
+        dataComponent: 'social-course-mode-badge',
+      }).svg
+    : '';
 
   return `
     <g
@@ -67,6 +120,8 @@ export function renderSocialCourseName({
       data-title-fit="${fit.didFit ? 'fit' : 'overflow'}"
     >
       ${linesSvg}
+      ${subtitleSvg}
+      ${modeBadgeSvg}
     </g>
   `;
 }

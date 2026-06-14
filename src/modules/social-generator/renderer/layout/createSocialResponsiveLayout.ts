@@ -144,7 +144,7 @@ export function createSocialResponsiveLayout({
 
   const partnerLogo = rect(
     photo.x + photo.width - partnerLogoWidth - spacing[6],
-    photo.y + photo.height - components.partnerBox.height - spacing[6],
+    photo.y + photo.height - components.partnerBox.height,
     partnerLogoWidth,
     components.partnerBox.height,
   );

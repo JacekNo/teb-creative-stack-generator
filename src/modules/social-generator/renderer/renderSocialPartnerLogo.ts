@@ -33,6 +33,34 @@ function renderStrokeAttributes(
   return `stroke="${borderColor}" stroke-width="${borderWidth}"`;
 }
 
+function createTopRoundedPath({
+  x,
+  y,
+  width,
+  height,
+  radius,
+}: {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  radius: number;
+}): string {
+  const cornerRadius = Math.max(0, Math.min(radius, width / 2, height / 2));
+  const right = x + width;
+  const bottom = y + height;
+
+  return [
+    `M ${x} ${bottom}`,
+    `V ${y + cornerRadius}`,
+    `Q ${x} ${y} ${x + cornerRadius} ${y}`,
+    `H ${right - cornerRadius}`,
+    `Q ${right} ${y} ${right} ${y + cornerRadius}`,
+    `V ${bottom}`,
+    'Z',
+  ].join(' ');
+}
+
 export function renderSocialPartnerLogo({
   creative,
   slot,
@@ -47,47 +75,76 @@ export function renderSocialPartnerLogo({
     return '';
   }
 
-  if (!publicAssetExists(creative.partner.logoPath)) {
-    return '';
-  }
-
   const style =
     variant === 'compact'
       ? styles.partnerLogo.compact
       : styles.partnerLogo.default;
+  const hasLogoAsset = publicAssetExists(creative.partner.logoPath);
 
   const cardWidth = Math.min(slot.width, style.maxWidth);
   const cardHeight = Math.min(slot.height, style.maxHeight);
+  const labelFontSize = Math.max(10, Math.round(style.maxHeight * 0.14));
+  const labelFontFamily = styles.brandLogo.default.fontFamily;
+  const labelY = slot.y + style.paddingY + labelFontSize;
 
   const logoX = slot.x + style.paddingX;
-  const logoY = slot.y + style.paddingY;
+  const logoY = labelY + style.paddingY * 0.55;
   const logoWidth = Math.max(0, cardWidth - style.paddingX * 2);
-  const logoHeight = Math.max(0, cardHeight - style.paddingY * 2);
+  const logoHeight = Math.max(0, slot.y + cardHeight - logoY - style.paddingY);
   const strokeAttributes = renderStrokeAttributes(
     style.borderColor,
     style.borderWidth,
   );
+  const backgroundPath = createTopRoundedPath({
+    x: slot.x,
+    y: slot.y,
+    width: cardWidth,
+    height: cardHeight,
+    radius: style.radius,
+  });
 
   return `
-    <g data-component="social-partner-logo">
-      <rect
-        x="${slot.x}"
-        y="${slot.y}"
-        width="${cardWidth}"
-        height="${cardHeight}"
-        rx="${style.radius}"
+    <g
+      data-component="social-partner-logo"
+      data-partner-logo-state="${hasLogoAsset ? 'asset' : 'placeholder'}"
+    >
+      <path
+        d="${backgroundPath}"
         fill="${style.backgroundColor}"
         ${strokeAttributes}
       />
-      <image
-        href="${escapeXml(publicAssetPath(creative.partner.logoPath))}"
-        x="${logoX}"
-        y="${logoY}"
-        width="${logoWidth}"
-        height="${logoHeight}"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="${escapeXml(creative.partner.name)}"
-      />
+      <text
+        x="${slot.x + style.paddingX}"
+        y="${labelY}"
+        font-family="${escapeXml(labelFontFamily)}"
+        font-size="${labelFontSize}"
+        font-weight="800"
+        letter-spacing="0.8"
+        fill="rgba(16, 45, 105, 0.52)"
+      >partner</text>
+      ${hasLogoAsset
+        ? `
+          <image
+            href="${escapeXml(publicAssetPath(creative.partner.logoPath))}"
+            x="${logoX}"
+            y="${logoY}"
+            width="${logoWidth}"
+            height="${logoHeight}"
+            preserveAspectRatio="xMidYMid meet"
+            aria-label="${escapeXml(creative.partner.name)}"
+          />
+        `
+        : `
+          <text
+            x="${logoX + logoWidth / 2}"
+            y="${logoY + logoHeight * 0.58}"
+            font-family="${escapeXml(labelFontFamily)}"
+            font-size="${Math.max(12, Math.round(labelFontSize * 1.12))}"
+            font-weight="800"
+            fill="rgba(16, 45, 105, 0.42)"
+            text-anchor="middle"
+          >logo partnera</text>
+        `}
     </g>
   `;
 }
