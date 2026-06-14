@@ -1,4 +1,5 @@
 import type { SocialFormatId } from '../types/social.types';
+import type { SocialCourseBadgeTone } from '../types/social.types';
 import {
   socialDesignTokens,
   type SocialDesignBrand,
@@ -112,6 +113,40 @@ function resolveSocialFormat(
 
 function createTheme(brand: SocialDesignBrand) {
   const brandTokens = socialDesignTokens.brands[brand];
+  const badgeTones: Record<
+    SocialCourseBadgeTone,
+    { fill: string; color: string; borderColor?: string }
+  > = {
+    primary: {
+      fill: brandTokens.primary,
+      color: brandTokens.onPrimary,
+    },
+    secondary: {
+      fill: brandTokens.secondary,
+      color: brandTokens.text,
+    },
+    light: {
+      fill: socialDesignTokens.helper.white,
+      color: brandTokens.text,
+      borderColor: socialDesignTokens.helper.border,
+    },
+    green: {
+      fill: '#1F7A2E',
+      color: socialDesignTokens.helper.white,
+    },
+    yellow: {
+      fill: socialDesignTokens.helper.yellow,
+      color: brandTokens.text,
+    },
+    popular: {
+      fill: '#FFF0DE',
+      color: '#7A4100',
+    },
+    online: {
+      fill: brandTokens.secondary,
+      color: brandTokens.text,
+    },
+  };
 
   return {
     brand: brandTokens,
@@ -147,6 +182,8 @@ function createTheme(brand: SocialDesignBrand) {
 
     badgePopularBackground: '#FFF0DE',
     badgePopularText: '#7A4100',
+
+    badgeTones,
   };
 }
 
@@ -326,6 +363,17 @@ export function createSocialDesignSystem({
         socialDesignTokens.components.badge.gap,
         scaleFactor,
         grid,
+      ),
+      rowGap: scaleNumber(
+        socialDesignTokens.components.badge.rowGap,
+        scaleFactor,
+        grid,
+      ),
+      borderWidth: Math.max(
+        1,
+        Math.round(
+          socialDesignTokens.components.badge.borderWidth * scaleFactor,
+        ),
       ),
     },
 

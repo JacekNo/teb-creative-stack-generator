@@ -101,10 +101,9 @@ export type SocialCourseFact = {
 
 export type SocialCourseBadgeTone =
   | 'primary'
-  | 'soft'
+  | 'secondary'
   | 'light'
   | 'green'
-  | 'blue'
   | 'popular'
   | 'yellow'
   | 'online';

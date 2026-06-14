@@ -4,6 +4,10 @@ import type {
   SocialLayoutSlot,
 } from '../../types/social.types';
 import type { SocialFormatDefinition } from '../socialFormats';
+import {
+  getSocialBadgeFlowHeight,
+  getVisibleSocialCourseBadges,
+} from './socialBadgeFlow';
 import { fitSocialCourseTitle } from './socialTitleFit';
 
 export type SocialRect = SocialLayoutSlot;
@@ -65,44 +69,6 @@ function countVisibleFacts(creative: SocialCreativeData): number {
   return (creative.courseFacts ?? []).filter((fact) => fact.value).slice(0, 4).length;
 }
 
-function countVisibleBadges(creative: SocialCreativeData): number {
-  if (!creative.enabledComponents.includes('courseBadges')) {
-    return 0;
-  }
-
-  return (creative.courseBadges ?? []).filter((badge) => badge.label).slice(0, 5).length;
-}
-
-function estimateBadgeWidth(
-  label: string,
-  fontSize: number,
-  paddingX: number,
-): number {
-  return label.length * fontSize * 0.56 + paddingX * 2;
-}
-
-function getTextValue(value: unknown): string {
-  if (!value) {
-    return '';
-  }
-
-  if (typeof value === 'string') {
-    return value;
-  }
-
-  if (typeof value === 'object' && value !== null && 'full' in value) {
-    const textValue = value as {
-      full: string;
-      short?: string;
-      compact?: string;
-    };
-
-    return textValue.short ?? textValue.compact ?? textValue.full;
-  }
-
-  return '';
-}
-
 function getFactsHeight({
   creative,
   system,
@@ -138,43 +104,9 @@ function getBadgesHeight({
   system: SocialDesignSystem;
   width: number;
 }): number {
-  const badgesCount = countVisibleBadges(creative);
+  const badges = getVisibleSocialCourseBadges({ creative, system });
 
-  if (badgesCount === 0) {
-    return 0;
-  }
-
-  const { components, spacing } = system;
-  const badgeStyle = components.badge;
-  const badgeHeight = Math.max(
-    badgeStyle.height,
-    badgeStyle.fontSize + badgeStyle.paddingY * 2,
-  );
-
-  let rows = 1;
-  let cursorX = 0;
-
-  for (const badge of (creative.courseBadges ?? []).slice(0, 5)) {
-    const label = getTextValue(badge.label);
-
-    if (!label) {
-      continue;
-    }
-
-    const badgeWidth = Math.min(
-      estimateBadgeWidth(label, badgeStyle.fontSize, badgeStyle.paddingX),
-      width,
-    );
-
-    if (cursorX > 0 && cursorX + badgeWidth > width) {
-      rows += 1;
-      cursorX = 0;
-    }
-
-    cursorX += badgeWidth + badgeStyle.gap;
-  }
-
-  return rows * badgeHeight + Math.max(0, rows - 1) * spacing[2];
+  return getSocialBadgeFlowHeight({ badges, system, width });
 }
 
 export function createSocialResponsiveLayout({

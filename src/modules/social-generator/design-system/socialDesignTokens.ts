@@ -201,14 +201,18 @@ export const socialDesignTokens = {
     },
 
     badge: {
-      height: 52,
+      height: 56,
       radius: 999,
-      paddingX: 24,
-      paddingY: 10,
+      paddingX: 28,
+      paddingY: 12,
       fontSize: 22,
       lineHeight: 28,
       fontWeight: 800,
       gap: 12,
+      rowGap: 12,
+      borderWidth: 2,
+      maxItems: 5,
+      textWidthRatio: 0.56,
     },
 
     logoBox: {

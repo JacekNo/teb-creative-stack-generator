@@ -13,6 +13,7 @@ export type SvgBadgeOptions = {
   paddingX: number;
   paddingY: number;
   radius: number;
+  height?: number;
 
   fill: string;
   color: string;
@@ -59,6 +60,7 @@ export function renderSvgBadge(options: SvgBadgeOptions): SvgBadgeResult {
     paddingX,
     paddingY,
     radius,
+    height: fixedHeight,
     fill,
     color,
     borderColor,
@@ -75,10 +77,11 @@ export function renderSvgBadge(options: SvgBadgeOptions): SvgBadgeResult {
     minWidth,
     typeof maxWidth === 'number' ? Math.min(naturalWidth, maxWidth) : naturalWidth,
   );
-  const height = fontSize + paddingY * 2;
+  const height = fixedHeight ?? fontSize + paddingY * 2;
 
   const textWidth = Math.max(0, width - paddingX * 2);
-  const textBaselineY = y + paddingY + fontSize * 0.78;
+  const textBaselineY =
+    y + Math.max(0, (height - fontSize) / 2) + fontSize * 0.78;
 
   const textBlock = renderSvgTextBlock({
     x: x + paddingX,
