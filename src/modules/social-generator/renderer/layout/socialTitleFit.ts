@@ -71,8 +71,8 @@ function estimateTextWidth(text: string, fontSize: number): number {
   return text.length * fontSize * averageGlyphWidth;
 }
 
-function normalizeWhitespace(value: string): string {
-  return value.trim().replace(/\s+/g, ' ');
+function normalizeWhitespace(value: string | undefined): string {
+  return (value ?? '').trim().replace(/\s+/g, ' ');
 }
 
 export function resolveSocialCourseNameParts(
@@ -176,15 +176,16 @@ function createSubtitleTypography(
   lineHeight: number;
   letterSpacing: number;
 } {
+  const titleStack = system.components.titleStack;
   const fontSize = Math.max(
-    system.typography.caption.fontSize,
-    Math.round(titleFontSize * 0.34),
+    titleStack.subtitleMinFontSize,
+    Math.round(titleFontSize * titleStack.subtitleFontRatio),
   );
 
   return {
     fontSize,
-    fontWeight: 800,
-    lineHeight: Math.round(fontSize * 1.14),
+    fontWeight: titleStack.subtitleFontWeight,
+    lineHeight: Math.round(fontSize * titleStack.subtitleLineHeightRatio),
     letterSpacing: 0,
   };
 }
@@ -204,8 +205,8 @@ export function fitSocialCourseTitle({
 }): SocialTitleFit {
   const parts = resolveSocialCourseNameParts(creative);
   let fallbackFit: SocialTitleFit | undefined;
-  const titleSubtitleGap = system.spacing[1];
-  const titleModeGap = system.spacing[3];
+  const titleSubtitleGap = system.components.titleStack.titleSubtitleGap;
+  const titleModeGap = system.components.titleStack.subtitleModeGap;
 
   for (const typographyKey of TITLE_VARIANTS) {
     const typography = system.typography[typographyKey];
@@ -235,7 +236,9 @@ export function fitSocialCourseTitle({
       fontSize: subtitleTypography.fontSize,
       lineHeight: subtitleTypography.lineHeight,
     });
-    const modeBadgeHeight = modeLabel ? system.components.badge.height : 0;
+    const modeBadgeHeight = modeLabel
+      ? system.components.titleStack.modeBadge.height
+      : 0;
     const height =
       titleHeight +
       (subtitleHeight > 0 ? titleSubtitleGap + subtitleHeight : 0) +

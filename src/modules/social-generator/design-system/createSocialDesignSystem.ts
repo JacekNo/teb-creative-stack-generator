@@ -112,117 +112,107 @@ function resolveSocialFormat(
 
 function createTheme(brand: SocialDesignBrand) {
   const brandTokens = socialDesignTokens.brands[brand];
-  const yellow = socialDesignTokens.helper.yellow;
-  const white = socialDesignTokens.helper.white;
+  const helper = socialDesignTokens.helper;
 
   return {
     brand: brandTokens,
 
     background: brandTokens.soft,
-    surface: white,
+    backgroundPatternColor: brandTokens.secondary,
+    surface: helper.white,
     surfaceSoft: brandTokens.light,
     surfaceTint: brandTokens.soft,
 
     textPrimary: brandTokens.text,
-    textSecondary: socialDesignTokens.helper.muted,
+    textSecondary: helper.muted,
     textOnPrimary: brandTokens.onPrimary,
 
-    borderSubtle: socialDesignTokens.helper.border,
-    backgroundPatternColor: brandTokens.secondary,
+    borderSubtle: helper.border,
 
+    courseModeBadge: {
+      fill: helper.onlineBlue,
+      color: helper.white,
+      borderColor: helper.onlineBlue,
+    },
 
-    badgePrimaryBackground: brandTokens.primary,
-    badgePrimaryText: brandTokens.onPrimary,
+    cityBadge: {
+      fill: helper.white,
+      color: brandTokens.text,
+      borderColor: brandTokens.light,
+      iconColor: brandTokens.primary,
+      shadowColor: brandTokens.primary,
+    },
 
-    badgeSoftBackground: brandTokens.light,
-    badgeSoftText: brandTokens.text,
-
-    badgeLightBackground: white,
-    badgeLightText: brandTokens.text,
-
-    badgeGreenBackground: '#1F7A2E',
-    badgeGreenText: white,
-
-    badgePopularBackground: '#FFF0DE',
-    badgePopularText: '#7A4100',
+    brandLogo: {
+      fill: brandTokens.primary,
+      color: brandTokens.onPrimary,
+      borderColor: brandTokens.primary,
+    },
 
     badgeTones: {
-      // Filled brand CTA: promo #1 style.
       primary: {
         fill: brandTokens.primary,
         color: brandTokens.onPrimary,
         borderColor: brandTokens.primary,
         borderWidth: 0,
-        markerColor: 'transparent',
-        shadowColor: 'transparent',
       },
-
-      // Outline brand CTA: promo #2 style.
-      outline: {
-        fill: 'transparent',
-        color: brandTokens.primary,
-        borderColor: brandTokens.primary,
-        borderWidth: 2,
-        markerColor: 'transparent',
-        shadowColor: 'transparent',
-      },
-
       light: {
-        fill: 'transparent',
-        color: brandTokens.primary,
+        fill: helper.white,
+        color: brandTokens.text,
         borderColor: brandTokens.primary,
         borderWidth: 2,
-        markerColor: 'transparent',
-        shadowColor: 'transparent',
       },
-
-      soft: {
-        fill: brandTokens.light,
-        color: brandTokens.text,
-        borderColor: brandTokens.light,
-        borderWidth: 0,
-        markerColor: 'transparent',
-        shadowColor: 'transparent',
-      },
-
-      // Keep popular as an outline/light promo label instead of an egg-shaped chip.
       popular: {
-        fill: 'transparent',
-        color: brandTokens.primary,
+        fill: helper.white,
+        color: brandTokens.text,
         borderColor: brandTokens.primary,
         borderWidth: 2,
-        markerColor: 'transparent',
-        shadowColor: 'transparent',
       },
-
-      // Dedicated online badge follows master-brand blue.
-      online: {
-        fill: '#0F4496',
-        color: white,
-        borderColor: '#0F4496',
-        borderWidth: 0,
-        markerColor: 'transparent',
-        shadowColor: 'transparent',
-      },
-
       green: {
-        fill: '#16863D',
-        color: white,
-        borderColor: '#16863D',
+        fill: helper.green,
+        color: helper.white,
+        borderColor: helper.greenDark,
         borderWidth: 0,
-        markerColor: 'transparent',
-        shadowColor: 'transparent',
       },
-
-      yellow: {
-        fill: yellow,
-        color: brandTokens.text,
-        borderColor: yellow,
+      online: {
+        fill: helper.onlineBlue,
+        color: helper.white,
+        borderColor: helper.onlineBlue,
         borderWidth: 0,
-        markerColor: 'transparent',
-        shadowColor: 'transparent',
       },
     },
+
+    badgePrimaryBackground: brandTokens.primary,
+    badgePrimaryText: brandTokens.onPrimary,
+    badgeSoftBackground: brandTokens.light,
+    badgeSoftText: brandTokens.text,
+    badgeLightBackground: helper.white,
+    badgeLightText: brandTokens.text,
+    badgeGreenBackground: helper.green,
+    badgeGreenText: helper.white,
+    badgePopularBackground: helper.white,
+    badgePopularText: brandTokens.text,
+  };
+}
+
+function scaleBackground(
+  factor: number,
+  grid: number,
+) {
+  const background = socialDesignTokens.components.background;
+
+  return {
+    ...background,
+    patternSize: scaleNumber(background.patternSize, factor, grid),
+    patternStrokeWidth: Math.max(
+      1,
+      Math.round(background.patternStrokeWidth * factor),
+    ),
+    patternDotSize: scaleNumber(background.patternDotSize, factor, grid),
+    patternInsetX: scaleNumber(background.patternInsetX, factor, grid),
+    patternInsetY: scaleNumber(background.patternInsetY, factor, grid),
+    patternGap: scaleNumber(background.patternGap, factor, grid),
+    patternRowGap: scaleNumber(background.patternRowGap, factor, grid),
   };
 }
 
@@ -240,6 +230,9 @@ export function createSocialDesignSystem({
   const formatScale = formatTokens.width / baseWidth;
   const densityFactor = densityFactors[density];
   const scaleFactor = formatScale * densityFactor * creativeScale;
+  const supportContentScale =
+    socialDesignTokens.formatTuning[format].supportContentScale;
+  const supportScaleFactor = scaleFactor * supportContentScale;
 
   const grid = 4 * formatScale * creativeScale;
 
@@ -257,309 +250,151 @@ export function createSocialDesignSystem({
 
   const typography = {
     fontFamily: socialDesignTokens.typography.fontFamily,
-
-    heroXl: scaleTypographyToken(
-      socialDesignTokens.typography.heroXl,
-      scaleFactor,
-      grid,
-    ),
-    heroLg: scaleTypographyToken(
-      socialDesignTokens.typography.heroLg,
-      scaleFactor,
-      grid,
-    ),
-    heroMd: scaleTypographyToken(
-      socialDesignTokens.typography.heroMd,
-      scaleFactor,
-      grid,
-    ),
-    heroSm: scaleTypographyToken(
-      socialDesignTokens.typography.heroSm,
-      scaleFactor,
-      grid,
-    ),
-    heroXs: scaleTypographyToken(
-      socialDesignTokens.typography.heroXs,
-      scaleFactor,
-      grid,
-    ),
-    metaLg: scaleTypographyToken(
-      socialDesignTokens.typography.metaLg,
-      scaleFactor,
-      grid,
-    ),
-    meta: scaleTypographyToken(
-      socialDesignTokens.typography.meta,
-      scaleFactor,
-      grid,
-    ),
-    caption: scaleTypographyToken(
-      socialDesignTokens.typography.caption,
-      scaleFactor,
-      grid,
-    ),
-    micro: scaleTypographyToken(
-      socialDesignTokens.typography.micro,
-      scaleFactor,
-      grid,
-    ),
+    heroXl: scaleTypographyToken(socialDesignTokens.typography.heroXl, scaleFactor, grid),
+    heroLg: scaleTypographyToken(socialDesignTokens.typography.heroLg, scaleFactor, grid),
+    heroMd: scaleTypographyToken(socialDesignTokens.typography.heroMd, scaleFactor, grid),
+    heroSm: scaleTypographyToken(socialDesignTokens.typography.heroSm, scaleFactor, grid),
+    heroXs: scaleTypographyToken(socialDesignTokens.typography.heroXs, scaleFactor, grid),
+    metaLg: scaleTypographyToken(socialDesignTokens.typography.metaLg, scaleFactor, grid),
+    meta: scaleTypographyToken(socialDesignTokens.typography.meta, scaleFactor, grid),
+    caption: scaleTypographyToken(socialDesignTokens.typography.caption, scaleFactor, grid),
+    micro: scaleTypographyToken(socialDesignTokens.typography.micro, scaleFactor, grid),
   };
 
+  const titleStackTokens = socialDesignTokens.components.titleStack;
+  const modeBadgeTokens = titleStackTokens.modeBadge;
   const components = {
+    background: scaleBackground(scaleFactor, grid),
+
     titleCard: {
       ...socialDesignTokens.components.titleCard,
-      radius: scaleNumber(
-        socialDesignTokens.components.titleCard.radius,
-        scaleFactor,
-        grid,
-      ),
-      paddingX: scaleNumber(
-        socialDesignTokens.components.titleCard.paddingX,
-        scaleFactor,
-        grid,
-      ),
-      paddingY: scaleNumber(
-        socialDesignTokens.components.titleCard.paddingY,
-        scaleFactor,
-        grid,
-      ),
-      minFontSize: scaleNumber(
-        socialDesignTokens.components.titleCard.minFontSize,
-        scaleFactor,
-        grid,
-      ),
-      maxFontSize: scaleNumber(
-        socialDesignTokens.components.titleCard.maxFontSize,
-        scaleFactor,
-        grid,
-      ),
+      radius: scaleNumber(socialDesignTokens.components.titleCard.radius, scaleFactor, grid),
+      paddingX: scaleNumber(socialDesignTokens.components.titleCard.paddingX, scaleFactor, grid),
+      paddingY: scaleNumber(socialDesignTokens.components.titleCard.paddingY, scaleFactor, grid),
+      minFontSize: scaleNumber(socialDesignTokens.components.titleCard.minFontSize, scaleFactor, grid),
+      maxFontSize: scaleNumber(socialDesignTokens.components.titleCard.maxFontSize, scaleFactor, grid),
     },
 
-    background: {
-      ...socialDesignTokens.components.background,
-      patternSize: scaleNumber(
-        socialDesignTokens.components.background.patternSize,
-        scaleFactor,
-        grid,
-      ),
-      patternStrokeWidth: scaleNumber(
-        socialDesignTokens.components.background.patternStrokeWidth,
-        scaleFactor,
-        grid,
-      ),
-      patternDotSize: scaleNumber(
-        socialDesignTokens.components.background.patternDotSize,
-        scaleFactor,
-        grid,
-      ),
-      patternInsetX: scaleNumber(
-        socialDesignTokens.components.background.patternInsetX,
-        scaleFactor,
-        grid,
-      ),
-      patternInsetY: scaleNumber(
-        socialDesignTokens.components.background.patternInsetY,
-        scaleFactor,
-        grid,
-      ),
-      patternGap: scaleNumber(
-        socialDesignTokens.components.background.patternGap,
-        scaleFactor,
-        grid,
-      ),
-      patternRowGap: scaleNumber(
-        socialDesignTokens.components.background.patternRowGap,
-        scaleFactor,
-        grid,
-      ),
+    titleStack: {
+      titleSubtitleGap: scaleNumber(titleStackTokens.titleSubtitleGap, scaleFactor, grid),
+      subtitleModeGap: scaleNumber(titleStackTokens.subtitleModeGap, supportScaleFactor, grid),
+      subtitleFontRatio: titleStackTokens.subtitleFontRatio,
+      subtitleMinFontSize: scaleNumber(titleStackTokens.subtitleMinFontSize, supportScaleFactor, grid),
+      subtitleFontWeight: titleStackTokens.subtitleFontWeight,
+      subtitleLineHeightRatio: titleStackTokens.subtitleLineHeightRatio,
+      modeBadge: {
+        ...modeBadgeTokens,
+        height: scaleNumber(modeBadgeTokens.height, supportScaleFactor, grid),
+        radius: scaleNumber(modeBadgeTokens.radius, supportScaleFactor, grid),
+        paddingX: scaleNumber(modeBadgeTokens.paddingX, supportScaleFactor, grid),
+        paddingY: scaleNumber(modeBadgeTokens.paddingY, supportScaleFactor, grid),
+        fontSize: scaleNumber(modeBadgeTokens.fontSize, supportScaleFactor, grid),
+        lineHeight: scaleNumber(modeBadgeTokens.lineHeight, supportScaleFactor, grid),
+        lineHeightRatio:
+          scaleNumber(modeBadgeTokens.lineHeight, supportScaleFactor, grid) /
+          scaleNumber(modeBadgeTokens.fontSize, supportScaleFactor, grid),
+        letterSpacing: modeBadgeTokens.letterSpacing * supportScaleFactor,
+      },
     },
 
     badge: {
       ...socialDesignTokens.components.badge,
-      height: scaleNumber(
-        socialDesignTokens.components.badge.height,
-        scaleFactor,
-        grid,
-      ),
-      radius: scaleNumber(
-        socialDesignTokens.components.badge.radius,
-        scaleFactor,
-        grid,
-      ),
-      paddingX: scaleNumber(
-        socialDesignTokens.components.badge.paddingX,
-        scaleFactor,
-        grid,
-      ),
-      paddingY: scaleNumber(
-        socialDesignTokens.components.badge.paddingY,
-        scaleFactor,
-        grid,
-      ),
-      fontSize: scaleNumber(
-        socialDesignTokens.components.badge.fontSize,
-        scaleFactor,
-        grid,
-      ),
-      lineHeight: scaleNumber(
-        socialDesignTokens.components.badge.lineHeight,
-        scaleFactor,
-        grid,
-      ),
+      height: scaleNumber(socialDesignTokens.components.badge.height, supportScaleFactor, grid),
+      radius: scaleNumber(socialDesignTokens.components.badge.radius, supportScaleFactor, grid),
+      paddingX: scaleNumber(socialDesignTokens.components.badge.paddingX, supportScaleFactor, grid),
+      paddingY: scaleNumber(socialDesignTokens.components.badge.paddingY, supportScaleFactor, grid),
+      fontSize: scaleNumber(socialDesignTokens.components.badge.fontSize, supportScaleFactor, grid),
+      lineHeight: scaleNumber(socialDesignTokens.components.badge.lineHeight, supportScaleFactor, grid),
       lineHeightRatio:
-        scaleNumber(
-          socialDesignTokens.components.badge.lineHeight,
-          scaleFactor,
-          grid,
-        ) /
-        scaleNumber(
-          socialDesignTokens.components.badge.fontSize,
-          scaleFactor,
-          grid,
-        ),
-      gap: scaleNumber(
-        socialDesignTokens.components.badge.gap,
-        scaleFactor,
-        grid,
-      ),
-      rowGap: scaleNumber(
-        socialDesignTokens.components.badge.rowGap,
-        scaleFactor,
-        grid,
-      ),
-      columnGap: scaleNumber(
-        socialDesignTokens.components.badge.columnGap,
-        scaleFactor,
-        grid,
-      ),
-      borderWidth: scaleNumber(
-        socialDesignTokens.components.badge.borderWidth,
-        scaleFactor,
-        grid,
-      ),
-      markerSize: scaleNumber(
-        socialDesignTokens.components.badge.markerSize,
-        scaleFactor,
-        grid,
-      ),
-      markerInset: scaleNumber(
-        socialDesignTokens.components.badge.markerInset,
-        scaleFactor,
-        grid,
-      ),
-      shadowDx: scaleNumber(
-        socialDesignTokens.components.badge.shadowDx,
-        scaleFactor,
-        grid,
-      ),
-      shadowDy: scaleNumber(
-        socialDesignTokens.components.badge.shadowDy,
-        scaleFactor,
-        grid,
-      ),
-      shadowBlur: scaleNumber(
-        socialDesignTokens.components.badge.shadowBlur,
-        scaleFactor,
-        grid,
-      ),
-      shadowOpacity: socialDesignTokens.components.badge.shadowOpacity,
+        scaleNumber(socialDesignTokens.components.badge.lineHeight, supportScaleFactor, grid) /
+        scaleNumber(socialDesignTokens.components.badge.fontSize, supportScaleFactor, grid),
+      gap: scaleNumber(socialDesignTokens.components.badge.gap, supportScaleFactor, grid),
+      rowGap: scaleNumber(socialDesignTokens.components.badge.rowGap, supportScaleFactor, grid),
+      columnGap: scaleNumber(socialDesignTokens.components.badge.columnGap, supportScaleFactor, grid),
+      borderWidth: Math.max(1, Math.round(socialDesignTokens.components.badge.borderWidth * supportScaleFactor)),
+      letterSpacing: socialDesignTokens.components.badge.letterSpacing * supportScaleFactor,
     },
 
     logoBox: {
       ...socialDesignTokens.components.logoBox,
-      radius: scaleNumber(
-        socialDesignTokens.components.logoBox.radius,
-        scaleFactor,
-        grid,
-      ),
-      paddingX: scaleNumber(
-        socialDesignTokens.components.logoBox.paddingX,
-        scaleFactor,
-        grid,
-      ),
-      paddingY: scaleNumber(
-        socialDesignTokens.components.logoBox.paddingY,
-        scaleFactor,
-        grid,
-      ),
-      width: scaleNumber(
-        socialDesignTokens.components.logoBox.width,
-        scaleFactor,
-        grid,
-      ),
-      height: scaleNumber(
-        socialDesignTokens.components.logoBox.height,
-        scaleFactor,
-        grid,
-      ),
+      radius: scaleNumber(socialDesignTokens.components.logoBox.radius, supportScaleFactor, grid),
+      paddingX: scaleNumber(socialDesignTokens.components.logoBox.paddingX, supportScaleFactor, grid),
+      paddingY: scaleNumber(socialDesignTokens.components.logoBox.paddingY, supportScaleFactor, grid),
+      width: scaleNumber(socialDesignTokens.components.logoBox.width, supportScaleFactor, grid),
+      height: scaleNumber(socialDesignTokens.components.logoBox.height, supportScaleFactor, grid),
     },
 
     partnerBox: {
       ...socialDesignTokens.components.partnerBox,
-      radius: scaleNumber(
-        socialDesignTokens.components.partnerBox.radius,
-        scaleFactor,
-        grid,
-      ),
-      paddingX: scaleNumber(
-        socialDesignTokens.components.partnerBox.paddingX,
-        scaleFactor,
-        grid,
-      ),
-      paddingY: scaleNumber(
-        socialDesignTokens.components.partnerBox.paddingY,
-        scaleFactor,
-        grid,
-      ),
-      minWidth: scaleNumber(
-        socialDesignTokens.components.partnerBox.minWidth,
-        scaleFactor,
-        grid,
-      ),
-      maxWidth: scaleNumber(
-        socialDesignTokens.components.partnerBox.maxWidth,
-        scaleFactor,
-        grid,
-      ),
-      height: scaleNumber(
-        socialDesignTokens.components.partnerBox.height,
-        scaleFactor,
-        grid,
-      ),
+      radius: scaleNumber(socialDesignTokens.components.partnerBox.radius, supportScaleFactor, grid),
+      paddingX: scaleNumber(socialDesignTokens.components.partnerBox.paddingX, supportScaleFactor, grid),
+      paddingY: scaleNumber(socialDesignTokens.components.partnerBox.paddingY, supportScaleFactor, grid),
+      minWidth: scaleNumber(socialDesignTokens.components.partnerBox.minWidth, supportScaleFactor, grid),
+      maxWidth: scaleNumber(socialDesignTokens.components.partnerBox.maxWidth, supportScaleFactor, grid),
+      height: scaleNumber(socialDesignTokens.components.partnerBox.height, supportScaleFactor, grid),
+    },
+
+    factStack: {
+      ...socialDesignTokens.components.factStack,
+      gap: scaleNumber(socialDesignTokens.components.factStack.gap, supportScaleFactor, grid),
+      itemHeight: scaleNumber(socialDesignTokens.components.factStack.itemHeight, supportScaleFactor, grid),
+      iconSize: scaleNumber(socialDesignTokens.components.factStack.iconSize, supportScaleFactor, grid),
+      iconRadius: scaleNumber(socialDesignTokens.components.factStack.iconRadius, supportScaleFactor, grid),
+      iconTextGap: scaleNumber(socialDesignTokens.components.factStack.iconTextGap, supportScaleFactor, grid),
+      valueFontSize: scaleNumber(socialDesignTokens.components.factStack.valueFontSize, supportScaleFactor, grid),
+      valueLineHeight: scaleNumber(socialDesignTokens.components.factStack.valueLineHeight, supportScaleFactor, grid),
+      valueLineHeightRatio:
+        scaleNumber(socialDesignTokens.components.factStack.valueLineHeight, supportScaleFactor, grid) /
+        scaleNumber(socialDesignTokens.components.factStack.valueFontSize, supportScaleFactor, grid),
+      labelFontSize: scaleNumber(socialDesignTokens.components.factStack.labelFontSize, supportScaleFactor, grid),
+      labelLineHeight: scaleNumber(socialDesignTokens.components.factStack.labelLineHeight, supportScaleFactor, grid),
+      labelLineHeightRatio:
+        scaleNumber(socialDesignTokens.components.factStack.labelLineHeight, supportScaleFactor, grid) /
+        scaleNumber(socialDesignTokens.components.factStack.labelFontSize, supportScaleFactor, grid),
+      valueLabelGap: scaleNumber(socialDesignTokens.components.factStack.valueLabelGap, supportScaleFactor, grid),
+    },
+
+    cityBadge: {
+      ...socialDesignTokens.components.cityBadge,
+      height: scaleNumber(socialDesignTokens.components.cityBadge.height, supportScaleFactor, grid),
+      radius: scaleNumber(socialDesignTokens.components.cityBadge.radius, supportScaleFactor, grid),
+      paddingX: scaleNumber(socialDesignTokens.components.cityBadge.paddingX, supportScaleFactor, grid),
+      paddingY: scaleNumber(socialDesignTokens.components.cityBadge.paddingY, supportScaleFactor, grid),
+      fontSize: scaleNumber(socialDesignTokens.components.cityBadge.fontSize, supportScaleFactor, grid),
+      lineHeight: scaleNumber(socialDesignTokens.components.cityBadge.lineHeight, supportScaleFactor, grid),
+      lineHeightRatio:
+        scaleNumber(socialDesignTokens.components.cityBadge.lineHeight, supportScaleFactor, grid) /
+        scaleNumber(socialDesignTokens.components.cityBadge.fontSize, supportScaleFactor, grid),
+      borderWidth: Math.max(1, Math.round(socialDesignTokens.components.cityBadge.borderWidth * supportScaleFactor)),
+      iconSize: scaleNumber(socialDesignTokens.components.cityBadge.iconSize, supportScaleFactor, grid),
+      iconGap: scaleNumber(socialDesignTokens.components.cityBadge.iconGap, supportScaleFactor, grid),
+      letterSpacing: socialDesignTokens.components.cityBadge.letterSpacing * supportScaleFactor,
+      textWidthRatio: socialDesignTokens.components.cityBadge.textWidthRatio,
+      textBaselineOffsetRatio:
+        socialDesignTokens.components.cityBadge.textBaselineOffsetRatio,
+      align: socialDesignTokens.components.cityBadge.align as 'left' | 'right',
+      shadowDx: scaleNumber(socialDesignTokens.components.cityBadge.shadowDx, supportScaleFactor, grid),
+      shadowDy: scaleNumber(socialDesignTokens.components.cityBadge.shadowDy, supportScaleFactor, grid),
+      shadowBlur: scaleNumber(socialDesignTokens.components.cityBadge.shadowBlur, supportScaleFactor, grid),
+      shadowOpacity: socialDesignTokens.components.cityBadge.shadowOpacity,
+    },
+
+    contentFlow: {
+      insetX: scaleNumber(socialDesignTokens.components.contentFlow.insetX, scaleFactor, grid),
+      titleToFactsGap: scaleNumber(socialDesignTokens.components.contentFlow.titleToFactsGap, scaleFactor, grid),
+      factsToBadgesGap: scaleNumber(socialDesignTokens.components.contentFlow.factsToBadgesGap, scaleFactor, grid),
+      badgesToFooterGap: scaleNumber(socialDesignTokens.components.contentFlow.badgesToFooterGap, scaleFactor, grid),
+      footerGap: scaleNumber(socialDesignTokens.components.contentFlow.footerGap, scaleFactor, grid),
     },
 
     infoGrid: {
       ...socialDesignTokens.components.infoGrid,
-      radius: scaleNumber(
-        socialDesignTokens.components.infoGrid.radius,
-        scaleFactor,
-        grid,
-      ),
-      gap: scaleNumber(
-        socialDesignTokens.components.infoGrid.gap,
-        scaleFactor,
-        grid,
-      ),
-      itemPaddingX: scaleNumber(
-        socialDesignTokens.components.infoGrid.itemPaddingX,
-        scaleFactor,
-        grid,
-      ),
-      itemPaddingY: scaleNumber(
-        socialDesignTokens.components.infoGrid.itemPaddingY,
-        scaleFactor,
-        grid,
-      ),
-      labelFontSize: scaleNumber(
-        socialDesignTokens.components.infoGrid.labelFontSize,
-        scaleFactor,
-        grid,
-      ),
-      valueFontSize: scaleNumber(
-        socialDesignTokens.components.infoGrid.valueFontSize,
-        scaleFactor,
-        grid,
-      ),
+      radius: scaleNumber(socialDesignTokens.components.infoGrid.radius, scaleFactor, grid),
+      gap: scaleNumber(socialDesignTokens.components.infoGrid.gap, scaleFactor, grid),
+      itemPaddingX: scaleNumber(socialDesignTokens.components.infoGrid.itemPaddingX, scaleFactor, grid),
+      itemPaddingY: scaleNumber(socialDesignTokens.components.infoGrid.itemPaddingY, scaleFactor, grid),
+      labelFontSize: scaleNumber(socialDesignTokens.components.infoGrid.labelFontSize, scaleFactor, grid),
+      valueFontSize: scaleNumber(socialDesignTokens.components.infoGrid.valueFontSize, scaleFactor, grid),
     },
   };
 
@@ -571,6 +406,7 @@ export function createSocialDesignSystem({
     density,
     creativeScale,
     scaleFactor,
+    supportContentScale,
     grid,
 
     brand: socialDesignTokens.brands[brand],

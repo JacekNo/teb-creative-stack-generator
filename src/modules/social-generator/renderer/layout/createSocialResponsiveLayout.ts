@@ -61,12 +61,14 @@ function createSafeArea(system: SocialDesignSystem): SocialRect {
   );
 }
 
-function countVisibleFacts(creative: SocialCreativeData): number {
+function getVisibleFactsCount(creative: SocialCreativeData): number {
   if (!creative.enabledComponents.includes('courseFacts')) {
     return 0;
   }
 
-  return (creative.courseFacts ?? []).filter((fact) => fact.value).slice(0, 4).length;
+  return (creative.courseFacts ?? [])
+    .filter((fact) => Boolean(fact.value))
+    .slice(0, 4).length;
 }
 
 function getFactsHeight({
@@ -76,23 +78,19 @@ function getFactsHeight({
   creative: SocialCreativeData;
   system: SocialDesignSystem;
 }): number {
-  const factsCount = countVisibleFacts(creative);
+  const factsCount = getVisibleFactsCount(creative);
 
   if (factsCount === 0) {
     return 0;
   }
 
-  const { components, spacing } = system;
-  const columns = factsCount === 1 ? 1 : 2;
-  const rows = Math.ceil(factsCount / columns);
-  const itemHeight = Math.max(
-    spacing[18],
-    components.infoGrid.valueFontSize +
-      components.infoGrid.labelFontSize +
-      spacing[6],
-  );
+  const { factStack } = system.components;
+  const visibleCount = Math.min(factsCount, factStack.maxItems);
 
-  return rows * itemHeight + Math.max(0, rows - 1) * components.infoGrid.gap;
+  return (
+    visibleCount * factStack.itemHeight +
+    Math.max(0, visibleCount - 1) * factStack.gap
+  );
 }
 
 function getBadgesHeight({
@@ -122,7 +120,7 @@ export function createSocialResponsiveLayout({
     Boolean(creative.cityName) &&
     creative.offerMode !== 'online';
 
-  const footerHeight = Math.max(components.logoBox.height, components.badge.height);
+  const footerHeight = components.logoBox.height;
   const footer = rect(
     safeArea.x,
     safeArea.y + safeArea.height - footerHeight,
@@ -130,12 +128,28 @@ export function createSocialResponsiveLayout({
     footerHeight,
   );
 
+  const contentInsetX = Math.min(
+    components.contentFlow.insetX,
+    Math.max(0, safeArea.width * 0.08),
+  );
+  const contentX = safeArea.x + contentInsetX;
+  const contentWidth = Math.max(0, safeArea.width - contentInsetX * 2);
+
   const photo = rect(
     0,
     0,
     format.width,
     system.format.photoHeight,
   );
+
+  const city = hasCity
+    ? rect(
+        safeArea.x + spacing[2],
+        safeArea.y + spacing[2],
+        Math.min(safeArea.width * 0.42, spacing[32] * 1.32),
+        components.cityBadge.height,
+      )
+    : rect(safeArea.x, safeArea.y, 0, 0);
 
   const partnerLogoWidth = Math.min(
     components.partnerBox.maxWidth,
@@ -149,27 +163,37 @@ export function createSocialResponsiveLayout({
     components.partnerBox.height,
   );
 
-  const sectionGap = spacing[4];
-  const footerGap = spacing[6];
+  const contentStartY = Math.max(
+    0,
+    photo.y + photo.height - system.format.contentOverlap,
+  );
 
   const badgesHeight = getBadgesHeight({
     creative,
     system,
     width: safeArea.width,
   });
-  const cityHeight = hasCity ? components.badge.height : 0;
+  const factsHeight = getFactsHeight({
+    creative,
+    system,
+  });
 
-  const contentY = photo.y + photo.height;
+  const reservedBelowTitle =
+    (factsHeight > 0
+      ? components.contentFlow.titleToFactsGap + factsHeight
+      : 0) +
+    (badgesHeight > 0
+      ? components.contentFlow.factsToBadgesGap + badgesHeight
+      : 0) +
+    components.contentFlow.badgesToFooterGap +
+    footerHeight;
+
   const maxTitleCardHeight = Math.max(
     system.typography.heroXs.fontSize,
-    footer.y -
-      footerGap -
-      (badgesHeight > 0 ? badgesHeight + sectionGap : 0) -
-      (cityHeight > 0 ? cityHeight + sectionGap : 0) -
-      contentY,
+    footer.y - contentStartY - reservedBelowTitle,
   );
 
-  const titleInnerWidth = safeArea.width - components.titleCard.paddingX * 2;
+  const titleInnerWidth = contentWidth;
   const titleFit = fitSocialCourseTitle({
     creative,
     system,
@@ -188,56 +212,52 @@ export function createSocialResponsiveLayout({
 
   const titleCard = rect(
     safeArea.x,
-    contentY,
+    contentStartY,
     safeArea.width,
     titleCardHeight,
   );
 
   const courseName = rect(
-    titleCard.x + components.titleCard.paddingX,
+    contentX,
     titleCard.y + components.titleCard.paddingY,
-    titleCard.width - components.titleCard.paddingX * 2,
+    contentWidth,
     Math.max(0, titleCard.height - components.titleCard.paddingY * 2),
   );
 
+  const courseFacts = factsHeight > 0
+    ? rect(
+        contentX,
+        titleCard.y + titleCard.height + components.contentFlow.titleToFactsGap,
+        Math.min(contentWidth, spacing[32] * 3.6),
+        factsHeight,
+      )
+    : rect(contentX, titleCard.y + titleCard.height, 0, 0);
+
+  const courseBadgesY =
+    courseFacts.height > 0
+      ? courseFacts.y + courseFacts.height + components.contentFlow.factsToBadgesGap
+      : titleCard.y + titleCard.height + components.contentFlow.titleToFactsGap;
+
+  const badgesAvailableHeight = Math.max(
+    0,
+    footer.y - components.contentFlow.badgesToFooterGap - courseBadgesY,
+  );
+
+  const courseBadges = rect(
+    contentX,
+    courseBadgesY,
+    contentWidth,
+    Math.min(badgesHeight, badgesAvailableHeight),
+  );
+
   const brandLogo = rect(
-    footer.x,
+    contentX,
     footer.y,
     components.logoBox.width,
     footer.height,
   );
 
-  const factsHeight = getFactsHeight({
-    creative,
-    system,
-  });
-  const factsX = footer.x + components.logoBox.width + spacing[8];
-  const factsRight = footer.x + footer.width;
-  const courseFacts = rect(
-    factsX,
-    footer.y,
-    factsHeight > 0 ? Math.max(0, factsRight - factsX) : 0,
-    factsHeight > 0 ? footer.height : 0,
-  );
-
-  const courseBadges = rect(
-    safeArea.x,
-    titleCard.y + titleCard.height + (badgesHeight > 0 ? sectionGap : 0),
-    safeArea.width,
-    badgesHeight,
-  );
-
-  const city = rect(
-    safeArea.x,
-    courseBadges.y +
-      courseBadges.height +
-      (cityHeight > 0 ? sectionGap : 0),
-    Math.min(spacing[32], safeArea.width),
-    cityHeight,
-  );
-
   const contentBottom = Math.max(
-    city.y + city.height,
     courseBadges.y + courseBadges.height,
     footer.y + footer.height,
   );
