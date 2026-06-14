@@ -84,7 +84,7 @@ export function renderSvgBadge(options: SvgBadgeOptions): SvgBadgeResult {
     y + Math.max(0, (height - fontSize) / 2) + fontSize * 0.78;
 
   const textBlock = renderSvgTextBlock({
-    x: x + paddingX,
+    x: x + width / 2,
     y: textBaselineY,
     width: textWidth,
     text,
@@ -94,6 +94,7 @@ export function renderSvgBadge(options: SvgBadgeOptions): SvgBadgeResult {
     letterSpacing,
     fill: color,
     maxLines: 1,
+    textAnchor: 'middle',
     dataComponent: `${dataComponent}-text`,
   });
 

@@ -24,7 +24,7 @@ function createClipPathId(courseId: string): string {
   return `social-photo-clip-${courseId.replace(/[^a-zA-Z0-9_-]/g, '-')}`;
 }
 
-function createBottomRoundedPath({
+function createBottomLeftRoundedPath({
   x,
   y,
   width,
@@ -44,13 +44,46 @@ function createBottomRoundedPath({
   return [
     `M ${x} ${y}`,
     `H ${right}`,
-    `V ${bottom - cornerRadius}`,
-    `Q ${right} ${bottom} ${right - cornerRadius} ${bottom}`,
+    `V ${bottom}`,
     `H ${x + cornerRadius}`,
     `Q ${x} ${bottom} ${x} ${bottom - cornerRadius}`,
     `V ${y}`,
     'Z',
   ].join(' ');
+}
+
+function getFocalPointAlignment(value: number | undefined, axis: 'x' | 'y'): string {
+  const normalized = typeof value === 'number' ? value : 0.5;
+
+  if (axis === 'x') {
+    if (normalized <= 0.33) {
+      return 'xMin';
+    }
+
+    if (normalized >= 0.67) {
+      return 'xMax';
+    }
+
+    return 'xMid';
+  }
+
+  if (normalized <= 0.33) {
+    return 'YMin';
+  }
+
+  if (normalized >= 0.67) {
+    return 'YMax';
+  }
+
+  return 'YMid';
+}
+
+function getPhotoPreserveAspectRatio(creative: SocialCreativeData): string {
+  const focalPoint = creative.imageFocalPoint;
+  const xAlign = getFocalPointAlignment(focalPoint?.x, 'x');
+  const yAlign = getFocalPointAlignment(focalPoint?.y, 'y');
+
+  return `${xAlign}${yAlign} slice`;
 }
 
 export function renderSocialPhoto({
@@ -67,13 +100,14 @@ export function renderSocialPhoto({
   const imageHref = creative.imagePath
     ? publicAssetPath(creative.imagePath)
     : undefined;
-  const photoPath = createBottomRoundedPath({
+  const photoPath = createBottomLeftRoundedPath({
     x: slot.x,
     y: slot.y,
     width: slot.width,
     height: slot.height,
     radius: style.radius,
   });
+  const preserveAspectRatio = getPhotoPreserveAspectRatio(creative);
 
   if (!imageHref) {
     return `
@@ -113,7 +147,7 @@ export function renderSocialPhoto({
         y="${slot.y}"
         width="${slot.width}"
         height="${slot.height}"
-        preserveAspectRatio="xMidYMid slice"
+        preserveAspectRatio="${preserveAspectRatio}"
         clip-path="url(#${clipPathId})"
       />
     </g>

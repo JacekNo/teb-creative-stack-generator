@@ -117,7 +117,10 @@ export function createSocialResponsiveLayout({
   const { spacing, components } = system;
   const safeArea = createSafeArea(system);
   const canvas = rect(0, 0, format.width, format.height);
-  const hasCity = creative.enabledComponents.includes('city') && Boolean(creative.cityName);
+  const hasCity =
+    creative.enabledComponents.includes('city') &&
+    Boolean(creative.cityName) &&
+    creative.offerMode !== 'online';
 
   const footerHeight = Math.max(components.logoBox.height, components.badge.height);
   const footer = rect(
@@ -140,7 +143,7 @@ export function createSocialResponsiveLayout({
   );
 
   const partnerLogo = rect(
-    photo.x + photo.width - partnerLogoWidth - spacing[4],
+    photo.x + photo.width - partnerLogoWidth - spacing[6],
     photo.y + photo.height - components.partnerBox.height - spacing[6],
     partnerLogoWidth,
     components.partnerBox.height,
@@ -154,6 +157,7 @@ export function createSocialResponsiveLayout({
     system,
     width: safeArea.width,
   });
+  const cityHeight = hasCity ? components.badge.height : 0;
 
   const contentY = photo.y + photo.height;
   const maxTitleCardHeight = Math.max(
@@ -161,6 +165,7 @@ export function createSocialResponsiveLayout({
     footer.y -
       footerGap -
       (badgesHeight > 0 ? badgesHeight + sectionGap : 0) -
+      (cityHeight > 0 ? cityHeight + sectionGap : 0) -
       contentY,
   );
 
@@ -202,19 +207,12 @@ export function createSocialResponsiveLayout({
     footer.height,
   );
 
-  const city = rect(
-    footer.x + footer.width - spacing[28],
-    footer.y + Math.max(0, (footer.height - components.badge.height) / 2),
-    spacing[28],
-    components.badge.height,
-  );
-
   const factsHeight = getFactsHeight({
     creative,
     system,
   });
   const factsX = footer.x + components.logoBox.width + spacing[8];
-  const factsRight = hasCity ? city.x - spacing[8] : footer.x + footer.width;
+  const factsRight = footer.x + footer.width;
   const courseFacts = rect(
     factsX,
     footer.y,
@@ -229,7 +227,17 @@ export function createSocialResponsiveLayout({
     badgesHeight,
   );
 
+  const city = rect(
+    safeArea.x,
+    courseBadges.y +
+      courseBadges.height +
+      (cityHeight > 0 ? sectionGap : 0),
+    Math.min(spacing[32], safeArea.width),
+    cityHeight,
+  );
+
   const contentBottom = Math.max(
+    city.y + city.height,
     courseBadges.y + courseBadges.height,
     footer.y + footer.height,
   );
