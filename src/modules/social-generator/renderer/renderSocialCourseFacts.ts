@@ -12,6 +12,7 @@ export type RenderSocialCourseFactsOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
   system: SocialDesignSystem;
+  styles?: unknown;
 };
 
 function escapeXml(value: string): string {
@@ -126,18 +127,16 @@ function renderFact({
   x,
   y,
   width,
-  height,
   system,
 }: {
   fact: SocialCourseFact;
   x: number;
   y: number;
   width: number;
-  height: number;
   system: SocialDesignSystem;
 }): string {
-  const { components, spacing, typography, theme, radius } = system;
-
+  const { components, typography, theme } = system;
+  const factStyle = components.factStack;
   const value = getTextValue(fact.value);
   const label = getTextValue(fact.label);
 
@@ -145,21 +144,23 @@ function renderFact({
     return '';
   }
 
-  const iconSize = Math.min(height, spacing[16]);
-  const contentX = x + iconSize + spacing[4];
-  const contentWidth = Math.max(0, width - iconSize - spacing[4]);
-  const valueFontSize = components.infoGrid.valueFontSize;
-  const labelFontSize = components.infoGrid.labelFontSize;
-  const valueY = y + Math.max(0, (height - (valueFontSize + labelFontSize + spacing[1])) / 2) + valueFontSize;
-  const labelY = valueY + labelFontSize + spacing[2];
+  const iconSize = factStyle.iconSize;
+  const contentX = x + iconSize + factStyle.iconTextGap;
+  const contentWidth = Math.max(0, width - iconSize - factStyle.iconTextGap);
+  const textBlockHeight =
+    factStyle.valueLineHeight +
+    (label ? factStyle.valueLabelGap + factStyle.labelLineHeight : 0);
+  const textY = y + Math.max(0, (factStyle.itemHeight - textBlockHeight) / 2);
+  const valueY = textY + factStyle.valueFontSize;
+  const labelY = valueY + factStyle.valueLabelGap + factStyle.labelFontSize;
 
   return `
     <g data-component="social-course-fact" data-fact-id="${escapeXml(fact.id)}">
       ${renderFactIcon({
         x,
-        y: y + Math.max(0, (height - iconSize) / 2),
+        y: y + Math.max(0, (factStyle.itemHeight - iconSize) / 2),
         size: iconSize,
-        radius: radius.md,
+        radius: factStyle.iconRadius,
         fill: theme.surfaceSoft,
         stroke: theme.textPrimary,
         icon: fact.icon,
@@ -170,9 +171,9 @@ function renderFact({
         width: contentWidth,
         text: value,
         fontFamily: typography.fontFamily,
-        fontSize: valueFontSize,
-        fontWeight: 800,
-        lineHeight: typography.meta.lineHeightRatio,
+        fontSize: factStyle.valueFontSize,
+        fontWeight: factStyle.valueFontWeight,
+        lineHeight: factStyle.valueLineHeightRatio,
         letterSpacing: typography.meta.letterSpacing,
         fill: theme.textPrimary,
         maxLines: 1,
@@ -185,9 +186,9 @@ function renderFact({
             width: contentWidth,
             text: label,
             fontFamily: typography.fontFamily,
-            fontSize: labelFontSize,
-            fontWeight: 600,
-            lineHeight: typography.micro.lineHeightRatio,
+            fontSize: factStyle.labelFontSize,
+            fontWeight: factStyle.labelFontWeight,
+            lineHeight: factStyle.labelLineHeightRatio,
             letterSpacing: typography.micro.letterSpacing,
             fill: theme.textSecondary,
             maxLines: 1,
@@ -211,35 +212,26 @@ export function renderSocialCourseFacts({
     return '';
   }
 
-  const facts = (creative.courseFacts ?? []).slice(0, 4);
+  const facts = (creative.courseFacts ?? [])
+    .filter((fact) => Boolean(getTextValue(fact.value)))
+    .slice(0, system.components.factStack.maxItems);
 
   if (facts.length === 0) {
     return '';
   }
 
-  const { components } = system;
-  const gap = components.infoGrid.gap;
-  const columns = facts.length === 1 ? 1 : 2;
-  const rows = Math.ceil(facts.length / columns);
-  const itemWidth = (slot.width - gap * (columns - 1)) / columns;
-  const itemHeight = (slot.height - gap * (rows - 1)) / rows;
+  const factStyle = system.components.factStack;
 
   return `
     <g data-component="social-course-facts">
       ${facts
-        .map((fact, index) => {
-          const column = index % columns;
-          const row = Math.floor(index / columns);
-
-          return renderFact({
-            fact,
-            x: slot.x + column * (itemWidth + gap),
-            y: slot.y + row * (itemHeight + gap),
-            width: itemWidth,
-            height: itemHeight,
-            system,
-          });
-        })
+        .map((fact, index) => renderFact({
+          fact,
+          x: slot.x,
+          y: slot.y + index * (factStyle.itemHeight + factStyle.gap),
+          width: slot.width,
+          system,
+        }))
         .join('')}
     </g>
   `;

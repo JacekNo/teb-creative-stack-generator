@@ -2,24 +2,24 @@ import type {
   SocialCreativeData,
   SocialFormatId,
   SocialLayoutSlot,
-} from '../types/social.types';
-import type { CreativeThemeMode } from '../../creative-stack/design-system/creativeThemes';
-import type { CreativeDensity } from '../../creative-stack/design-system/createResponsiveScale';
+} from "../types/social.types";
+import type { CreativeThemeMode } from "../../creative-stack/design-system/creativeThemes";
+import type { CreativeDensity } from "../../creative-stack/design-system/createResponsiveScale";
 import {
   createSocialDesignSystem,
   type SocialDensity,
-} from '../design-system/createSocialDesignSystem';
-import { getSocialFormat } from './socialFormats';
-import { createSocialResponsiveLayout } from './layout/createSocialResponsiveLayout';
-import { createSocialComponentStyles } from './socialComponentStyles';
-import { renderSocialBackground } from './renderSocialBackground';
-import { renderSocialBrandLogo } from './renderSocialBrandLogo';
-import { renderSocialCity } from './renderSocialCity';
-import { renderSocialCourseBadges } from './renderSocialCourseBadges';
-import { renderSocialCourseFacts } from './renderSocialCourseFacts';
-import { renderSocialCourseName } from './renderSocialCourseName';
-import { renderSocialPartnerLogo } from './renderSocialPartnerLogo';
-import { renderSocialPhoto } from './renderSocialPhoto';
+} from "../design-system/createSocialDesignSystem";
+import { getSocialFormat } from "./socialFormats";
+import { createSocialResponsiveLayout } from "./layout/createSocialResponsiveLayout";
+import { createSocialComponentStyles } from "./socialComponentStyles";
+import { renderSocialBackground } from "./renderSocialBackground";
+import { renderSocialBrandLogo } from "./renderSocialBrandLogo";
+import { renderSocialCity } from "./renderSocialCity";
+import { renderSocialCourseBadges } from "./renderSocialCourseBadges";
+import { renderSocialCourseFacts } from "./renderSocialCourseFacts";
+import { renderSocialCourseName } from "./renderSocialCourseName";
+import { renderSocialPartnerLogo } from "./renderSocialPartnerLogo";
+import { renderSocialPhoto } from "./renderSocialPhoto";
 
 export type RenderSocialSvgOptions = {
   creative: SocialCreativeData;
@@ -34,11 +34,11 @@ type SocialRenderSlots = Record<string, SocialLayoutSlot>;
 
 function escapeXml(value: string): string {
   return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&apos;');
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
 }
 
 function renderDebugSlot(
@@ -70,23 +70,17 @@ function renderDebugSlot(
   `;
 }
 
-function renderDebugOverlay(
-  slots: SocialRenderSlots,
-  stroke: string,
-): string {
+function renderDebugOverlay(slots: SocialRenderSlots, stroke: string): string {
   return `
     <g data-component="social-debug-overlay">
       ${Object.entries(slots)
         .map(([name, slot]) => renderDebugSlot(name, slot, stroke))
-        .join('')}
+        .join("")}
     </g>
   `;
 }
 
-function renderSafeZoneOverlay(
-  slot: SocialLayoutSlot,
-  stroke: string,
-): string {
+function renderSafeZoneOverlay(slot: SocialLayoutSlot, stroke: string): string {
   return `
     <g data-component="social-safe-zone-overlay">
       <rect
@@ -115,8 +109,8 @@ export function renderSocialSvg({
   creative,
   formatId,
   showDebugOverlay = false,
-  themeMode = 'light',
-  density = 'default',
+  themeMode = "light",
+  density = "default",
   creativeScale = 1,
 }: RenderSocialSvgOptions): string {
   const format = getSocialFormat(formatId);
@@ -181,7 +175,7 @@ export function renderSocialSvg({
         creative,
         slot: slots.courseName,
         system,
-        maxLines: 3,
+        
       })}
 
       ${renderSocialCourseFacts({
@@ -199,8 +193,7 @@ export function renderSocialSvg({
       ${renderSocialCity({
         creative,
         slot: slots.city,
-        styles,
-        variant: 'compact',
+        system,
       })}
 
       ${renderSocialBrandLogo({
@@ -210,12 +203,16 @@ export function renderSocialSvg({
         system,
       })}
 
-      ${showDebugOverlay
-        ? renderSafeZoneOverlay(layout.safeArea, styles.debug.safeZoneStroke)
-        : ''}
-      ${showDebugOverlay
-        ? renderDebugOverlay(slots, styles.debug.slotStroke)
-        : ''}
+      ${
+        showDebugOverlay
+          ? renderSafeZoneOverlay(layout.safeArea, styles.debug.safeZoneStroke)
+          : ""
+      }
+      ${
+        showDebugOverlay
+          ? renderDebugOverlay(slots, styles.debug.slotStroke)
+          : ""
+      }
     </svg>
   `;
 }
