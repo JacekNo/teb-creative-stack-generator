@@ -83,55 +83,144 @@
   - partner card na prawym dolnym rogu zdjęcia,
   - facts w dolnym rzędzie obok brand logo,
   - miasto jako opcjonalny element pod badge’ami.
+- Zaktualizowano dane wejściowe social:
+  - `courses.normalized.json` ma 139 kierunków,
+  - dodano 45 kierunków `PKU_ONLINE`,
+  - `image-map.final.json` ma 139 / 139 mapowań zdjęć,
+  - wszystkie mapowania zdjęć mają status `mapped`.
+- Podpięto realne assety brandów:
+  - `teb-kursy.svg`,
+  - `teb-medyczne.svg`,
+  - `teb-policealne.svg`.
+- Rozszerzono registry partnerów i aliasów nazw w `partners.ts`.
+- Dodano `socialCreativeCatalog.ts`, który buduje katalog social z danych ads-generatora.
+- Panel testowy social korzysta z pełnej listy 139 kierunków.
 
 ## Now
 
-### 1. Social Generator — dane online i partnerzy
+### 1. Stage 3E — kalibracja wizualna elementów social
 
-Cel: przygotować dane pod pełniejsze generowanie grafik social na podstawie informacji z teb.pl.
-
-Zakres:
-
-- uzupełnić listę kierunków o kursy online,
-- dodać do danych `deliveryMode` albo utrzymać spójny model `offerMode`,
-- dodać `modeLabel` / `offerModeLabel` dla kierunków online,
-- przygotować pełną listę partnerów,
-- przypisać partnerów do konkretnych kierunków,
-- przygotować pliki logotypów partnerów,
-- osadzić logotypy partnerów w publicznych assetach,
-- zweryfikować, czy każdy `partnerKey` ma istniejący plik logo.
-
-### 2. Social Generator — warianty brandów i badge QA
-
-Cel: sprawdzić aktualny system wizualny na brandach `kursy`, `policealne`, `medyczne`, `edukacja`.
+Cel: poprawić rytm i skalę kluczowych elementów po podpięciu pełnego katalogu kierunków.
 
 Zakres:
 
-- dodać mockowe kreacje dla SP i SM,
-- sprawdzić kolory tytułu, patternu, badge’y i facts,
-- dopracować warianty `primary`, `popular`, `online`, `green`,
-- przygotować docelowe logo brandów zamiast wspólnego fallbacku `teb-edukacja.svg`,
-- sprawdzić partner card z realnym assetem partnera.
+- powiększyć `courseBadges`:
+  - wysokość,
+  - font,
+  - padding,
+  - border / outline dla wariantów jasnych,
+  - odstępy między badge’ami.
+- sprawdzić łamanie nazw kierunków:
+  - czy maksymalna szerokość tekstu pokrywa się z szerokością slotu,
+  - czy estymacja szerokości tekstu nie wymusza zbyt szybkiego przejścia do nowej linii,
+  - czy auto-fit zaczyna od największego sensownego rozmiaru.
+- powiększyć logo brandu w footerze.
+- znacząco powiększyć logo partnera na zdjęciu:
+  - większy slot partner card,
+  - większy obszar samego logo,
+  - mniejsza dominacja etykiety `partner`,
+  - sprawdzenie safe zone i przylegania do zdjęcia.
+- sprawdzić warianty:
+  - square `1080×1080`,
+  - portrait `1080×1350`,
+  - stories `1080×1920`,
+  - krótkie i długie nazwy,
+  - SP, SM, PKU, KKZ, PKU online.
+
+### 2. Stage 3F — ręczne kadrowanie zdjęcia
+
+Cel: pozwolić ręcznie dopasować kompozycję zdjęcia tam, gdzie automatyczny focal point nie wystarcza.
+
+Zakres:
+
+- dodać do edycji kontrolki `imageFocalPoint.x` i `imageFocalPoint.y`,
+- umożliwić przesuwanie zdjęcia:
+  - sliderami,
+  - docelowo przeciąganiem punktu kadrowania na podglądzie.
+- dodać opcjonalną skalę zdjęcia `imageScale`,
+- dodać reset do wartości bazowej z `image-map.final.json`,
+- pokazać w debug overlay punkt focal point i obszar kadrowania,
+- zapisywać ustawienia jako override draftu, bez modyfikowania danych źródłowych.
+
+### 3. Stage 3G — eksport aktualnych ustawień bez backendu
+
+Cel: umożliwić zapis i odtworzenie ręcznych zmian przed wdrożeniem backendu.
+
+Zakres:
+
+- eksport aktualnego draftu do pliku JSON,
+- import / odtworzenie draftu z JSON,
+- objąć eksportem:
+  - `courseId`,
+  - teksty tytułu i dopisku,
+  - badge’e,
+  - facts,
+  - partnera,
+  - miasto,
+  - włączone / wyłączone komponenty,
+  - format aktywnego podglądu,
+  - `imageFocalPoint`,
+  - `imageScale`.
+- dodać opcjonalny auto-save w `localStorage`,
+- dodać przycisk resetu draftu do danych katalogowych.
 
 ## Next
 
-### 1. Social Generator — kontrolki UI design systemu
+### 1. Stage 4A — katalog kierunków w gridzie
 
-Cel: umożliwić testowanie responsywności bez edycji kodu.
+Cel: pokazać wszystkie kierunki jako minimalistyczny katalog grafik social.
 
 Zakres:
 
-- format aktywnego podglądu,
-- brand,
-- density:
-  - `compact`,
-  - `default`,
-  - `comfortable`,
-- `creativeScale`,
-- debug overlay on/off,
-- wybór mockowej kreacji.
+- główny panel na całą szerokość strony,
+- grid kart kierunków,
+- podgląd każdej karty jako format square `1080×1080`,
+- minimalistyczny wariant renderu do szybkiego skanowania,
+- górny pasek filtrów:
+  - wyszukiwarka po nazwie,
+  - brand,
+  - typ oferty,
+  - online / stacjonarne,
+  - partner,
+  - status braków / fallbacków.
+- akcje po najechaniu na kartę:
+  - `Pobierz set`,
+  - `Edytuj`.
 
-### 2. Social Generator — walidator jakości
+### 2. Stage 4B — widok edycji pojedynczego kierunku
+
+Cel: przejść z katalogu do pełnej edycji wybranego kierunku.
+
+Zakres:
+
+- po kliknięciu `Edytuj` otworzyć widok edycji kierunku,
+- zachować jeden aktywny podgląd i przełącznik formatów,
+- uporządkować UI panelu edycji:
+  - treść,
+  - badge’e,
+  - facts,
+  - zdjęcie / kadrowanie,
+  - partner,
+  - miasto,
+  - eksport.
+- dodać przycisk `Pobierz` także w widoku edycji,
+- przygotować miejsce na walidację i ostrzeżenia jakościowe.
+
+### 3. Stage 4C — eksport setu social z aktualnego draftu
+
+Cel: wygenerować komplet grafik social z jednego draftu i aktualnych override’ów.
+
+Zakres:
+
+- render `1080×1080`,
+- render `1080×1350`,
+- render `1080×1920`,
+- eksport PNG,
+- ZIP setu,
+- nazewnictwo dla online i stacjonarnych,
+- raport eksportu z ostrzeżeniami.
+
+### 4. Social Generator — walidator jakości
 
 Cel: wykrywać problemy produkcyjne przed eksportem.
 
@@ -144,11 +233,11 @@ Zakres ostrzeżeń:
 - footer koliduje z innymi elementami,
 - brak zdjęcia,
 - brak logo partnera,
-- partner logo wychodzi poza slot,
+- partner logo wychodzi poza slot albo safe zone,
 - elementy story wchodzą w safe zone ryzyka,
 - ryzyko zbyt małego tekstu po skalowaniu.
 
-### 3. Social Generator — cleanup legacy rendererów
+### 5. Social Generator — cleanup legacy rendererów
 
 Cel: usunąć stare komponenty kampanijne, jeśli nie są już używane.
 
@@ -161,21 +250,7 @@ Do sprawdzenia/usunięcia:
 - `socialLayouts.ts`, jeśli stary statyczny layout nie jest już importowany,
 - stare typy komponentów kampanijnych w `social.types.ts`.
 
-### 4. Social Generator — eksport paczki formatów
-
-Cel: wygenerować komplet grafik social z jednego draftu.
-
-Zakres:
-
-- render `1080×1080`,
-- render `1080×1350`,
-- render `1080×1920`,
-- eksport PNG,
-- ZIP setu,
-- nazewnictwo dla online i stacjonarnych,
-- raport eksportu.
-
-### 5. Google Ads — eksport PNG
+### 6. Google Ads — eksport PNG
 
 Cel: przygotować eksport gotowych grafik z SVG do PNG.
 
@@ -187,7 +262,7 @@ Do sprawdzenia:
 - obsługa obrazów lokalnych,
 - nazewnictwo plików eksportowych.
 
-### 6. Google Ads — batch export
+### 7. Google Ads — batch export
 
 Cel: wygenerować zestawy grafik dla wielu kierunków i miast.
 
@@ -200,7 +275,7 @@ Zakres:
 - generowanie 3 formatów Google Ads,
 - raport błędów i ostrzeżeń.
 
-### 7. Clean Google asset mode
+### 8. Clean Google asset mode
 
 Cel: przygotować alternatywny tryb eksportu bez tekstu, CTA i logo dla assetowego modelu Google Ads / Performance Max.
 
