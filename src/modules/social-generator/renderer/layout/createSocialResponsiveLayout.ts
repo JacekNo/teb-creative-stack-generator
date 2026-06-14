@@ -1,14 +1,10 @@
-import type { ResponsiveScale } from '../../../creative-stack/design-system/createResponsiveScale';
+import type { SocialDesignSystem } from '../../design-system/createSocialDesignSystem';
+import type { SocialLayoutSlot } from '../../types/social.types';
 import type { SocialFormatDefinition } from '../socialFormats';
 
-export type SocialRect = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
+export type SocialRect = SocialLayoutSlot;
 
-export type SocialResponsiveLayoutKind = 'square' | 'portrait' | 'story';
+export type SocialResponsiveLayoutKind = 'square' | 'portrait' | 'stories';
 
 export type SocialResponsiveLayout = {
   kind: SocialResponsiveLayoutKind;
@@ -16,214 +12,19 @@ export type SocialResponsiveLayout = {
   safeArea: SocialRect;
   photo: SocialRect;
   content: SocialRect;
+  titleCard: SocialRect;
   courseName: SocialRect;
-  benefit: SocialRect;
-  price: SocialRect;
-  startDate: SocialRect;
+  courseFacts: SocialRect;
+  courseBadges: SocialRect;
+  footer: SocialRect;
   city: SocialRect;
-  offerMode: SocialRect;
   partnerLogo: SocialRect;
   brandLogo: SocialRect;
 };
 
 export type CreateSocialResponsiveLayoutOptions = {
   format: SocialFormatDefinition;
-  scale: ResponsiveScale;
-};
-
-type SocialSlotUnits = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-type SocialLayoutTemplate = {
-  photo: SocialSlotUnits;
-  partnerLogo: SocialSlotUnits;
-  courseName: SocialSlotUnits;
-  offerMode: SocialSlotUnits;
-  benefit: SocialSlotUnits;
-  price: SocialSlotUnits;
-  startDate: SocialSlotUnits;
-  city: SocialSlotUnits;
-  brandLogo: SocialSlotUnits;
-};
-
-const SOCIAL_LAYOUT_TEMPLATES: Record<
-  SocialResponsiveLayoutKind,
-  SocialLayoutTemplate
-> = {
-  square: {
-  photo: {
-    x: 0,
-    y: 0,
-    width: 1080,
-    height: 54.8,
-  },
-  partnerLogo: {
-    x: 76,
-    y: 8.8,
-    width: 22,
-    height: 9.2,
-  },
-  offerMode: {
-    x: 7.2,
-    y: 60.4,
-    width: 26,
-    height: 6.4,
-  },
-  courseName: {
-    x: 7.2,
-    y: 66.4,
-    width: 78,
-    height: 14.8,
-  },
-  benefit: {
-    x: 7.2,
-    y: 82.8,
-    width: 78,
-    height: 9.2,
-  },
-  price: {
-    x: 7.2,
-    y: 94.6,
-    width: 21,
-    height: 7.2,
-  },
-  startDate: {
-    x: 29.2,
-    y: 94.6,
-    width: 25,
-    height: 7.2,
-  },
-  city: {
-    x: 72,
-    y: 94.6,
-    width: 26,
-    height: 7.2,
-  },
-  brandLogo: {
-    x: 7.2,
-    y: 101.8,
-    width: 20,
-    height: 4.8,
-  },
-},
-
-  portrait: {
-    photo: {
-      x: 5.6,
-      y: 5.6,
-      width: 96.8,
-      height: 69,
-    },
-    partnerLogo: {
-      x: 76,
-      y: 8.8,
-      width: 22,
-      height: 9.2,
-    },
-    courseName: {
-      x: 7.2,
-      y: 80,
-      width: 82,
-      height: 25,
-    },
-    offerMode: {
-      x: 7.2,
-      y: 72.8,
-      width: 26,
-      height: 6.4,
-    },
-    benefit: {
-      x: 7.2,
-      y: 104.8,
-      width: 76,
-      height: 9.2,
-    },
-    price: {
-      x: 7.2,
-      y: 116,
-      width: 19,
-      height: 7.2,
-    },
-    startDate: {
-      x: 28,
-      y: 116,
-      width: 25,
-      height: 7.2,
-    },
-    city: {
-      x: 72,
-      y: 116,
-      width: 26,
-      height: 7.2,
-    },
-    brandLogo: {
-      x: 7.2,
-      y: 125.6,
-      width: 17.8,
-      height: 6.2,
-    },
-  },
-
-  story: {
-    photo: {
-      x: 6.4,
-      y: 28.4,
-      width: 95.2,
-      height: 76,
-    },
-    partnerLogo: {
-      x: 75.6,
-      y: 32,
-      width: 22,
-      height: 9.2,
-    },
-    courseName: {
-      x: 7.2,
-      y: 110,
-      width: 82,
-      height: 27,
-    },
-    offerMode: {
-      x: 7.2,
-      y: 102.8,
-      width: 26,
-      height: 6.4,
-    },
-    benefit: {
-      x: 7.2,
-      y: 137.6,
-      width: 76,
-      height: 9.6,
-    },
-    price: {
-      x: 7.2,
-      y: 149.8,
-      width: 19,
-      height: 7.2,
-    },
-    startDate: {
-      x: 28,
-      y: 149.8,
-      width: 25,
-      height: 7.2,
-    },
-    city: {
-      x: 7.2,
-      y: 158.8,
-      width: 28,
-      height: 7.2,
-    },
-    brandLogo: {
-      x: 7.2,
-      y: 168.8,
-      width: 17.8,
-      height: 6.2,
-    },
-  },
+  system: SocialDesignSystem;
 };
 
 function rect(
@@ -240,113 +41,160 @@ function rect(
   };
 }
 
-function fromUnits(slot: SocialSlotUnits, u: number): SocialRect {
+function createSafeArea(system: SocialDesignSystem): SocialRect {
+  const { safe, width, height } = system.format;
+
   return rect(
-    slot.x * u,
-    slot.y * u,
-    slot.width * u,
-    slot.height * u,
+    safe.left,
+    safe.top,
+    width - safe.left - safe.right,
+    height - safe.top - safe.bottom,
   );
 }
 
-function getLayoutKind(
-  format: SocialFormatDefinition,
-): SocialResponsiveLayoutKind {
-  if (format.ratio === '9:16') {
-    return 'story';
+function getTitleCardHeight(system: SocialDesignSystem): number {
+  const { spacing } = system;
+
+  if (system.formatKey === 'stories') {
+    return spacing[32] + spacing[24];
   }
 
-  if (format.ratio === '4:5') {
-    return 'portrait';
+  if (system.formatKey === 'portrait') {
+    return spacing[32] + spacing[16];
   }
 
-  return 'square';
+  return spacing[32] + spacing[12];
 }
 
-function createSafeArea(
-  format: SocialFormatDefinition,
-  u: number,
-): SocialRect {
-  if (format.safeZone) {
-    const { top, right, bottom, left } = format.safeZone;
+function getFactsHeight(system: SocialDesignSystem): number {
+  const { spacing } = system;
 
-    return rect(
-      left,
-      top,
-      format.width - left - right,
-      format.height - top - bottom,
-    );
+  if (system.formatKey === 'stories') {
+    return spacing[32] + spacing[12];
   }
 
-  return rect(
-    5.6 * u,
-    5.6 * u,
-    format.width - 11.2 * u,
-    format.height - 11.2 * u,
-  );
+  if (system.formatKey === 'portrait') {
+    return spacing[32];
+  }
+
+  return spacing[24] + spacing[4];
 }
 
-function createContentArea(
-  slots: Pick<
-    SocialResponsiveLayout,
-    | 'courseName'
-    | 'benefit'
-    | 'price'
-    | 'startDate'
-    | 'city'
-    | 'offerMode'
-    | 'brandLogo'
-  >,
-): SocialRect {
-  const slotList = Object.values(slots);
+function getBadgesHeight(system: SocialDesignSystem): number {
+  const { spacing } = system;
 
-  const minX = Math.min(...slotList.map((slot) => slot.x));
-  const minY = Math.min(...slotList.map((slot) => slot.y));
-  const maxX = Math.max(...slotList.map((slot) => slot.x + slot.width));
-  const maxY = Math.max(...slotList.map((slot) => slot.y + slot.height));
+  if (system.formatKey === 'stories') {
+    return spacing[24];
+  }
 
-  return rect(minX, minY, maxX - minX, maxY - minY);
+  return spacing[16];
 }
 
 export function createSocialResponsiveLayout({
   format,
-  scale,
+  system,
 }: CreateSocialResponsiveLayoutOptions): SocialResponsiveLayout {
-  const kind = getLayoutKind(format);
-  const template = SOCIAL_LAYOUT_TEMPLATES[kind];
-  const { u } = scale;
+  const { spacing, components } = system;
+  const safeArea = createSafeArea(system);
+  const canvas = rect(0, 0, format.width, format.height);
 
-  const courseName = fromUnits(template.courseName, u);
-  const benefit = fromUnits(template.benefit, u);
-  const price = fromUnits(template.price, u);
-  const startDate = fromUnits(template.startDate, u);
-  const city = fromUnits(template.city, u);
-  const offerMode = fromUnits(template.offerMode, u);
-  const brandLogo = fromUnits(template.brandLogo, u);
+  const photo = rect(
+    safeArea.x,
+    safeArea.y,
+    safeArea.width,
+    system.format.photoHeight,
+  );
 
-  const content = createContentArea({
-    courseName,
-    benefit,
-    price,
-    startDate,
-    city,
-    offerMode,
-    brandLogo,
-  });
+  const partnerLogoWidth = Math.min(
+    components.partnerBox.maxWidth,
+    Math.max(components.partnerBox.minWidth, spacing[28]),
+  );
+
+  const partnerLogo = rect(
+    photo.x + photo.width - partnerLogoWidth - spacing[4],
+    photo.y + spacing[4],
+    partnerLogoWidth,
+    components.partnerBox.height,
+  );
+
+  const contentY = photo.y + photo.height - system.format.contentOverlap;
+  const footerHeight = components.logoBox.height;
+  const sectionGap = spacing[5];
+
+  const titleCard = rect(
+    safeArea.x,
+    contentY,
+    safeArea.width,
+    getTitleCardHeight(system),
+  );
+
+  const courseName = rect(
+    titleCard.x + components.titleCard.paddingX,
+    titleCard.y + components.titleCard.paddingY,
+    titleCard.width - components.titleCard.paddingX * 2,
+    titleCard.height - components.titleCard.paddingY * 2,
+  );
+
+  const courseFacts = rect(
+    safeArea.x,
+    titleCard.y + titleCard.height + sectionGap,
+    safeArea.width,
+    getFactsHeight(system),
+  );
+
+  const courseBadges = rect(
+    safeArea.x,
+    courseFacts.y + courseFacts.height + sectionGap,
+    safeArea.width,
+    getBadgesHeight(system),
+  );
+
+  const footer = rect(
+    safeArea.x,
+    safeArea.y + safeArea.height - footerHeight,
+    safeArea.width,
+    footerHeight,
+  );
+
+  const brandLogo = rect(
+    footer.x,
+    footer.y,
+    components.logoBox.width,
+    components.logoBox.height,
+  );
+
+  const city = rect(
+    footer.x + footer.width - spacing[28],
+    footer.y + Math.max(0, (footer.height - components.badge.height) / 2),
+    spacing[28],
+    components.badge.height,
+  );
+
+  const contentBottom = Math.max(
+    courseBadges.y + courseBadges.height,
+    footer.y + footer.height,
+  );
+
+  const content = rect(
+    safeArea.x,
+    titleCard.y,
+    safeArea.width,
+    contentBottom - titleCard.y,
+  );
 
   return {
-    kind,
-    canvas: rect(0, 0, format.width, format.height),
-    safeArea: createSafeArea(format, u),
-    photo: fromUnits(template.photo, u),
+    kind: system.formatKey,
+    canvas,
+    safeArea,
+    photo,
     content,
+    titleCard,
     courseName,
-    benefit,
-    price,
-    startDate,
+    courseFacts,
+    courseBadges,
+    footer,
     city,
-    offerMode,
-    partnerLogo: fromUnits(template.partnerLogo, u),
+    partnerLogo,
     brandLogo,
   };
 }

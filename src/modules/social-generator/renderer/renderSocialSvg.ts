@@ -6,27 +6,26 @@ import type {
 import type { CreativeThemeMode } from '../../creative-stack/design-system/creativeThemes';
 import type { CreativeDensity } from '../../creative-stack/design-system/createResponsiveScale';
 import {
-  getSocialFormat,
-  type SocialFormatDefinition,
-} from './socialFormats';
+  createSocialDesignSystem,
+  type SocialDensity,
+} from '../design-system/createSocialDesignSystem';
+import { getSocialFormat } from './socialFormats';
 import { createSocialResponsiveLayout } from './layout/createSocialResponsiveLayout';
 import { createSocialComponentStyles } from './socialComponentStyles';
-import { renderSocialBenefit } from './renderSocialBenefit';
 import { renderSocialBrandLogo } from './renderSocialBrandLogo';
 import { renderSocialCity } from './renderSocialCity';
+import { renderSocialCourseBadges } from './renderSocialCourseBadges';
+import { renderSocialCourseFacts } from './renderSocialCourseFacts';
 import { renderSocialCourseName } from './renderSocialCourseName';
-import { renderSocialOfferMode } from './renderSocialOfferMode';
 import { renderSocialPartnerLogo } from './renderSocialPartnerLogo';
 import { renderSocialPhoto } from './renderSocialPhoto';
-import { renderSocialPrice } from './renderSocialPrice';
-import { renderSocialStartDate } from './renderSocialStartDate';
 
 export type RenderSocialSvgOptions = {
   creative: SocialCreativeData;
   formatId: SocialFormatId;
   showDebugOverlay?: boolean;
   themeMode?: CreativeThemeMode;
-  density?: CreativeDensity;
+  density?: SocialDensity;
   creativeScale?: number;
 };
 
@@ -52,6 +51,28 @@ function renderCanvasBackground(
       y="0"
       width="${width}"
       height="${height}"
+      fill="${fill}"
+    />
+  `;
+}
+
+function renderSurfaceCard({
+  slot,
+  radius,
+  fill,
+}: {
+  slot: SocialLayoutSlot;
+  radius: number;
+  fill: string;
+}): string {
+  return `
+    <rect
+      data-component="social-title-card-surface"
+      x="${slot.x}"
+      y="${slot.y}"
+      width="${slot.width}"
+      height="${slot.height}"
+      rx="${radius}"
       fill="${fill}"
     />
   `;
@@ -100,30 +121,24 @@ function renderDebugOverlay(
 }
 
 function renderSafeZoneOverlay(
-  format: SocialFormatDefinition,
+  slot: SocialLayoutSlot,
   stroke: string,
 ): string {
-  if (!format.safeZone) {
-    return '';
-  }
-
-  const { top, right, bottom, left } = format.safeZone;
-
   return `
     <g data-component="social-safe-zone-overlay">
       <rect
-        x="${left}"
-        y="${top}"
-        width="${format.width - left - right}"
-        height="${format.height - top - bottom}"
+        x="${slot.x}"
+        y="${slot.y}"
+        width="${slot.width}"
+        height="${slot.height}"
         fill="none"
         stroke="${stroke}"
         stroke-width="3"
         stroke-dasharray="12 10"
       />
       <text
-        x="${left + 12}"
-        y="${top + 32}"
+        x="${slot.x + 12}"
+        y="${slot.y + 32}"
         font-family="Arial, sans-serif"
         font-size="22"
         font-weight="700"
@@ -131,6 +146,21 @@ function renderSafeZoneOverlay(
       >safe zone</text>
     </g>
   `;
+}
+
+function getCourseNameVariant(
+  creative: SocialCreativeData,
+  formatId: SocialFormatId,
+): 'default' | 'compact' {
+  if (formatId === 'story-9x16-1080') {
+    return 'compact';
+  }
+
+  if (creative.courseName.length > 34) {
+    return 'compact';
+  }
+
+  return 'default';
 }
 
 export function renderSocialSvg({
@@ -143,28 +173,34 @@ export function renderSocialSvg({
 }: RenderSocialSvgOptions): string {
   const format = getSocialFormat(formatId);
 
+  const system = createSocialDesignSystem({
+    brandKey: creative.brandKey,
+    formatId,
+    density,
+    creativeScale,
+  });
+
   const styles = createSocialComponentStyles({
     width: format.width,
     height: format.height,
     brandKey: creative.brandKey,
     themeMode,
-    density,
+    density: density as CreativeDensity,
     creativeScale,
   });
 
   const layout = createSocialResponsiveLayout({
     format,
-    scale: styles.scale,
+    system,
   });
 
   const slots: SocialRenderSlots = {
     photo: layout.photo,
     partnerLogo: layout.partnerLogo,
-    offerMode: layout.offerMode,
+    titleCard: layout.titleCard,
     courseName: layout.courseName,
-    benefit: layout.benefit,
-    price: layout.price,
-    startDate: layout.startDate,
+    courseFacts: layout.courseFacts,
+    courseBadges: layout.courseBadges,
     city: layout.city,
     brandLogo: layout.brandLogo,
   };
@@ -181,7 +217,7 @@ export function renderSocialSvg({
       ${renderCanvasBackground(
         format.width,
         format.height,
-        styles.canvas.backgroundColor,
+        system.theme.background,
       )}
 
       ${renderSocialPhoto({
@@ -196,40 +232,36 @@ export function renderSocialSvg({
         styles,
       })}
 
-      ${renderSocialOfferMode({
-        creative,
-        slot: slots.offerMode,
-        styles,
+      ${renderSurfaceCard({
+        slot: layout.titleCard,
+        radius: system.components.titleCard.radius,
+        fill: system.theme.surface,
       })}
 
       ${renderSocialCourseName({
         creative,
         slot: slots.courseName,
         styles,
+        variant: getCourseNameVariant(creative, formatId),
       })}
 
-      ${renderSocialBenefit({
+      ${renderSocialCourseFacts({
         creative,
-        slot: slots.benefit,
-        styles,
+        slot: slots.courseFacts,
+        system,
       })}
 
-      ${renderSocialPrice({
+      ${renderSocialCourseBadges({
         creative,
-        slot: slots.price,
-        styles,
-      })}
-
-      ${renderSocialStartDate({
-        creative,
-        slot: slots.startDate,
-        styles,
+        slot: slots.courseBadges,
+        system,
       })}
 
       ${renderSocialCity({
         creative,
         slot: slots.city,
         styles,
+        variant: 'compact',
       })}
 
       ${renderSocialBrandLogo({
@@ -239,7 +271,7 @@ export function renderSocialSvg({
       })}
 
       ${showDebugOverlay
-        ? renderSafeZoneOverlay(format, styles.debug.safeZoneStroke)
+        ? renderSafeZoneOverlay(layout.safeArea, styles.debug.safeZoneStroke)
         : ''}
       ${showDebugOverlay
         ? renderDebugOverlay(slots, styles.debug.slotStroke)
