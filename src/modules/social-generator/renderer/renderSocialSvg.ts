@@ -12,6 +12,7 @@ import {
 import { getSocialFormat } from './socialFormats';
 import { createSocialResponsiveLayout } from './layout/createSocialResponsiveLayout';
 import { createSocialComponentStyles } from './socialComponentStyles';
+import { renderSocialBackground } from './renderSocialBackground';
 import { renderSocialBrandLogo } from './renderSocialBrandLogo';
 import { renderSocialCity } from './renderSocialCity';
 import { renderSocialCourseBadges } from './renderSocialCourseBadges';
@@ -38,22 +39,6 @@ function escapeXml(value: string): string {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&apos;');
-}
-
-function renderCanvasBackground(
-  width: number,
-  height: number,
-  fill: string,
-): string {
-  return `
-    <rect
-      x="0"
-      y="0"
-      width="${width}"
-      height="${height}"
-      fill="${fill}"
-    />
-  `;
 }
 
 function renderSurfaceCard({
@@ -200,11 +185,7 @@ export function renderSocialSvg({
       role="img"
       aria-label="${escapeXml(creative.courseName)}"
     >
-      ${renderCanvasBackground(
-        format.width,
-        format.height,
-        system.theme.background,
-      )}
+      ${renderSocialBackground({ system })}
 
       ${renderSocialPhoto({
         creative,
@@ -254,6 +235,7 @@ export function renderSocialSvg({
         creative,
         slot: slots.brandLogo,
         styles,
+        system,
       })}
 
       ${showDebugOverlay

@@ -10,6 +10,7 @@ export const socialDesignTokens = {
   brands: {
     edukacja: {
       name: 'TEB Edukacja',
+      logoPath: '/creative-stack/logos/teb-edukacja.svg',
       primary: '#102D69',
       secondary: '#0F4496',
       light: '#E8F0FF',
@@ -20,6 +21,7 @@ export const socialDesignTokens = {
 
     kursy: {
       name: 'TEB Kursy',
+      logoPath: '/creative-stack/logos/teb-edukacja.svg',
       primary: '#994365',
       secondary: '#C7839F',
       light: '#F7E6EF',
@@ -30,6 +32,7 @@ export const socialDesignTokens = {
 
     medyczne: {
       name: 'TEB Szkoły Medyczne',
+      logoPath: '/creative-stack/logos/teb-edukacja.svg',
       primary: '#009489',
       secondary: '#B8DDD5',
       light: '#E4F5F2',
@@ -40,6 +43,7 @@ export const socialDesignTokens = {
 
     policealne: {
       name: 'TEB Szkoły Policealne',
+      logoPath: '/creative-stack/logos/teb-edukacja.svg',
       primary: '#E27D00',
       secondary: '#F5B062',
       light: '#FFF0DE',
@@ -174,6 +178,18 @@ export const socialDesignTokens = {
   },
 
   components: {
+    background: {
+      patternColor: '#FFFFFF',
+      patternOpacity: 0.32,
+      patternColumns: 12,
+      patternGap: 10,
+      patternRowGap: 10,
+      patternInsetX: 20,
+      patternInsetY: 20,
+      patternRotate: 0,
+      patternStagger: true,
+    },
+
     titleCard: {
       radius: 40,
       paddingX: 44,

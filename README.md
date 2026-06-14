@@ -1,22 +1,136 @@
 # TEB Creative Stack Generator
 
-Lekki generator kreacji reklamowych dla TEB Edukacja, oparty o dane, komponenty, szablony SVG i reguły walidacji.
+Lekki generator kreacji reklamowych dla TEB Edukacja, oparty o dane, komponenty, szablony SVG, design system i reguły walidacji.
+
+Projekt rozwija się w dwóch równoległych kierunkach:
+
+- `ads-generator` — moduł grafik Google Ads, który stanowi pierwszy działający fundament projektu.
+- `social-generator` — moduł grafik social media, rozwijany jako bardziej responsywny system kompozycji oparty o dane kierunku, format, brand i design tokens.
 
 ## Cel projektu
 
-Pierwszym zastosowaniem jest generowanie grafik Google Ads dla kierunków TEB Edukacja w 3 formatach. Projekt ma być jednak przygotowany szerzej jako fundament pod późniejsze generowanie grafik stackowych, m.in. pod social media.
+Celem projektu jest stworzenie narzędzia do szybkiego, spójnego i skalowalnego generowania materiałów graficznych TEB dla wielu kierunków, miast, marek i formatów.
 
-## Zakres MVP
+Pierwszym zastosowaniem był generator Google Ads. Aktualnie rozwijany jest moduł social media, który ma stać się podstawą do generowania zestawów grafik z jednego draftu kreacji.
+
+## Status projektu
+
+### Google Ads
+
+Moduł Google Ads ma działające techniczne MVP.
+
+Obecnie działa:
+
+- lokalny projekt Vue 3 + TypeScript + Vite,
+- moduł `ads-generator`,
+- dane kierunków, miast, brandów i zdjęć,
+- resolver danych,
+- podgląd SVG w 3 formatach Google Ads,
+- prawdziwe logo TEB Edukacja SVG,
+- podpięte fonty Roc Grotesk,
+- text fitting i logika łamania długich nazw,
+- podstawowy walidator jakości kreacji,
+- roboczy widok kontroli jakości.
+
+Do dopracowania:
+
+- finalna kalibracja layoutów,
+- eksport PNG,
+- eksport ZIP,
+- batch generation,
+- raport eksportu i walidacji.
+
+### Social Generator
+
+Moduł `social-generator` jest aktywnie rozwijany na gałęzi:
+
+```txt
+feature/social-generator
+```
+
+Zrealizowano:
+
+- strukturę modułu `src/modules/social-generator/`,
+- wspólną warstwę `src/modules/creative-stack/`,
+- formaty social:
+  - `1080×1080`,
+  - `1080×1350`,
+  - `1080×1920`,
+- mockowe dane social i partnerów,
+- helper `publicAssetPath.ts` obsługujący `BASE_URL`,
+- podgląd jednego aktywnego formatu:
+  - `SocialPreviewStage.vue`,
+  - `SocialGeneratorSmokeTest.vue`,
+- renderery SVG elementów social,
+- debug overlay dla safe zone i slotów,
+- osobny social design system:
+  - `socialDesignTokens.ts`,
+  - `createSocialDesignSystem.ts`,
+- model danych:
+  - `courseNameParts`,
+  - `courseFacts`,
+  - `courseBadges`,
+- renderery:
+  - `renderSocialCourseFacts.ts`,
+  - `renderSocialCourseBadges.ts`,
+- responsywny title flow:
+  - auto-fit po skali tytułu,
+  - maksymalnie 3 linie,
+  - strukturalny podział nazwy na `main`, `subtitle`, `modeLabel`,
+  - pełna szerokość netto dla title card,
+  - dynamiczna wysokość title card zależna od treści.
+
+Aktualny kierunek rozwoju:
+
+```txt
+jeden draft kreacji
++ jeden aktywny podgląd
++ responsywny layout flow
++ eksport paczki formatów
+```
+
+## Najważniejsza decyzja architektoniczna social-generatora
+
+Social Generator nie powinien być zestawem ręcznie utrzymywanych layoutów dla każdego formatu. Projekt przyjmuje model:
+
+```txt
+format → brand → design system → layout flow → SVG renderer
+```
+
+Użytkownik pracuje na jednym aktywnym podglądzie i przełącza format, np. `1:1`, `4:5`, `9:16`. Dane kreacji pozostają wspólne. Eksport docelowo wygeneruje całą paczkę formatów z jednego draftu.
+
+## Zakres Google Ads MVP
 
 - 3 formaty Google Ads.
 - 3 zestawy kolorystyczne brandów:
-  - TEB Kursy
-  - TEB Szkoły Medyczne
-  - TEB Szkoły Policealne
+  - TEB Kursy,
+  - TEB Szkoły Medyczne,
+  - TEB Szkoły Policealne.
 - Wspólny logotyp TEB Edukacja.
 - Zmienne elementy: zdjęcie, nazwa kierunku, nazwa miasta, CTA.
-- Źródłowe zdjęcia kierunków w formacie 1080×720.
+- Źródłowe zdjęcia kierunków HD.
 - Eksport docelowo: PNG oraz paczka ZIP.
+
+## Zakres Social Generator MVP
+
+- 3 formaty social:
+  - square 1080×1080,
+  - portrait/feed 1080×1350,
+  - stories/reels 1080×1920.
+- Jeden aktywny podgląd roboczy.
+- Dane kierunku jako struktura informacyjna, nie sztywny układ kampanijny.
+- Nazwa kierunku z podziałem:
+  - `main`,
+  - `subtitle`,
+  - `modeLabel`.
+- Informacje kierunku:
+  - `courseFacts`,
+  - `courseBadges`.
+- Pominięcie ceny i rat na obecnym etapie social.
+- Obsługa kierunków online.
+- Logo partnera, jeśli kierunek ma partnera.
+- Docelowo realne logo brandu w lewym dolnym rogu.
+- Debug overlay dla safe zone, slotów i sekcji layoutu.
 
 ## Docelowy pipeline
 
@@ -25,26 +139,156 @@ Dane wejściowe
 → normalizacja
 → mapowanie assetów
 → wybór brandu i formatu
-→ reguły typograficzne
-→ szablon SVG
-→ render PNG
+→ design system
+→ responsive layout
+→ SVG renderer
 → walidacja
+→ render PNG
 → eksport
 ```
 
-## Planowany stack
+## Stack
 
 - Vue 3
 - TypeScript
 - Vite
-- SVG templates / SVG renderer
-- Sharp / resvg dla eksportu PNG
-- JSON / XLSX jako źródło danych
-- ZIP export
+- SVG renderer
+- JSON / XLSX jako źródła danych
+- Sharp / resvg dla eksportu PNG — planowane
+- ZIP export — planowane
+
+## Architektura warstw
+
+Projekt rozdziela dwie warstwy:
+
+```txt
+App UI
+panel, lista, filtry, playground, quality overview, preview stage
+
+Creative Output
+SVG, layouty reklam, brand tokens, design system, zdjęcia, eksport
+```
+
+Style aplikacji nie powinny sterować wyglądem finalnych grafik.
+
+Wygląd finalnych grafik powinien wynikać z:
+
+```txt
+brand tokens
++ design tokens
++ layout config
++ renderery SVG
+```
+
+## Główne katalogi
+
+```txt
+src/modules/creative-stack/
+  design-system/
+  svg-components/
+  utils/
+
+src/modules/ads-generator/
+  data/
+  renderer/
+  types/
+  validators/
+
+src/modules/social-generator/
+  components/
+  data/
+  design-system/
+  renderer/
+  types/
+```
+
+## Ważne pliki Social Generatora
+
+```txt
+src/modules/social-generator/design-system/socialDesignTokens.ts
+src/modules/social-generator/design-system/createSocialDesignSystem.ts
+src/modules/social-generator/renderer/layout/createSocialResponsiveLayout.ts
+src/modules/social-generator/renderer/layout/socialTitleFit.ts
+src/modules/social-generator/renderer/renderSocialSvg.ts
+src/modules/social-generator/renderer/renderSocialCourseName.ts
+src/modules/social-generator/renderer/renderSocialCourseFacts.ts
+src/modules/social-generator/renderer/renderSocialCourseBadges.ts
+src/modules/social-generator/types/social.types.ts
+src/modules/social-generator/data/social-creatives.mock.ts
+```
+
+## Design system social
+
+Social Generator korzysta z własnego design systemu opartego o skalę 4 px:
+
+```txt
+4, 8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64, 72, 80, 96, 112, 128
+```
+
+Tokeny definiują:
+
+- brandy,
+- kolory,
+- typografię,
+- line height,
+- spacing,
+- radius,
+- safe zones,
+- formaty,
+- title card,
+- badge,
+- logo box,
+- partner box,
+- info grid.
+
+Zasada:
+
+```txt
+wartości liczbowe mogą istnieć w tokenach,
+ale nie powinny być powielane bezpośrednio w rendererach.
+```
+
+## Komendy
+
+Instalacja zależności:
+
+```bash
+npm install
+```
+
+Uruchomienie projektu lokalnie:
+
+```bash
+npm run dev
+```
+
+Build kontrolny:
+
+```bash
+npm run build
+```
+
+## Zasady pracy
+
+Na początku sesji:
+
+1. Sprawdź `BACKLOG.md`.
+2. Sprawdź dokument projektowy modułu, nad którym pracujesz.
+3. Wybierz jedno zadanie na sesję.
+
+Na końcu sesji:
+
+1. Uruchom `npm run build`.
+2. Zaktualizuj backlog.
+3. Dopisz zmianę do dokumentacji lub changeloga.
+4. Zrób mały commit opisujący jeden logiczny krok.
 
 ## Struktura dokumentacji
 
 ```txt
+README.md
+BACKLOG.md
+SOCIAL_GENERATOR_DESIGN.md
 docs/
   00_project-overview.md
   01_product-brief.md
@@ -58,238 +302,4 @@ docs/
   09_decisions.md
   decisions/
   templates/
-BACKLOG.md
 ```
-
-## Jak korzystać z dokumentacji
-
-Na początku sesji pracy:
-
-1. Sprawdź `BACKLOG.md`.
-2. Sprawdź ostatni wpis w `docs/08_changelog.md`.
-3. Wybierz jedno zadanie na sesję.
-
-Na końcu sesji pracy:
-
-1. Dopisz krótki wpis do changeloga.
-2. Zaktualizuj backlog.
-3. Dodaj decyzję do `docs/decisions/`, jeśli zmienił się kierunek projektu.
-
-# Aktualizacje do istniejących dokumentów
-
-## README.md — dopisz / zaktualizuj sekcję „Status projektu”
-
-```md
-## Status projektu
-
-Projekt znajduje się na etapie technicznego MVP dla Google Ads.
-
-Obecnie działa:
-
-- lokalny projekt Vue 3 + TypeScript + Vite,
-- moduł `ads-generator`,
-- dane kierunków, miast, brandów i zdjęć,
-- resolver danych,
-- playground do testowania wybranego kierunku i miasta,
-- podgląd SVG w 3 formatach Google Ads,
-- prawdziwe logo TEB Edukacja SVG,
-- text fitting v0.1,
-- walidator jakości kreacji,
-- widok Quality Overview dla całej bazy kierunków.
-
-Jeszcze nie działa:
-
-- eksport PNG,
-- eksport ZIP,
-- batch generation,
-- finalna kalibracja layoutów,
-- moduł social media.
-```
-
-## README.md — dopisz sekcję „Architektura warstw”
-
-````md
-## Architektura warstw
-
-Projekt rozdziela dwie warstwy:
-
-```txt
-App UI
-panel, lista, filtry, playground, Quality Overview
-
-Creative Output
-SVG, layouty reklam, brand tokens, zdjęcia, eksport
-````
-
-Style aplikacji nie powinny sterować wyglądem finalnych grafik.
-
-Layouty reklam są definiowane w TypeScript, przede wszystkim w:
-
-```txt
-src/modules/ads-generator/renderer/googleAdsLayouts.ts
-```
-
-Figma Dev Mode może służyć jako źródło wartości wizualnych, ale nie jest silnikiem produkcyjnym generatora.
-
-````
-
----
-
-## docs/04_generator-architecture.md — dopisz sekcję „Aktualny pipeline”
-
-```md
-## Aktualny pipeline
-
-Obecny przepływ danych wygląda tak:
-
-```txt
-courseId + cityId
-↓
-resolveCreativeInput()
-↓
-ResolvedCreativeInput
-↓
-validateGoogleAdsCreative()
-↓
-renderAdSvg()
-↓
-podgląd SVG w 3 formatach Google Ads
-````
-
-Kluczowe pliki:
-
-```txt
-src/modules/ads-generator/utils/creativeResolver.ts
-src/modules/ads-generator/validators/validateGoogleAdsCreative.ts
-src/modules/ads-generator/renderer/renderAdSvg.ts
-src/modules/ads-generator/renderer/googleAdsLayouts.ts
-src/modules/ads-generator/renderer/textFit.ts
-```
-
-Aktualnie renderer generuje podgląd SVG. Eksport PNG nie został jeszcze wdrożony.
-
-````
-
-## docs/04_generator-architecture.md — dopisz sekcję „Warstwy odpowiedzialności”
-
-```md
-## Warstwy odpowiedzialności
-
-### Data layer
-
-Źródła danych generatora:
-
-```txt
-courses.normalized.json
-cities.normalized.json
-brands.json
-image-map.final.json
-campaigns.json
-````
-
-### Resolver layer
-
-Łączy dane kierunku, miasta, brandu, zdjęcia i kampanii w jeden obiekt:
-
-```txt
-ResolvedCreativeInput
-```
-
-### Validation layer
-
-Sprawdza, czy kreacja jest bezpieczna produkcyjnie:
-
-```txt
-OK
-WARNING
-ERROR
-```
-
-### Renderer layer
-
-Generuje SVG na podstawie danych i layout configu.
-
-### App UI layer
-
-Udostępnia playground i Quality Overview. Nie powinna decydować o finalnym wyglądzie reklam.
-
-````
-
----
-
-## docs/05_validation-rules.md — dopisz sekcję „Aktualne reguły walidacji”
-
-```md
-## Aktualne reguły walidacji
-
-Walidator `validateGoogleAdsCreative()` sprawdza:
-
-- status zdjęcia,
-- flagi przeglądu kierunku,
-- flagi przeglądu miasta,
-- poprawność brandu,
-- dopasowanie tytułu do karty tytułowej,
-- dopasowanie dopisku do karty tytułowej,
-- dopasowanie miasta do pigułki w action row,
-- minimalne rozmiary fontów.
-
-Statusy:
-
-```txt
-OK — kreacja nie ma wykrytych problemów
-WARNING — kreacja może wymagać przeglądu
-ERROR — kreacja nie powinna być eksportowana bez poprawki
-````
-
-Walidacja jest obecnie oparta na estymacji szerokości tekstu. Po podpięciu fontu Roc Grotesk i kalibracji layoutów reguły powinny zostać doprecyzowane.
-
-````
-
----
-
-## docs/07_roadmap.md — podmień najbliższe etapy
-
-```md
-## Roadmap
-
-### Etap 1 — Refactor struktury
-
-- Globalne style UI.
-- Rozbicie renderera SVG na mniejsze pliki.
-- Utrzymanie obecnego działania aplikacji.
-- Build kontrolny.
-
-### Etap 2 — Kalibracja layoutów Google Ads
-
-- Dopracowanie 1200×1200.
-- Dopracowanie 1200×628.
-- Dopracowanie 960×1200.
-- Przeniesienie wartości z Figma Dev Mode do `googleAdsLayouts.ts`.
-
-### Etap 3 — Typografia
-
-- Podpięcie fontu Roc Grotesk.
-- Text fitting v0.2.
-- Warianty dla długich nazw.
-- Lepsza obsługa długich miast.
-
-### Etap 4 — Eksport
-
-- Eksport pojedynczego SVG/PNG.
-- Eksport 3 formatów dla jednej kreacji.
-- Eksport ZIP.
-- Raport eksportu.
-
-### Etap 5 — Produkcja masowa
-
-- Wybór wielu kierunków.
-- Wybór wielu miast.
-- Eksport tylko kreacji OK / OK + WARNING.
-- Raport błędów.
-
-### Etap 6 — Social media
-
-- Format social media.
-- Wykorzystanie pól startu, przewag, partnerów i certyfikatów.
-- Osobne layouty social.
-````

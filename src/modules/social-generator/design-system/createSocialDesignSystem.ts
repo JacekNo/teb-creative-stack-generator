@@ -230,6 +230,30 @@ export function createSocialDesignSystem({
   };
 
   const components = {
+    background: {
+      ...socialDesignTokens.components.background,
+      patternGap: scaleNumber(
+        socialDesignTokens.components.background.patternGap,
+        scaleFactor,
+        grid,
+      ),
+      patternRowGap: scaleNumber(
+        socialDesignTokens.components.background.patternRowGap,
+        scaleFactor,
+        grid,
+      ),
+      patternInsetX: scaleNumber(
+        socialDesignTokens.components.background.patternInsetX,
+        scaleFactor,
+        grid,
+      ),
+      patternInsetY: scaleNumber(
+        socialDesignTokens.components.background.patternInsetY,
+        scaleFactor,
+        grid,
+      ),
+    },
+
     titleCard: {
       ...socialDesignTokens.components.titleCard,
       radius: scaleNumber(

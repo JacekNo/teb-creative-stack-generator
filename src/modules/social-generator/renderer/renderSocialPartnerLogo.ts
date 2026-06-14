@@ -1,3 +1,4 @@
+import { publicAssetExists } from '../../creative-stack/utils/publicAssetExists';
 import { publicAssetPath } from '../../creative-stack/utils/publicAssetPath';
 import type {
   SocialCreativeData,
@@ -43,6 +44,10 @@ export function renderSocialPartnerLogo({
   }
 
   if (!creative.partner) {
+    return '';
+  }
+
+  if (!publicAssetExists(creative.partner.logoPath)) {
     return '';
   }
 

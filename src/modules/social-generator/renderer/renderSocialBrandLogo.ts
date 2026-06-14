@@ -1,3 +1,6 @@
+import { publicAssetExists } from '../../creative-stack/utils/publicAssetExists';
+import { publicAssetPath } from '../../creative-stack/utils/publicAssetPath';
+import type { SocialDesignSystem } from '../design-system/createSocialDesignSystem';
 import type {
   SocialCreativeData,
   SocialLayoutSlot,
@@ -8,6 +11,7 @@ export type RenderSocialBrandLogoOptions = {
   creative: SocialCreativeData;
   slot: SocialLayoutSlot;
   styles: SocialComponentStyles;
+  system: SocialDesignSystem;
 };
 
 function escapeXml(value: string): string {
@@ -19,33 +23,36 @@ function escapeXml(value: string): string {
     .replaceAll("'", '&apos;');
 }
 
-function getBrandLabel(brandKey: string): string {
-  if (brandKey === 'kursy') {
-    return 'TEB Kursy';
-  }
-
-  if (brandKey === 'medyczne') {
-    return 'TEB Medyczne';
-  }
-
-  if (brandKey === 'policealne') {
-    return 'TEB Policealne';
-  }
-
-  return 'TEB Edukacja';
-}
-
 export function renderSocialBrandLogo({
   creative,
   slot,
   styles,
+  system,
 }: RenderSocialBrandLogoOptions): string {
   if (!creative.enabledComponents.includes('brandLogo')) {
     return '';
   }
 
   const style = styles.brandLogo.default;
-  const brandLabel = getBrandLabel(creative.brandKey);
+  const logoPath = system.brand.logoPath;
+
+  if (publicAssetExists(logoPath)) {
+    return `
+      <g data-component="social-brand-logo">
+        <image
+          href="${escapeXml(publicAssetPath(logoPath))}"
+          x="${slot.x}"
+          y="${slot.y}"
+          width="${slot.width}"
+          height="${slot.height}"
+          preserveAspectRatio="xMinYMid meet"
+          aria-label="${escapeXml(system.brand.name)}"
+        />
+      </g>
+    `;
+  }
+
+  const brandLabel = system.brand.name;
   const baselineY = slot.y + Math.min(slot.height, style.maxHeight) * 0.72;
 
   return `
