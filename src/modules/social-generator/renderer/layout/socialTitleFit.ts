@@ -87,14 +87,6 @@ export function resolveSocialCourseNameParts(
   }
 
   const normalizedName = normalizeWhitespace(creative.courseName);
-  const onlineSuffix = /\s+ONLINE$/i;
-
-  if (onlineSuffix.test(normalizedName)) {
-    return {
-      main: normalizeWhitespace(normalizedName.replace(onlineSuffix, '')),
-      modeLabel: 'ONLINE',
-    };
-  }
 
   return {
     main: normalizedName,

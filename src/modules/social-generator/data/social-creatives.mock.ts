@@ -57,11 +57,10 @@ export const socialCreativesMock: SocialCreativeData[] = [
 
   {
     courseId: 'pku-programowanie-python-z-cisco-networking-academy',
-    courseName: 'Programowanie Python z Cisco Networking Academy ONLINE',
+    courseName: 'Programowanie Python z Cisco Networking Academy',
     courseNameParts: {
       main: 'Programowanie Python',
       subtitle: 'z Cisco Networking Academy',
-      modeLabel: 'ONLINE',
     },
     brandKey: 'kursy',
     offerMode: 'online',
@@ -94,6 +93,11 @@ export const socialCreativesMock: SocialCreativeData[] = [
     ],
 
     courseBadges: [
+      {
+        id: 'online',
+        label: 'nauka online',
+        tone: 'online',
+      },
       {
         id: 'no-matura',
         label: 'Nie wymagamy matury!',

@@ -211,7 +211,6 @@ Przykład:
 courseNameParts: {
   main: 'Programowanie Python',
   subtitle: 'z Cisco Networking Academy',
-  modeLabel: 'ONLINE',
 }
 ```
 
@@ -303,7 +302,7 @@ Badge UI wymaga osobnego dopracowania:
 
 - paddingi, wysokość i radius wynikają z design tokens,
 - badge’e układają się w flow z zawijaniem,
-- `modeLabel` typu `ONLINE` może być renderowany jako osobny badge przy tytule,
+- tryb online na obecnym etapie renderujemy jako pierwszy `courseBadge`,
 - course badges nie powinny dublować badge’a trybu,
 - tony kolorystyczne są brand-aware,
 - finalne warianty wizualne wymagają QA na brandach Kursy, SP, SM i Edukacja.
@@ -329,8 +328,7 @@ stationary:
 
 online:
 - domyślnie ukrywa miasto,
-- może pokazywać ONLINE w tytule,
-- może mieć badge ONLINE,
+- pokazuje `nauka online` jako pierwszy badge w tonie `online`,
 - może mieć fact „Zajęcia online na żywo”.
 ```
 
@@ -497,7 +495,7 @@ Zrealizowano:
 - dodać tony badge’y,
 - poprawić flow i zawijanie,
 - oprzeć paddingi i rozmiary o design tokens,
-- wykonane: `modeLabel` renderuje się jako osobny badge przy tytule.
+- wykonane: online może być renderowany jako badge w `courseBadges`.
 
 #### Stage 3D — dane i warianty brandów
 

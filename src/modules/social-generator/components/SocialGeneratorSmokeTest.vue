@@ -115,7 +115,7 @@ function resetFormFromCreative(creative: SocialCreativeData): void {
   const parts = creative.courseNameParts ?? {
     main: creative.courseName,
     subtitle: '',
-    modeLabel: creative.offerMode === 'online' ? 'ONLINE' : '',
+    modeLabel: '',
   };
 
   form.titleMain = getTextValue(parts.main);
